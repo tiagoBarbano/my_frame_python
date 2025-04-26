@@ -1,34 +1,32 @@
-from prometheus_client import Counter, Histogram
 import time
 
-REQUEST_COUNT = Counter("http_requests_total", "Total HTTP requests", ["method", "path", "status"])
-REQUEST_LATENCY = Histogram("http_request_duration_seconds", "Request latency", ["method", "path"])
+from prometheus_client import Histogram
+
+
+REQUEST_LATENCY = Histogram("http_request_duration_seconds", "Request latency", ["method", "path", "status"])
 
 class PrometheusMiddleware:
     def __init__(self, app):
         self.app = app
 
     async def __call__(self, scope, receive, send):
+        start_time = time.monotonic_ns()
+        
         if scope["type"] != "http" or scope["path"] == "/metrics":
             return await self.app(scope, receive, send)
 
         method = scope["method"]
         path = scope["path"]
-        status_holder = {}
-
-        start_time = time.perf_counter()
+        status_code = 500
 
         async def send_wrapper(message):
+            nonlocal status_code
             if message["type"] == "http.response.start":
-                status = message["status"]
-                status_holder["status"] = status
+                status_code = message["status"]
             await send(message)
 
         await self.app(scope, receive, send_wrapper)
 
-        duration = time.perf_counter() - start_time
-        status = str(status_holder.get("status", 500))
-
-        REQUEST_COUNT.labels(method, path, status).inc()
-        REQUEST_LATENCY.labels(method, path).observe(duration)
+        duration = (time.monotonic_ns() - start_time) / 1_000_000_000
+        REQUEST_LATENCY.labels(method, path, str(status_code)).observe(duration)
         

@@ -23,7 +23,7 @@
             "args": [
                 "--interface",
                 "asginl",
-                "main_granian:app"
+                "main:app"
             ],
             "jinja": true
         }

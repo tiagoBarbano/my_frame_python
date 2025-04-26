@@ -1,22 +1,17 @@
 import msgspec
 
-import _opentelemetry as otel
-
-# from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
-# from middleware import LoggerMiddleware
-# from prometheus import PrometheusMiddleware
+import tracing as otel
 
 from app import app, json_response, read_body, send_response
 from config import Settings
 from router import post, get
 
-# app = PrometheusMiddleware(app)
-# app = LoggerMiddleware(app)
-# app = OpenTelemetryMiddleware(app)
-
+from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
+from middleware import LoggerMiddleware
+from prometheus import PrometheusMiddleware
+from logger_conf import logger
 
 set = Settings()
-
 
 class User(msgspec.Struct):
     empresa: str
@@ -37,4 +32,9 @@ async def cotador(scope, receive, send):
 
 @get("/")
 async def hello_world(scope, receive, send):
+    # logger.info("HelloWorld")
     return await send_response(send, json_response({"message": "HelloWorld"}))
+
+
+# app = PrometheusMiddleware(app)
+# app = OpenTelemetryMiddleware(app)
