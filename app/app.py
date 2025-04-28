@@ -1,7 +1,7 @@
 import orjson
 
-from routing import routes
-from config import Settings
+from app.routing import routes
+from app.config import Settings
 
 settings = Settings()
 

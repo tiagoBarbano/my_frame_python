@@ -5,7 +5,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExport
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter  # noqa: F401
 
-from config import Settings
+from app.config import Settings
 
 
 settings = Settings()
@@ -14,14 +14,13 @@ settings = Settings()
 resource = Resource.create(attributes={"service.name": settings.app_name})
 tracer = TracerProvider(resource=resource)
 
-tracer.add_span_processor(
-   BatchSpanProcessor(ConsoleSpanExporter()
-      # OTLPSpanExporter(
-      #       endpoint="http://localhost:4317",
-      #       insecure=True,
-      # )
-   )
+exporter = (
+    ConsoleSpanExporter()
+    if settings.flag_local
+    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)
 )
+
+tracer.add_span_processor(BatchSpanProcessor(exporter))
 trace.set_tracer_provider(tracer)
 
-LoggingInstrumentor().instrument(tracer_provider=tracer) 
+LoggingInstrumentor().instrument(tracer_provider=tracer)

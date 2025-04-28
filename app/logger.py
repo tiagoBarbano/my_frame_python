@@ -9,7 +9,7 @@ import atexit
 
 from opentelemetry import trace
 
-from config import Settings
+from app.config import Settings
 
 
 settings = Settings()

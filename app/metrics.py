@@ -7,7 +7,7 @@ from prometheus_client import (
     multiprocess,
 )
 
-from config import Settings
+from app.config import Settings
 
 settings = Settings()
 

@@ -61,11 +61,17 @@ services:
       - grafana
       - prometheus
       - tempo
+    environment:
+      - PROMETHEUS_MULTIPROC_DIR=metrics
+      - APP_NAME=MY_FRAME_GRANIAN
+      - LOGGER_LEVEL=info
+      - ENDPOINT_OTEL=http://localhost:4317
+      - FLAG_LOCAL=false
     deploy:
       resources:
         limits:
-          memory: 350M
-          cpus: 2.0
+          memory: 150M
+          cpus: 1.0
     logging: *default-logging
 
   grafana:

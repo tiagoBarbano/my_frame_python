@@ -1,14 +1,5 @@
 [
     {
-        "label": "time",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "time",
-        "description": "time",
-        "detail": "time",
-        "documentation": {}
-    },
-    {
         "label": "orjson",
         "kind": 6,
         "isExtraImport": true,
@@ -19,58 +10,66 @@
     },
     {
         "label": "routes",
-        "importPath": "routing",
-        "description": "routing",
+        "importPath": "app.routing",
+        "description": "app.routing",
         "isExtraImport": true,
-        "detail": "routing",
+        "detail": "app.routing",
         "documentation": {}
     },
     {
         "label": "post",
-        "importPath": "routing",
-        "description": "routing",
+        "importPath": "app.routing",
+        "description": "app.routing",
         "isExtraImport": true,
-        "detail": "routing",
+        "detail": "app.routing",
         "documentation": {}
     },
     {
         "label": "get",
-        "importPath": "routing",
-        "description": "routing",
+        "importPath": "app.routing",
+        "description": "app.routing",
         "isExtraImport": true,
-        "detail": "routing",
+        "detail": "app.routing",
         "documentation": {}
     },
     {
         "label": "Settings",
-        "importPath": "config",
-        "description": "config",
+        "importPath": "app.config",
+        "description": "app.config",
         "isExtraImport": true,
-        "detail": "config",
+        "detail": "app.config",
         "documentation": {}
     },
     {
         "label": "Settings",
-        "importPath": "config",
-        "description": "config",
+        "importPath": "app.config",
+        "description": "app.config",
         "isExtraImport": true,
-        "detail": "config",
+        "detail": "app.config",
         "documentation": {}
     },
     {
         "label": "Settings",
-        "importPath": "config",
-        "description": "config",
+        "importPath": "app.config",
+        "description": "app.config",
         "isExtraImport": true,
-        "detail": "config",
+        "detail": "app.config",
         "documentation": {}
     },
     {
         "label": "Settings",
-        "importPath": "config",
-        "description": "config",
+        "importPath": "app.config",
+        "description": "app.config",
         "isExtraImport": true,
-        "detail": "config",
+        "detail": "app.config",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "app.config",
+        "description": "app.config",
+        "isExtraImport": true,
+        "detail": "app.config",
         "documentation": {}
     },
     {
@@ -87,30 +86,6 @@
         "description": "pydantic_settings",
         "isExtraImport": true,
         "detail": "pydantic_settings",
-        "documentation": {}
-    },
-    {
-        "label": "HttpUser",
-        "importPath": "locust",
-        "description": "locust",
-        "isExtraImport": true,
-        "detail": "locust",
-        "documentation": {}
-    },
-    {
-        "label": "task",
-        "importPath": "locust",
-        "description": "locust",
-        "isExtraImport": true,
-        "detail": "locust",
-        "documentation": {}
-    },
-    {
-        "label": "between",
-        "importPath": "locust",
-        "description": "locust",
-        "isExtraImport": true,
-        "detail": "locust",
         "documentation": {}
     },
     {
@@ -138,6 +113,15 @@
         "importPath": "sys",
         "description": "sys",
         "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
         "documentation": {}
     },
     {
@@ -181,104 +165,6 @@
         "description": "opentelemetry",
         "isExtraImport": true,
         "detail": "opentelemetry",
-        "documentation": {}
-    },
-    {
-        "label": "msgspec",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "msgspec",
-        "description": "msgspec",
-        "detail": "msgspec",
-        "documentation": {}
-    },
-    {
-        "label": "tracing",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "tracing",
-        "description": "tracing",
-        "detail": "tracing",
-        "documentation": {}
-    },
-    {
-        "label": "PrometheusMiddleware",
-        "importPath": "metrics",
-        "description": "metrics",
-        "isExtraImport": true,
-        "detail": "metrics",
-        "documentation": {}
-    },
-    {
-        "label": "prometheus_metrics",
-        "importPath": "metrics",
-        "description": "metrics",
-        "isExtraImport": true,
-        "detail": "metrics",
-        "documentation": {}
-    },
-    {
-        "label": "LoggerMiddleware",
-        "importPath": "logger",
-        "description": "logger",
-        "isExtraImport": true,
-        "detail": "logger",
-        "documentation": {}
-    },
-    {
-        "label": "app",
-        "importPath": "app",
-        "description": "app",
-        "isExtraImport": true,
-        "detail": "app",
-        "documentation": {}
-    },
-    {
-        "label": "json_response",
-        "importPath": "app",
-        "description": "app",
-        "isExtraImport": true,
-        "detail": "app",
-        "documentation": {}
-    },
-    {
-        "label": "read_body",
-        "importPath": "app",
-        "description": "app",
-        "isExtraImport": true,
-        "detail": "app",
-        "documentation": {}
-    },
-    {
-        "label": "send_response",
-        "importPath": "app",
-        "description": "app",
-        "isExtraImport": true,
-        "detail": "app",
-        "documentation": {}
-    },
-    {
-        "label": "text_response",
-        "importPath": "app",
-        "description": "app",
-        "isExtraImport": true,
-        "detail": "app",
-        "documentation": {}
-    },
-    {
-        "label": "OpenTelemetryMiddleware",
-        "importPath": "opentelemetry.instrumentation.asgi",
-        "description": "opentelemetry.instrumentation.asgi",
-        "isExtraImport": true,
-        "detail": "opentelemetry.instrumentation.asgi",
-        "documentation": {}
-    },
-    {
-        "label": "parse_excluded_urls",
-        "importPath": "opentelemetry.util.http",
-        "description": "opentelemetry.util.http",
-        "isExtraImport": true,
-        "detail": "opentelemetry.util.http",
         "documentation": {}
     },
     {
@@ -362,111 +248,341 @@
         "documentation": {}
     },
     {
+        "label": "HttpUser",
+        "importPath": "locust",
+        "description": "locust",
+        "isExtraImport": true,
+        "detail": "locust",
+        "documentation": {}
+    },
+    {
+        "label": "task",
+        "importPath": "locust",
+        "description": "locust",
+        "isExtraImport": true,
+        "detail": "locust",
+        "documentation": {}
+    },
+    {
+        "label": "between",
+        "importPath": "locust",
+        "description": "locust",
+        "isExtraImport": true,
+        "detail": "locust",
+        "documentation": {}
+    },
+    {
+        "label": "msgspec",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "msgspec",
+        "description": "msgspec",
+        "detail": "msgspec",
+        "documentation": {}
+    },
+    {
+        "label": "app.tracing",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "app.tracing",
+        "description": "app.tracing",
+        "detail": "app.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "PrometheusMiddleware",
+        "importPath": "app.metrics",
+        "description": "app.metrics",
+        "isExtraImport": true,
+        "detail": "app.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "prometheus_metrics",
+        "importPath": "app.metrics",
+        "description": "app.metrics",
+        "isExtraImport": true,
+        "detail": "app.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "LoggerMiddleware",
+        "importPath": "app.logger",
+        "description": "app.logger",
+        "isExtraImport": true,
+        "detail": "app.logger",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "importPath": "app.app",
+        "description": "app.app",
+        "isExtraImport": true,
+        "detail": "app.app",
+        "documentation": {}
+    },
+    {
+        "label": "json_response",
+        "importPath": "app.app",
+        "description": "app.app",
+        "isExtraImport": true,
+        "detail": "app.app",
+        "documentation": {}
+    },
+    {
+        "label": "read_body",
+        "importPath": "app.app",
+        "description": "app.app",
+        "isExtraImport": true,
+        "detail": "app.app",
+        "documentation": {}
+    },
+    {
+        "label": "send_response",
+        "importPath": "app.app",
+        "description": "app.app",
+        "isExtraImport": true,
+        "detail": "app.app",
+        "documentation": {}
+    },
+    {
+        "label": "text_response",
+        "importPath": "app.app",
+        "description": "app.app",
+        "isExtraImport": true,
+        "detail": "app.app",
+        "documentation": {}
+    },
+    {
+        "label": "OpenTelemetryMiddleware",
+        "importPath": "opentelemetry.instrumentation.asgi",
+        "description": "opentelemetry.instrumentation.asgi",
+        "isExtraImport": true,
+        "detail": "opentelemetry.instrumentation.asgi",
+        "documentation": {}
+    },
+    {
+        "label": "parse_excluded_urls",
+        "importPath": "opentelemetry.util.http",
+        "description": "opentelemetry.util.http",
+        "isExtraImport": true,
+        "detail": "opentelemetry.util.http",
+        "documentation": {}
+    },
+    {
         "label": "json_response",
         "kind": 2,
-        "importPath": "app",
-        "description": "app",
+        "importPath": "app.app",
+        "description": "app.app",
         "peekOfCode": "def json_response(data, status=200):\n    return status, [(b\"content-type\", b\"application/json\")], [orjson.dumps(data)]\ndef text_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/plain\")], [data]\nasync def read_body(receive):\n    body = b\"\"\n    while True:\n        message = await receive()\n        if message[\"type\"] == \"http.request\":\n            body += message.get(\"body\", b\"\")",
-        "detail": "app",
+        "detail": "app.app",
         "documentation": {}
     },
     {
         "label": "text_response",
         "kind": 2,
-        "importPath": "app",
-        "description": "app",
+        "importPath": "app.app",
+        "description": "app.app",
         "peekOfCode": "def text_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/plain\")], [data]\nasync def read_body(receive):\n    body = b\"\"\n    while True:\n        message = await receive()\n        if message[\"type\"] == \"http.request\":\n            body += message.get(\"body\", b\"\")\n            if not message.get(\"more_body\", False):\n                break",
-        "detail": "app",
+        "detail": "app.app",
         "documentation": {}
     },
     {
         "label": "settings",
         "kind": 5,
-        "importPath": "app",
-        "description": "app",
+        "importPath": "app.app",
+        "description": "app.app",
         "peekOfCode": "settings = Settings()\nasync def app(scope, receive, send):\n    method = scope[\"method\"]\n    path = scope[\"path\"]\n    handler = routes.get((path, method))\n    if handler:\n        return await handler(scope, receive, send)\n    return await send_response(send, json_response({\"error\": \"Not found\"}, 404))\ndef json_response(data, status=200):\n    return status, [(b\"content-type\", b\"application/json\")], [orjson.dumps(data)]",
-        "detail": "app",
+        "detail": "app.app",
         "documentation": {}
     },
     {
         "label": "Settings",
         "kind": 6,
-        "importPath": "config",
-        "description": "config",
-        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = None\n    app_name: str\n    logger_level: str\n    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')",
-        "detail": "config",
-        "documentation": {}
-    },
-    {
-        "label": "BenchmarkUser",
-        "kind": 6,
-        "importPath": "locustfile",
-        "description": "locustfile",
-        "peekOfCode": "class BenchmarkUser(HttpUser):\n    # wait_time = between(1, 2)\n    @task\n    def cotacao(self):\n        self.client.post(\"/cotacao\", json={\"empresa\": \"ABC\", \"valor\": 100})",
-        "detail": "locustfile",
+        "importPath": "app.config",
+        "description": "app.config",
+        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = None\n    app_name: str\n    logger_level: str = \"WARNING\"\n    endpoint_otel: str = \"http://localhost:4317\"\n    flag_local: bool = False\n    enable_tracing: bool = False\n    enable_metrics: bool = False\n    enable_logger: bool = False\n    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')",
+        "detail": "app.config",
         "documentation": {}
     },
     {
         "label": "OrjsonFormatter",
         "kind": 6,
-        "importPath": "logger",
-        "description": "logger",
+        "importPath": "app.logger",
+        "description": "app.logger",
         "peekOfCode": "class OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,\n        }\n        span = trace.get_current_span()",
-        "detail": "logger",
+        "detail": "app.logger",
         "documentation": {}
     },
     {
         "label": "LoggerMiddleware",
         "kind": 6,
-        "importPath": "logger",
-        "description": "logger",
+        "importPath": "app.logger",
+        "description": "app.logger",
         "peekOfCode": "class LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] == \"http\":\n            log.info(f\"{scope['method']} {scope['path']}\")\n        await self.app(scope, receive, send)",
-        "detail": "logger",
+        "detail": "app.logger",
         "documentation": {}
     },
     {
         "label": "settings",
         "kind": 5,
-        "importPath": "logger",
-        "description": "logger",
+        "importPath": "app.logger",
+        "description": "app.logger",
         "peekOfCode": "settings = Settings()\n_LOG_QUEUE = queue.Queue()\n_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),",
-        "detail": "logger",
+        "detail": "app.logger",
         "documentation": {}
     },
     {
         "label": "_LOG_QUEUE",
         "kind": 5,
-        "importPath": "logger",
-        "description": "logger",
+        "importPath": "app.logger",
+        "description": "app.logger",
         "peekOfCode": "_LOG_QUEUE = queue.Queue()\n_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,",
-        "detail": "logger",
+        "detail": "app.logger",
         "documentation": {}
     },
     {
         "label": "_SHUTDOWN",
         "kind": 5,
-        "importPath": "logger",
-        "description": "logger",
+        "importPath": "app.logger",
+        "description": "app.logger",
         "peekOfCode": "_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,\n        }",
-        "detail": "logger",
+        "detail": "app.logger",
         "documentation": {}
     },
     {
         "label": "log",
         "kind": 5,
-        "importPath": "logger",
-        "description": "logger",
+        "importPath": "app.logger",
+        "description": "app.logger",
         "peekOfCode": "log = _setup_logging()\n_writer_thread = threading.Thread(target=_log_writer, daemon=True)\n_writer_thread.start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] == \"http\":\n            log.info(f\"{scope['method']} {scope['path']}\")",
-        "detail": "logger",
+        "detail": "app.logger",
         "documentation": {}
     },
     {
         "label": "_writer_thread",
         "kind": 5,
-        "importPath": "logger",
-        "description": "logger",
+        "importPath": "app.logger",
+        "description": "app.logger",
         "peekOfCode": "_writer_thread = threading.Thread(target=_log_writer, daemon=True)\n_writer_thread.start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] == \"http\":\n            log.info(f\"{scope['method']} {scope['path']}\")\n        await self.app(scope, receive, send)",
-        "detail": "logger",
+        "detail": "app.logger",
+        "documentation": {}
+    },
+    {
+        "label": "PrometheusMiddleware",
+        "kind": 6,
+        "importPath": "app.metrics",
+        "description": "app.metrics",
+        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        status_code = 500",
+        "detail": "app.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "prometheus_metrics",
+        "kind": 2,
+        "importPath": "app.metrics",
+        "description": "app.metrics",
+        "peekOfCode": "def prometheus_metrics():\n    if settings.prometheus_multiproc_dir:\n        registry = CollectorRegistry()\n        multiprocess.MultiProcessCollector(registry)\n        return generate_latest(registry)\n    else:\n        return generate_latest()\nREQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)",
+        "detail": "app.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "kind": 5,
+        "importPath": "app.metrics",
+        "description": "app.metrics",
+        "peekOfCode": "settings = Settings()\ndef prometheus_metrics():\n    if settings.prometheus_multiproc_dir:\n        registry = CollectorRegistry()\n        multiprocess.MultiProcessCollector(registry)\n        return generate_latest(registry)\n    else:\n        return generate_latest()\nREQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]",
+        "detail": "app.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "REQUEST_LATENCY",
+        "kind": 5,
+        "importPath": "app.metrics",
+        "description": "app.metrics",
+        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nclass PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)",
+        "detail": "app.metrics",
+        "documentation": {}
+    },
+    {
+        "label": "route",
+        "kind": 2,
+        "importPath": "app.routing",
+        "description": "app.routing",
+        "peekOfCode": "def route(method: str, path: str):\n    def decorator(func):\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
+        "detail": "app.routing",
+        "documentation": {}
+    },
+    {
+        "label": "routes",
+        "kind": 5,
+        "importPath": "app.routing",
+        "description": "app.routing",
+        "peekOfCode": "routes = {}\ndef route(method: str, path: str):\n    def decorator(func):\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
+        "detail": "app.routing",
+        "documentation": {}
+    },
+    {
+        "label": "get",
+        "kind": 5,
+        "importPath": "app.routing",
+        "description": "app.routing",
+        "peekOfCode": "get = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
+        "detail": "app.routing",
+        "documentation": {}
+    },
+    {
+        "label": "post",
+        "kind": 5,
+        "importPath": "app.routing",
+        "description": "app.routing",
+        "peekOfCode": "post = lambda path: route(\"POST\", path)  # noqa: E731",
+        "detail": "app.routing",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "kind": 5,
+        "importPath": "app.tracing",
+        "description": "app.tracing",
+        "peekOfCode": "settings = Settings()\n\"\"\"Responsável por habilitar o OpenTelemetry para o Tracing\"\"\"\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))",
+        "detail": "app.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "resource",
+        "kind": 5,
+        "importPath": "app.tracing",
+        "description": "app.tracing",
+        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "detail": "app.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "tracer",
+        "kind": 5,
+        "importPath": "app.tracing",
+        "description": "app.tracing",
+        "peekOfCode": "tracer = TracerProvider(resource=resource)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "detail": "app.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "exporter",
+        "kind": 5,
+        "importPath": "app.tracing",
+        "description": "app.tracing",
+        "peekOfCode": "exporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "detail": "app.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "BenchmarkUser",
+        "kind": 6,
+        "importPath": "tests.locustfile",
+        "description": "tests.locustfile",
+        "peekOfCode": "class BenchmarkUser(HttpUser):\n    # wait_time = between(1, 2)\n    @task\n    def cotacao(self):\n        self.client.post(\"/cotacao\", json={\"empresa\": \"ABC\", \"valor\": 100})",
+        "detail": "tests.locustfile",
         "documentation": {}
     },
     {
@@ -479,29 +595,11 @@
         "documentation": {}
     },
     {
-        "label": "app",
+        "label": "settings",
         "kind": 5,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "app = LoggerMiddleware(app)\napp = PrometheusMiddleware(app)\napp = OpenTelemetryMiddleware(app, excluded_urls=parse_excluded_urls(\"/metrics\"), exclude_spans=[\"send\", \"receive\"])\nclass User(msgspec.Struct):\n    empresa: str\n    valor: int\ndecode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode\n@post(\"/cotador\")\nasync def cotador(scope, receive, send):",
-        "detail": "main",
-        "documentation": {}
-    },
-    {
-        "label": "app",
-        "kind": 5,
-        "importPath": "main",
-        "description": "main",
-        "peekOfCode": "app = PrometheusMiddleware(app)\napp = OpenTelemetryMiddleware(app, excluded_urls=parse_excluded_urls(\"/metrics\"), exclude_spans=[\"send\", \"receive\"])\nclass User(msgspec.Struct):\n    empresa: str\n    valor: int\ndecode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode\n@post(\"/cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)",
-        "detail": "main",
-        "documentation": {}
-    },
-    {
-        "label": "app",
-        "kind": 5,
-        "importPath": "main",
-        "description": "main",
-        "peekOfCode": "app = OpenTelemetryMiddleware(app, excluded_urls=parse_excluded_urls(\"/metrics\"), exclude_spans=[\"send\", \"receive\"])\nclass User(msgspec.Struct):\n    empresa: str\n    valor: int\ndecode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode\n@post(\"/cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)",
+        "peekOfCode": "settings = Settings()\nif settings.enable_logger:\n    app = LoggerMiddleware(app)\n# Metricas do Prometheus\nif settings.enable_metrics:\n    app = PrometheusMiddleware(app)\n    @get(\"/metrics\")\n    async def metrics(scope, receive, send):\n        body = prometheus_metrics()\n        return await send_response(send, text_response(body))",
         "detail": "main",
         "documentation": {}
     },
@@ -521,105 +619,6 @@
         "description": "main",
         "peekOfCode": "encode = msgspec.json.Encoder().encode\n@post(\"/cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)\n    result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}\n    return await send_response(send, json_response(result))\n@get(\"/\")\nasync def hello_world(scope, receive, send):\n    return await send_response(send, json_response({\"message\": \"HelloWorld\"}))",
         "detail": "main",
-        "documentation": {}
-    },
-    {
-        "label": "PrometheusMiddleware",
-        "kind": 6,
-        "importPath": "metrics",
-        "description": "metrics",
-        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        status_code = 500",
-        "detail": "metrics",
-        "documentation": {}
-    },
-    {
-        "label": "prometheus_metrics",
-        "kind": 2,
-        "importPath": "metrics",
-        "description": "metrics",
-        "peekOfCode": "def prometheus_metrics():\n    if settings.prometheus_multiproc_dir:\n        registry = CollectorRegistry()\n        multiprocess.MultiProcessCollector(registry)\n        return generate_latest(registry)\n    else:\n        return generate_latest()\nREQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)",
-        "detail": "metrics",
-        "documentation": {}
-    },
-    {
-        "label": "settings",
-        "kind": 5,
-        "importPath": "metrics",
-        "description": "metrics",
-        "peekOfCode": "settings = Settings()\ndef prometheus_metrics():\n    if settings.prometheus_multiproc_dir:\n        registry = CollectorRegistry()\n        multiprocess.MultiProcessCollector(registry)\n        return generate_latest(registry)\n    else:\n        return generate_latest()\nREQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]",
-        "detail": "metrics",
-        "documentation": {}
-    },
-    {
-        "label": "REQUEST_LATENCY",
-        "kind": 5,
-        "importPath": "metrics",
-        "description": "metrics",
-        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nclass PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)",
-        "detail": "metrics",
-        "documentation": {}
-    },
-    {
-        "label": "route",
-        "kind": 2,
-        "importPath": "routing",
-        "description": "routing",
-        "peekOfCode": "def route(method: str, path: str):\n    def decorator(func):\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
-        "detail": "routing",
-        "documentation": {}
-    },
-    {
-        "label": "routes",
-        "kind": 5,
-        "importPath": "routing",
-        "description": "routing",
-        "peekOfCode": "routes = {}\ndef route(method: str, path: str):\n    def decorator(func):\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
-        "detail": "routing",
-        "documentation": {}
-    },
-    {
-        "label": "get",
-        "kind": 5,
-        "importPath": "routing",
-        "description": "routing",
-        "peekOfCode": "get = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
-        "detail": "routing",
-        "documentation": {}
-    },
-    {
-        "label": "post",
-        "kind": 5,
-        "importPath": "routing",
-        "description": "routing",
-        "peekOfCode": "post = lambda path: route(\"POST\", path)  # noqa: E731",
-        "detail": "routing",
-        "documentation": {}
-    },
-    {
-        "label": "settings",
-        "kind": 5,
-        "importPath": "tracing",
-        "description": "tracing",
-        "peekOfCode": "settings = Settings()\n\"\"\"Responsável por habilitar o OpenTelemetry para o Tracing\"\"\"\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(ConsoleSpanExporter()\n      # OTLPSpanExporter(\n      #       endpoint=\"http://localhost:4317\",\n      #       insecure=True,\n      # )",
-        "detail": "tracing",
-        "documentation": {}
-    },
-    {
-        "label": "resource",
-        "kind": 5,
-        "importPath": "tracing",
-        "description": "tracing",
-        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(ConsoleSpanExporter()\n      # OTLPSpanExporter(\n      #       endpoint=\"http://localhost:4317\",\n      #       insecure=True,\n      # )\n   )\n)",
-        "detail": "tracing",
-        "documentation": {}
-    },
-    {
-        "label": "tracer",
-        "kind": 5,
-        "importPath": "tracing",
-        "description": "tracing",
-        "peekOfCode": "tracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(ConsoleSpanExporter()\n      # OTLPSpanExporter(\n      #       endpoint=\"http://localhost:4317\",\n      #       insecure=True,\n      # )\n   )\n)\ntrace.set_tracer_provider(tracer)",
-        "detail": "tracing",
         "documentation": {}
     }
 ]

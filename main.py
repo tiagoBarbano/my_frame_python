@@ -1,18 +1,37 @@
 import msgspec
 
-import tracing as otel  # noqa: F401
-from metrics import PrometheusMiddleware, prometheus_metrics
-from logger import LoggerMiddleware
+import app.tracing as otel  # noqa: F401
+from app.metrics import PrometheusMiddleware, prometheus_metrics
+from app.logger import LoggerMiddleware
 
-from app import app, json_response, read_body, send_response, text_response
-from routing import post, get
+from app.app import app, json_response, read_body, send_response, text_response
+from app.routing import post, get
 
 from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
 from opentelemetry.util.http import parse_excluded_urls
+from app.config import Settings
 
-app = LoggerMiddleware(app)
-app = PrometheusMiddleware(app)
-app = OpenTelemetryMiddleware(app, excluded_urls=parse_excluded_urls("/metrics"), exclude_spans=["send", "receive"])
+settings = Settings()
+
+if settings.enable_logger:
+    app = LoggerMiddleware(app)
+
+# Metricas do Prometheus
+if settings.enable_metrics:
+    app = PrometheusMiddleware(app)
+        
+    @get("/metrics")
+    async def metrics(scope, receive, send):
+        body = prometheus_metrics()
+        return await send_response(send, text_response(body))
+
+
+if settings.enable_tracing:
+    app = OpenTelemetryMiddleware(
+        app,
+        excluded_urls=parse_excluded_urls("/metrics"),
+        exclude_spans=["send", "receive"],
+    )
 
 
 class User(msgspec.Struct):
@@ -37,8 +56,3 @@ async def hello_world(scope, receive, send):
     return await send_response(send, json_response({"message": "HelloWorld"}))
 
 
-# Metricas do Prometheus
-@get("/metrics")
-async def metrics(scope, receive, send):
-    body = prometheus_metrics()
-    return await send_response(send, text_response(body))
