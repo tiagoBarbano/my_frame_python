@@ -14,3 +14,4 @@ granian==2.2.5
 orjson==3.10.16
 ujson==5.10.0
 prometheus-client==0.21.1
+python-logging-loki==0.3.1

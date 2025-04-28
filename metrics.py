@@ -1,9 +1,30 @@
 import time
 
-from prometheus_client import Histogram
+from prometheus_client import (
+    Histogram,
+    CollectorRegistry,
+    generate_latest,
+    multiprocess,
+)
+
+from config import Settings
+
+settings = Settings()
 
 
-REQUEST_LATENCY = Histogram("http_request_duration_seconds", "Request latency", ["method", "path", "status"])
+def prometheus_metrics():
+    if settings.prometheus_multiproc_dir:
+        registry = CollectorRegistry()
+        multiprocess.MultiProcessCollector(registry)
+        return generate_latest(registry)
+    else:
+        return generate_latest()
+
+
+REQUEST_LATENCY = Histogram(
+    "http_request_duration_seconds", "Request latency", ["method", "path", "status"]
+)
+
 
 class PrometheusMiddleware:
     def __init__(self, app):
@@ -11,7 +32,7 @@ class PrometheusMiddleware:
 
     async def __call__(self, scope, receive, send):
         start_time = time.monotonic_ns()
-        
+
         if scope["type"] != "http" or scope["path"] == "/metrics":
             return await self.app(scope, receive, send)
 
@@ -29,4 +50,3 @@ class PrometheusMiddleware:
 
         duration = (time.monotonic_ns() - start_time) / 1_000_000_000
         REQUEST_LATENCY.labels(method, path, str(status_code)).observe(duration)
-        

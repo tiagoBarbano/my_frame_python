@@ -1,18 +1,12 @@
 import orjson
-from prometheus_client import CollectorRegistry, generate_latest, multiprocess
 
-def prometheus_metrics():
-    registry = CollectorRegistry()
-    multiprocess.MultiProcessCollector(registry)
-    return generate_latest(registry)
+from routing import routes
+from config import Settings
 
-
-from router import routes
-
+settings = Settings()
 
 
 async def app(scope, receive, send):
-    assert scope["type"] == "http"
     method = scope["method"]
     path = scope["path"]
 
@@ -20,21 +14,15 @@ async def app(scope, receive, send):
     if handler:
         return await handler(scope, receive, send)
 
-    if path == "/metrics":
-        body = prometheus_metrics()
-        await send({
-            "type": "http.response.start",
-            "status": 200,
-            "headers": [(b"content-type", b"text/plain")],
-        })
-        await send({"type": "http.response.body", "body": body})
-        return
-
     return await send_response(send, json_response({"error": "Not found"}, 404))
 
 
 def json_response(data, status=200):
     return status, [(b"content-type", b"application/json")], [orjson.dumps(data)]
+
+
+def text_response(data, status=200):
+    return status, [(b"content-type", b"text/plain")], [data]
 
 
 async def read_body(receive):
@@ -48,7 +36,6 @@ async def read_body(receive):
     return body
 
 
-# Envio da resposta
 async def send_response(send, response):
     status, headers, body = response
     await send({"type": "http.response.start", "status": status, "headers": headers})

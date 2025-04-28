@@ -7,5 +7,5 @@ def route(method: str, path: str):
         return func
     return decorator
 
-get = lambda path: route("GET", path)
-post = lambda path: route("POST", path)
+get = lambda path: route("GET", path)  # noqa: E731
+post = lambda path: route("POST", path)  # noqa: E731

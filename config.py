@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    prometheus_multiproc_dir: str
+    prometheus_multiproc_dir: str | None = None
     app_name: str
     logger_level: str
     

@@ -1,17 +1,19 @@
 import msgspec
 
-import tracing as otel
+import tracing as otel  # noqa: F401
+from metrics import PrometheusMiddleware, prometheus_metrics
+from logger import LoggerMiddleware
 
-from app import app, json_response, read_body, send_response
-from config import Settings
-from router import post, get
+from app import app, json_response, read_body, send_response, text_response
+from routing import post, get
 
 from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
-from middleware import LoggerMiddleware
-from prometheus import PrometheusMiddleware
-from logger_conf import logger
+from opentelemetry.util.http import parse_excluded_urls
 
-set = Settings()
+app = LoggerMiddleware(app)
+app = PrometheusMiddleware(app)
+app = OpenTelemetryMiddleware(app, excluded_urls=parse_excluded_urls("/metrics"), exclude_spans=["send", "receive"])
+
 
 class User(msgspec.Struct):
     empresa: str
@@ -32,9 +34,11 @@ async def cotador(scope, receive, send):
 
 @get("/")
 async def hello_world(scope, receive, send):
-    # logger.info("HelloWorld")
     return await send_response(send, json_response({"message": "HelloWorld"}))
 
 
-# app = PrometheusMiddleware(app)
-# app = OpenTelemetryMiddleware(app)
+# Metricas do Prometheus
+@get("/metrics")
+async def metrics(scope, receive, send):
+    body = prometheus_metrics()
+    return await send_response(send, text_response(body))
