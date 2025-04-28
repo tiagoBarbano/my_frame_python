@@ -26,6 +26,14 @@
                 "main:app"
             ],
             "jinja": true
+        },
+        {
+            "type": "go",
+            "name": "debug main.go",
+            "request": "launch",
+            "mode": "auto",
+            "args": [],
+            "program": "/home/f0113800/dev/my_frame_granian/golang/main.go"
         }
     ]
 

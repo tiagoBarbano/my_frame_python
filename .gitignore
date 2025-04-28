@@ -1,3 +1,6 @@
+/fastify/node_modules
+metrics
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -116,7 +119,7 @@ ipython_config.py
 .pdm.toml
 .pdm-python
 .pdm-build/
-fastify
+
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
 

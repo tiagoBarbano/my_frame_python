@@ -1,5 +1,14 @@
 [
     {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
         "label": "orjson",
         "kind": 6,
         "isExtraImport": true,
@@ -129,15 +138,6 @@
         "importPath": "sys",
         "description": "sys",
         "detail": "sys",
-        "documentation": {}
-    },
-    {
-        "label": "time",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "time",
-        "description": "time",
-        "detail": "time",
         "documentation": {}
     },
     {
@@ -600,7 +600,7 @@
         "kind": 5,
         "importPath": "tracing",
         "description": "tracing",
-        "peekOfCode": "settings = Settings()\n\"\"\"Responsável por habilitar o OpenTelemetry para o Tracing\"\"\"\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(\n      OTLPSpanExporter(\n            endpoint=\"http://tempo:4317\",\n            insecure=True,\n      )",
+        "peekOfCode": "settings = Settings()\n\"\"\"Responsável por habilitar o OpenTelemetry para o Tracing\"\"\"\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(ConsoleSpanExporter()\n      # OTLPSpanExporter(\n      #       endpoint=\"http://localhost:4317\",\n      #       insecure=True,\n      # )",
         "detail": "tracing",
         "documentation": {}
     },
@@ -609,7 +609,7 @@
         "kind": 5,
         "importPath": "tracing",
         "description": "tracing",
-        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(\n      OTLPSpanExporter(\n            endpoint=\"http://tempo:4317\",\n            insecure=True,\n      )\n   )\n)",
+        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(ConsoleSpanExporter()\n      # OTLPSpanExporter(\n      #       endpoint=\"http://localhost:4317\",\n      #       insecure=True,\n      # )\n   )\n)",
         "detail": "tracing",
         "documentation": {}
     },
@@ -618,7 +618,7 @@
         "kind": 5,
         "importPath": "tracing",
         "description": "tracing",
-        "peekOfCode": "tracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(\n      OTLPSpanExporter(\n            endpoint=\"http://tempo:4317\",\n            insecure=True,\n      )\n   )\n)\ntrace.set_tracer_provider(tracer)",
+        "peekOfCode": "tracer = TracerProvider(resource=resource)\ntracer.add_span_processor(\n   BatchSpanProcessor(ConsoleSpanExporter()\n      # OTLPSpanExporter(\n      #       endpoint=\"http://localhost:4317\",\n      #       insecure=True,\n      # )\n   )\n)\ntrace.set_tracer_provider(tracer)",
         "detail": "tracing",
         "documentation": {}
     }

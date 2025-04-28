@@ -64,8 +64,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: 150M
-          cpus: 1.5
+          memory: 350M
+          cpus: 2.0
     logging: *default-logging
 
   grafana:

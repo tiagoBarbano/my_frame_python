@@ -15,11 +15,11 @@ resource = Resource.create(attributes={"service.name": settings.app_name})
 tracer = TracerProvider(resource=resource)
 
 tracer.add_span_processor(
-   BatchSpanProcessor(
-      OTLPSpanExporter(
-            endpoint="http://tempo:4317",
-            insecure=True,
-      )
+   BatchSpanProcessor(ConsoleSpanExporter()
+      # OTLPSpanExporter(
+      #       endpoint="http://localhost:4317",
+      #       insecure=True,
+      # )
    )
 )
 trace.set_tracer_provider(tracer)
