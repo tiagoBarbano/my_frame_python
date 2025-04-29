@@ -1,5 +1,5 @@
 from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace import TracerProvider, sampling
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter  # noqa: F401
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
@@ -11,8 +11,11 @@ from app.config import Settings
 settings = Settings()
 
 """Responsável por habilitar o OpenTelemetry para o Tracing"""
+
+# Amostragem: 5% das requisições (0.05)
+sampler = sampling.ParentBased(sampling.TraceIdRatioBased(0.10))
 resource = Resource.create(attributes={"service.name": settings.app_name})
-tracer = TracerProvider(resource=resource)
+tracer = TracerProvider(resource=resource, sampler=sampler)
 
 exporter = (
     ConsoleSpanExporter()

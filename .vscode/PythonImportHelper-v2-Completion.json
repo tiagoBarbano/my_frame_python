@@ -215,6 +215,14 @@
         "documentation": {}
     },
     {
+        "label": "sampling",
+        "importPath": "opentelemetry.sdk.trace",
+        "description": "opentelemetry.sdk.trace",
+        "isExtraImport": true,
+        "detail": "opentelemetry.sdk.trace",
+        "documentation": {}
+    },
+    {
         "label": "Resource",
         "importPath": "opentelemetry.sdk.resources",
         "description": "opentelemetry.sdk.resources",
@@ -417,7 +425,7 @@
         "kind": 6,
         "importPath": "app.config",
         "description": "app.config",
-        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = None\n    app_name: str\n    logger_level: str = \"WARNING\"\n    endpoint_otel: str = \"http://localhost:4317\"\n    flag_local: bool = False\n    enable_tracing: bool = False\n    enable_metrics: bool = True\n    enable_logger: bool = False\n    enable_swagger: bool = True",
+        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = None\n    app_name: str\n    logger_level: str = \"WARNING\"\n    endpoint_otel: str = \"http://localhost:4317\"\n    flag_local: bool = False\n    enable_tracing: bool = False\n    enable_metrics: bool = False\n    enable_logger: bool = False\n    enable_swagger: bool = False",
         "detail": "app.config",
         "documentation": {}
     },
@@ -579,7 +587,16 @@
         "kind": 5,
         "importPath": "app.tracing",
         "description": "app.tracing",
-        "peekOfCode": "settings = Settings()\n\"\"\"Responsável por habilitar o OpenTelemetry para o Tracing\"\"\"\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))",
+        "peekOfCode": "settings = Settings()\n\"\"\"Responsável por habilitar o OpenTelemetry para o Tracing\"\"\"\n# Amostragem: 5% das requisições (0.05)\nsampler = sampling.ParentBased(sampling.TraceIdRatioBased(0.10))\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)",
+        "detail": "app.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "sampler",
+        "kind": 5,
+        "importPath": "app.tracing",
+        "description": "app.tracing",
+        "peekOfCode": "sampler = sampling.ParentBased(sampling.TraceIdRatioBased(0.10))\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)",
         "detail": "app.tracing",
         "documentation": {}
     },
@@ -588,7 +605,7 @@
         "kind": 5,
         "importPath": "app.tracing",
         "description": "app.tracing",
-        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.tracing",
         "documentation": {}
     },
@@ -597,7 +614,7 @@
         "kind": 5,
         "importPath": "app.tracing",
         "description": "app.tracing",
-        "peekOfCode": "tracer = TracerProvider(resource=resource)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "tracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.tracing",
         "documentation": {}
     },

@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     endpoint_otel: str = "http://localhost:4317"
     flag_local: bool = False
     enable_tracing: bool = False
-    enable_metrics: bool = True
+    enable_metrics: bool = False
     enable_logger: bool = False
-    enable_swagger: bool = True
+    enable_swagger: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
