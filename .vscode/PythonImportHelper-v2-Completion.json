@@ -17,6 +17,14 @@
         "documentation": {}
     },
     {
+        "label": "openapi_spec",
+        "importPath": "app.routing",
+        "description": "app.routing",
+        "isExtraImport": true,
+        "detail": "app.routing",
+        "documentation": {}
+    },
+    {
         "label": "post",
         "importPath": "app.routing",
         "description": "app.routing",
@@ -30,6 +38,14 @@
         "description": "app.routing",
         "isExtraImport": true,
         "detail": "app.routing",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "importPath": "app.config",
+        "description": "app.config",
+        "isExtraImport": true,
+        "detail": "app.config",
         "documentation": {}
     },
     {
@@ -95,15 +111,6 @@
         "importPath": "logging",
         "description": "logging",
         "detail": "logging",
-        "documentation": {}
-    },
-    {
-        "label": "os",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "os",
-        "description": "os",
-        "detail": "os",
         "documentation": {}
     },
     {
@@ -346,7 +353,7 @@
         "documentation": {}
     },
     {
-        "label": "text_response",
+        "label": "text_plain_response",
         "importPath": "app.app",
         "description": "app.app",
         "isExtraImport": true,
@@ -374,16 +381,25 @@
         "kind": 2,
         "importPath": "app.app",
         "description": "app.app",
-        "peekOfCode": "def json_response(data, status=200):\n    return status, [(b\"content-type\", b\"application/json\")], [orjson.dumps(data)]\ndef text_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/plain\")], [data]\nasync def read_body(receive):\n    body = b\"\"\n    while True:\n        message = await receive()\n        if message[\"type\"] == \"http.request\":\n            body += message.get(\"body\", b\"\")",
+        "peekOfCode": "def json_response(data, status=200):\n    return status, [(b\"content-type\", b\"application/json\")], [orjson.dumps(data)]\ndef text_plain_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/plain\")], [data]\ndef text_html_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/html\")], [data]\nasync def read_body(receive):\n    body = b\"\"\n    while True:\n        message = await receive()",
         "detail": "app.app",
         "documentation": {}
     },
     {
-        "label": "text_response",
+        "label": "text_plain_response",
         "kind": 2,
         "importPath": "app.app",
         "description": "app.app",
-        "peekOfCode": "def text_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/plain\")], [data]\nasync def read_body(receive):\n    body = b\"\"\n    while True:\n        message = await receive()\n        if message[\"type\"] == \"http.request\":\n            body += message.get(\"body\", b\"\")\n            if not message.get(\"more_body\", False):\n                break",
+        "peekOfCode": "def text_plain_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/plain\")], [data]\ndef text_html_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/html\")], [data]\nasync def read_body(receive):\n    body = b\"\"\n    while True:\n        message = await receive()\n        if message[\"type\"] == \"http.request\":\n            body += message.get(\"body\", b\"\")",
+        "detail": "app.app",
+        "documentation": {}
+    },
+    {
+        "label": "text_html_response",
+        "kind": 2,
+        "importPath": "app.app",
+        "description": "app.app",
+        "peekOfCode": "def text_html_response(data, status=200):\n    return status, [(b\"content-type\", b\"text/html\")], [data]\nasync def read_body(receive):\n    body = b\"\"\n    while True:\n        message = await receive()\n        if message[\"type\"] == \"http.request\":\n            body += message.get(\"body\", b\"\")\n            if not message.get(\"more_body\", False):\n                break",
         "detail": "app.app",
         "documentation": {}
     },
@@ -392,7 +408,7 @@
         "kind": 5,
         "importPath": "app.app",
         "description": "app.app",
-        "peekOfCode": "settings = Settings()\nasync def app(scope, receive, send):\n    method = scope[\"method\"]\n    path = scope[\"path\"]\n    handler = routes.get((path, method))\n    if handler:\n        return await handler(scope, receive, send)\n    return await send_response(send, json_response({\"error\": \"Not found\"}, 404))\ndef json_response(data, status=200):\n    return status, [(b\"content-type\", b\"application/json\")], [orjson.dumps(data)]",
+        "peekOfCode": "settings = Settings()\nasync def app(scope, receive, send):\n    method = scope[\"method\"]\n    path = scope[\"path\"]\n    handler = routes.get((path, method))\n    if handler:\n        return await handler(scope, receive, send)\n    if settings.enable_swagger:\n        if path == \"/openapi.json\":\n            return await send_response(send, json_response(openapi_spec))",
         "detail": "app.app",
         "documentation": {}
     },
@@ -401,7 +417,7 @@
         "kind": 6,
         "importPath": "app.config",
         "description": "app.config",
-        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = None\n    app_name: str\n    logger_level: str = \"WARNING\"\n    endpoint_otel: str = \"http://localhost:4317\"\n    flag_local: bool = False\n    enable_tracing: bool = False\n    enable_metrics: bool = False\n    enable_logger: bool = False\n    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')",
+        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = None\n    app_name: str\n    logger_level: str = \"WARNING\"\n    endpoint_otel: str = \"http://localhost:4317\"\n    flag_local: bool = False\n    enable_tracing: bool = False\n    enable_metrics: bool = True\n    enable_logger: bool = False\n    enable_swagger: bool = True",
         "detail": "app.config",
         "documentation": {}
     },
@@ -473,7 +489,7 @@
         "kind": 6,
         "importPath": "app.metrics",
         "description": "app.metrics",
-        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        status_code = 500",
+        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if (\n            scope[\"type\"] != \"http\"\n            or scope[\"path\"] == \"/metrics\"\n        ):\n            return await self.app(scope, receive, send)",
         "detail": "app.metrics",
         "documentation": {}
     },
@@ -500,7 +516,7 @@
         "kind": 5,
         "importPath": "app.metrics",
         "description": "app.metrics",
-        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nclass PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)",
+        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nclass PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if (\n            scope[\"type\"] != \"http\"",
         "detail": "app.metrics",
         "documentation": {}
     },
@@ -509,7 +525,16 @@
         "kind": 2,
         "importPath": "app.routing",
         "description": "app.routing",
-        "peekOfCode": "def route(method: str, path: str):\n    def decorator(func):\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
+        "peekOfCode": "def route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n            \"summary\": summary,\n            \"responses\": {\"200\": {\"description\": \"Sucesso\"}},\n        }\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path, summary: route(\"get\", path, summary)  # noqa: E731",
+        "detail": "app.routing",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "kind": 5,
+        "importPath": "app.routing",
+        "description": "app.routing",
+        "peekOfCode": "settings = Settings()\nroutes = {}\nopenapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {",
         "detail": "app.routing",
         "documentation": {}
     },
@@ -518,7 +543,16 @@
         "kind": 5,
         "importPath": "app.routing",
         "description": "app.routing",
-        "peekOfCode": "routes = {}\ndef route(method: str, path: str):\n    def decorator(func):\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
+        "peekOfCode": "routes = {}\nopenapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n            \"summary\": summary,",
+        "detail": "app.routing",
+        "documentation": {}
+    },
+    {
+        "label": "openapi_spec",
+        "kind": 5,
+        "importPath": "app.routing",
+        "description": "app.routing",
+        "peekOfCode": "openapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n            \"summary\": summary,\n            \"responses\": {\"200\": {\"description\": \"Sucesso\"}},",
         "detail": "app.routing",
         "documentation": {}
     },
@@ -527,7 +561,7 @@
         "kind": 5,
         "importPath": "app.routing",
         "description": "app.routing",
-        "peekOfCode": "get = lambda path: route(\"GET\", path)  # noqa: E731\npost = lambda path: route(\"POST\", path)  # noqa: E731",
+        "peekOfCode": "get = lambda path, summary: route(\"get\", path, summary)  # noqa: E731\npost = lambda path, summary: route(\"post\", path, summary)  # noqa: E731",
         "detail": "app.routing",
         "documentation": {}
     },
@@ -536,7 +570,7 @@
         "kind": 5,
         "importPath": "app.routing",
         "description": "app.routing",
-        "peekOfCode": "post = lambda path: route(\"POST\", path)  # noqa: E731",
+        "peekOfCode": "post = lambda path, summary: route(\"post\", path, summary)  # noqa: E731",
         "detail": "app.routing",
         "documentation": {}
     },
@@ -590,7 +624,7 @@
         "kind": 6,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "class User(msgspec.Struct):\n    empresa: str\n    valor: int\ndecode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode\n@post(\"/cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)\n    result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}",
+        "peekOfCode": "class User(msgspec.Struct):\n    empresa: str\n    valor: int\ndecode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode\n@post(\"/cotador\", summary=\"Cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)\n    result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}",
         "detail": "main",
         "documentation": {}
     },
@@ -599,7 +633,7 @@
         "kind": 5,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "settings = Settings()\nif settings.enable_logger:\n    app = LoggerMiddleware(app)\n# Metricas do Prometheus\nif settings.enable_metrics:\n    app = PrometheusMiddleware(app)\n    @get(\"/metrics\")\n    async def metrics(scope, receive, send):\n        body = prometheus_metrics()\n        return await send_response(send, text_response(body))",
+        "peekOfCode": "settings = Settings()\nif settings.enable_logger:\n    app = LoggerMiddleware(app)\n# Metricas do Prometheus\nif settings.enable_metrics:\n    app = PrometheusMiddleware(app)\n    @get(\"/metrics\", summary=\"Prometheus metrics\")\n    async def metrics(scope, receive, send):\n        body = prometheus_metrics()\n        return await send_response(send, text_plain_response(body))",
         "detail": "main",
         "documentation": {}
     },
@@ -608,7 +642,7 @@
         "kind": 5,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "decode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode\n@post(\"/cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)\n    result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}\n    return await send_response(send, json_response(result))\n@get(\"/\")\nasync def hello_world(scope, receive, send):",
+        "peekOfCode": "decode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode\n@post(\"/cotador\", summary=\"Cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)\n    result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}\n    return await send_response(send, json_response(result))\n@get(\"/\", summary=\"HelloWorld\")\nasync def hello_world(scope, receive, send):",
         "detail": "main",
         "documentation": {}
     },
@@ -617,7 +651,7 @@
         "kind": 5,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "encode = msgspec.json.Encoder().encode\n@post(\"/cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)\n    result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}\n    return await send_response(send, json_response(result))\n@get(\"/\")\nasync def hello_world(scope, receive, send):\n    return await send_response(send, json_response({\"message\": \"HelloWorld\"}))",
+        "peekOfCode": "encode = msgspec.json.Encoder().encode\n@post(\"/cotador\", summary=\"Cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = decode(body)\n    result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}\n    return await send_response(send, json_response(result))\n@get(\"/\", summary=\"HelloWorld\")\nasync def hello_world(scope, receive, send):\n    return await send_response(send, json_response({\"message\": \"HelloWorld\"}))",
         "detail": "main",
         "documentation": {}
     }

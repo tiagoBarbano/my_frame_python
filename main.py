@@ -4,7 +4,7 @@ import app.tracing as otel  # noqa: F401
 from app.metrics import PrometheusMiddleware, prometheus_metrics
 from app.logger import LoggerMiddleware
 
-from app.app import app, json_response, read_body, send_response, text_response
+from app.app import app, json_response, read_body, send_response, text_plain_response
 from app.routing import post, get
 
 from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
@@ -19,11 +19,11 @@ if settings.enable_logger:
 # Metricas do Prometheus
 if settings.enable_metrics:
     app = PrometheusMiddleware(app)
-        
-    @get("/metrics")
+
+    @get("/metrics", summary="Prometheus metrics")
     async def metrics(scope, receive, send):
         body = prometheus_metrics()
-        return await send_response(send, text_response(body))
+        return await send_response(send, text_plain_response(body))
 
 
 if settings.enable_tracing:
@@ -43,7 +43,7 @@ decode = msgspec.json.Decoder(type=User).decode
 encode = msgspec.json.Encoder().encode
 
 
-@post("/cotador")
+@post("/cotador", summary="Cotador")
 async def cotador(scope, receive, send):
     body = await read_body(receive)
     data = decode(body)
@@ -51,8 +51,6 @@ async def cotador(scope, receive, send):
     return await send_response(send, json_response(result))
 
 
-@get("/")
+@get("/", summary="HelloWorld")
 async def hello_world(scope, receive, send):
     return await send_response(send, json_response({"message": "HelloWorld"}))
-
-

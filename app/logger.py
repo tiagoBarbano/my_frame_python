@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 import orjson
 import time
@@ -48,8 +47,7 @@ def _log_writer():
         stream.flush()
 
 def _setup_logging() -> logging.Logger:
-    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
-
+    log_level = settings.logger_level.upper()
     formatter = OrjsonFormatter()
 
     class QueueHandler(logging.Handler):
