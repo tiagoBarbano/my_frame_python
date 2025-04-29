@@ -65,8 +65,12 @@ services:
       - PROMETHEUS_MULTIPROC_DIR=metrics
       - APP_NAME=MY_FRAME_GRANIAN
       - LOGGER_LEVEL=info
-      - ENDPOINT_OTEL=http://localhost:4317
+      - ENDPOINT_OTEL=http://tempo:4317
       - FLAG_LOCAL=false
+      - ENABLE_TRACING=false
+      - ENABLE_METRICS=false
+      - ENABLE_LOGGER=false
+      - ENABLE_SWAGGER=false
     deploy:
       resources:
         limits:

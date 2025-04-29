@@ -89,6 +89,14 @@
         "documentation": {}
     },
     {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
         "label": "BaseSettings",
         "importPath": "pydantic_settings",
         "description": "pydantic_settings",
@@ -425,7 +433,7 @@
         "kind": 6,
         "importPath": "app.config",
         "description": "app.config",
-        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = None\n    app_name: str\n    logger_level: str = \"WARNING\"\n    endpoint_otel: str = \"http://localhost:4317\"\n    flag_local: bool = False\n    enable_tracing: bool = False\n    enable_metrics: bool = False\n    enable_logger: bool = False\n    enable_swagger: bool = False",
+        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = Field(default=None, validate_default=False)\n    app_name: str\n    logger_level: str = Field(default=\"WARNING\", validate_default=False)\n    endpoint_otel: str = Field(default=\"http://localhost:4317\", validate_default=False)\n    flag_local: bool = Field(default=False, validate_default=False)\n    enable_tracing: bool = Field(default=False, validate_default=False)\n    enable_metrics: bool = Field(default=False, validate_default=False)\n    enable_logger: bool = Field(default=False, validate_default=False)\n    enable_swagger: bool = Field(default=False, validate_default=False)",
         "detail": "app.config",
         "documentation": {}
     },
