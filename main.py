@@ -4,7 +4,7 @@ from app.core.metrics import PrometheusMiddleware
 from app.core.logger import LoggerMiddleware
 from app.core.application import app
 from app.config import Settings
-from app.router import *
+from app.router import *  # noqa: F403
 
 
 from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware

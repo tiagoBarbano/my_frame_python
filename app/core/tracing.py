@@ -10,18 +10,33 @@ from app.config import Settings
 
 settings = Settings()
 
-"""Responsável por habilitar o OpenTelemetry para o Tracing"""
 
-# Amostragem: 10% das requisições (0.10)
-sampler = sampling.ParentBased(sampling.TraceIdRatioBased(0.10))
-resource = Resource.create(attributes={"service.name": settings.app_name})
-tracer = TracerProvider(resource=resource, sampler=sampler)
+class ErrorAwareSampler(sampling.Sampler):
+    def __init__(self, ratio=0.1):
+        self.normal_sampler = sampling.TraceIdRatioBased(ratio)
+
+    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):
+        if attributes and attributes.get("force_sample") is True:
+            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)
+        return self.normal_sampler.should_sample(
+            parent_context, trace_id, name, kind, attributes, links
+        )
+
+    def get_description(self):
+        return f"ErrorAwareSampler({self.normal_sampler.get_description()})"
+
+
+"""Responsável por habilitar o OpenTelemetry para o Tracing"""
 
 exporter = (
     ConsoleSpanExporter()
     if settings.flag_local
     else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)
 )
+
+
+resource = Resource.create(attributes={"service.name": settings.app_name})
+tracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))
 
 tracer.add_span_processor(BatchSpanProcessor(exporter))
 trace.set_tracer_provider(tracer)

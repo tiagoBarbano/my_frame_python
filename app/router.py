@@ -1,3 +1,4 @@
+from app.core.exception import AppException
 from app.core.routing import post, get
 from app.core.application import (
     json_response,
@@ -17,3 +18,7 @@ async def cotador(scope, receive, send):
 @get("/", summary="HelloWorld")
 async def hello_world(scope, receive, send):
     return await send_response(send, json_response({"message": "HelloWorld"}))
+
+@get("/exception", summary="HelloWorld")
+async def exception_handler(scope, receive, send):
+    raise AppException("Recurso não encontrado", 400)

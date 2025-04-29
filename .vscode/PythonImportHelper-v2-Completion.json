@@ -9,6 +9,22 @@
         "documentation": {}
     },
     {
+        "label": "AppException",
+        "importPath": "app.core.exception",
+        "description": "app.core.exception",
+        "isExtraImport": true,
+        "detail": "app.core.exception",
+        "documentation": {}
+    },
+    {
+        "label": "AppException",
+        "importPath": "app.core.exception",
+        "description": "app.core.exception",
+        "isExtraImport": true,
+        "detail": "app.core.exception",
+        "documentation": {}
+    },
+    {
         "label": "prometheus_metrics",
         "importPath": "app.core.metrics",
         "description": "app.core.metrics",
@@ -105,6 +121,62 @@
         "documentation": {}
     },
     {
+        "label": "trace",
+        "importPath": "opentelemetry",
+        "description": "opentelemetry",
+        "isExtraImport": true,
+        "detail": "opentelemetry",
+        "documentation": {}
+    },
+    {
+        "label": "trace",
+        "importPath": "opentelemetry",
+        "description": "opentelemetry",
+        "isExtraImport": true,
+        "detail": "opentelemetry",
+        "documentation": {}
+    },
+    {
+        "label": "trace",
+        "importPath": "opentelemetry",
+        "description": "opentelemetry",
+        "isExtraImport": true,
+        "detail": "opentelemetry",
+        "documentation": {}
+    },
+    {
+        "label": "Status",
+        "importPath": "opentelemetry.trace",
+        "description": "opentelemetry.trace",
+        "isExtraImport": true,
+        "detail": "opentelemetry.trace",
+        "documentation": {}
+    },
+    {
+        "label": "StatusCode",
+        "importPath": "opentelemetry.trace",
+        "description": "opentelemetry.trace",
+        "isExtraImport": true,
+        "detail": "opentelemetry.trace",
+        "documentation": {}
+    },
+    {
+        "label": "log",
+        "importPath": "app.core.logger",
+        "description": "app.core.logger",
+        "isExtraImport": true,
+        "detail": "app.core.logger",
+        "documentation": {}
+    },
+    {
+        "label": "LoggerMiddleware",
+        "importPath": "app.core.logger",
+        "description": "app.core.logger",
+        "isExtraImport": true,
+        "detail": "app.core.logger",
+        "documentation": {}
+    },
+    {
         "label": "logging",
         "kind": 6,
         "isExtraImport": true,
@@ -156,22 +228,6 @@
         "importPath": "atexit",
         "description": "atexit",
         "detail": "atexit",
-        "documentation": {}
-    },
-    {
-        "label": "trace",
-        "importPath": "opentelemetry",
-        "description": "opentelemetry",
-        "isExtraImport": true,
-        "detail": "opentelemetry",
-        "documentation": {}
-    },
-    {
-        "label": "trace",
-        "importPath": "opentelemetry",
-        "description": "opentelemetry",
-        "isExtraImport": true,
-        "detail": "opentelemetry",
         "documentation": {}
     },
     {
@@ -369,14 +425,6 @@
         "documentation": {}
     },
     {
-        "label": "LoggerMiddleware",
-        "importPath": "app.core.logger",
-        "description": "app.core.logger",
-        "isExtraImport": true,
-        "detail": "app.core.logger",
-        "documentation": {}
-    },
-    {
         "label": "*",
         "importPath": "app.router",
         "description": "app.router",
@@ -432,8 +480,26 @@
         "kind": 5,
         "importPath": "app.core.application",
         "description": "app.core.application",
-        "peekOfCode": "settings = Settings()\nasync def app(scope, receive, send):\n    method = scope[\"method\"]\n    path = scope[\"path\"]\n    handler = routes.get((path, method))\n    if handler:\n        return await handler(scope, receive, send)\n    if settings.enable_metrics:\n        if path == \"/metrics\":\n            body = prometheus_metrics()",
+        "peekOfCode": "settings = Settings()\nasync def app(scope, receive, send):\n    try:\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        handler = routes.get((path, method))\n        if handler:\n            return await handler(scope, receive, send)\n        if settings.enable_metrics:\n            if path == \"/metrics\":",
         "detail": "app.core.application",
+        "documentation": {}
+    },
+    {
+        "label": "AppException",
+        "kind": 6,
+        "importPath": "app.core.exception",
+        "description": "app.core.exception",
+        "peekOfCode": "class AppException(Exception):\n    def __init__(self, message: str, status_code: int = 400):\n        self.message = message\n        self.status_code = status_code\n        with tracer.start_span(f\"error.{status_code}\", attributes={\"force_sample\": True}) as span:\n            span.set_status(Status(StatusCode.ERROR, message))\n            span.record_exception(self)\n        log.error(self.message, extra={\"status_code\":status_code})\n        super().__init__(message)",
+        "detail": "app.core.exception",
+        "documentation": {}
+    },
+    {
+        "label": "tracer",
+        "kind": 5,
+        "importPath": "app.core.exception",
+        "description": "app.core.exception",
+        "peekOfCode": "tracer = trace.get_tracer(\"error.tracer\")\nclass AppException(Exception):\n    def __init__(self, message: str, status_code: int = 400):\n        self.message = message\n        self.status_code = status_code\n        with tracer.start_span(f\"error.{status_code}\", attributes={\"force_sample\": True}) as span:\n            span.set_status(Status(StatusCode.ERROR, message))\n            span.record_exception(self)\n        log.error(self.message, extra={\"status_code\":status_code})\n        super().__init__(message)",
+        "detail": "app.core.exception",
         "documentation": {}
     },
     {
@@ -590,38 +656,20 @@
         "documentation": {}
     },
     {
+        "label": "ErrorAwareSampler",
+        "kind": 6,
+        "importPath": "app.core.tracing",
+        "description": "app.core.tracing",
+        "peekOfCode": "class ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio=0.1):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )\n    def get_description(self):",
+        "detail": "app.core.tracing",
+        "documentation": {}
+    },
+    {
         "label": "settings",
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "settings = Settings()\n\"\"\"Responsável por habilitar o OpenTelemetry para o Tracing\"\"\"\n# Amostragem: 10% das requisições (0.10)\nsampler = sampling.ParentBased(sampling.TraceIdRatioBased(0.10))\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)",
-        "detail": "app.core.tracing",
-        "documentation": {}
-    },
-    {
-        "label": "sampler",
-        "kind": 5,
-        "importPath": "app.core.tracing",
-        "description": "app.core.tracing",
-        "peekOfCode": "sampler = sampling.ParentBased(sampling.TraceIdRatioBased(0.10))\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)",
-        "detail": "app.core.tracing",
-        "documentation": {}
-    },
-    {
-        "label": "resource",
-        "kind": 5,
-        "importPath": "app.core.tracing",
-        "description": "app.core.tracing",
-        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
-        "detail": "app.core.tracing",
-        "documentation": {}
-    },
-    {
-        "label": "tracer",
-        "kind": 5,
-        "importPath": "app.core.tracing",
-        "description": "app.core.tracing",
-        "peekOfCode": "tracer = TracerProvider(resource=resource, sampler=sampler)\nexporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "settings = Settings()\nclass ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio=0.1):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -630,7 +678,25 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "exporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "exporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "detail": "app.core.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "resource",
+        "kind": 5,
+        "importPath": "app.core.tracing",
+        "description": "app.core.tracing",
+        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "detail": "app.core.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "tracer",
+        "kind": 5,
+        "importPath": "app.core.tracing",
+        "description": "app.core.tracing",
+        "peekOfCode": "tracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -639,7 +705,7 @@
         "kind": 6,
         "importPath": "app.config",
         "description": "app.config",
-        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = Field(default=None, validate_default=False)\n    app_name: str\n    logger_level: str = Field(default=\"WARNING\", validate_default=False)\n    endpoint_otel: str = Field(default=\"http://localhost:4317\", validate_default=False)\n    flag_local: bool = Field(default=False, validate_default=False)\n    enable_tracing: bool = Field(default=True, validate_default=False)\n    enable_metrics: bool = Field(default=True, validate_default=False)\n    enable_logger: bool = Field(default=False, validate_default=False)\n    enable_swagger: bool = Field(default=True, validate_default=False)",
+        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = Field(default=None, validate_default=False)\n    app_name: str\n    logger_level: str = Field(default=\"WARNING\", validate_default=False)\n    endpoint_otel: str = Field(default=\"http://localhost:4317\", validate_default=False)\n    flag_local: bool = Field(default=True, validate_default=False)\n    enable_tracing: bool = Field(default=True, validate_default=False)\n    enable_metrics: bool = Field(default=True, validate_default=False)\n    enable_logger: bool = Field(default=False, validate_default=False)\n    enable_swagger: bool = Field(default=True, validate_default=False)",
         "detail": "app.config",
         "documentation": {}
     },

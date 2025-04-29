@@ -35,6 +35,12 @@ class OrjsonFormatter(logging.Formatter):
         if record.exc_info:
             log_record["exception"] = self.formatException(record.exc_info)
 
+        # Adiciona campos extras
+        standard_keys = logging.LogRecord('', '', '', '', '', '', '', '').__dict__.keys()
+        for key, value in record.__dict__.items():
+            if key not in standard_keys and key not in log_record:
+                log_record[key] = value            
+
         return orjson.dumps(log_record, option=orjson.OPT_APPEND_NEWLINE)
 
 def _log_writer():
