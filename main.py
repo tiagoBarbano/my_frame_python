@@ -1,56 +1,34 @@
-import msgspec
+import app.core.tracing as otel  # noqa: F401
 
-import app.tracing as otel  # noqa: F401
-from app.metrics import PrometheusMiddleware, prometheus_metrics
-from app.logger import LoggerMiddleware
+from app.core.metrics import PrometheusMiddleware
+from app.core.logger import LoggerMiddleware
+from app.core.application import app
+from app.config import Settings
+from app.router import *
 
-from app.app import app, json_response, read_body, send_response, text_plain_response
-from app.routing import post, get
 
 from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
 from opentelemetry.util.http import parse_excluded_urls
-from app.config import Settings
 
 settings = Settings()
 
+# Define a função principal do aplicativo
+app = app
+
+# Configuração dos Middlewares
+# Habilita o Middleware de logger
 if settings.enable_logger:
     app = LoggerMiddleware(app)
 
-# Metricas do Prometheus
+# Habilita as Metricas do Prometheus
 if settings.enable_metrics:
     app = PrometheusMiddleware(app)
 
-    @get("/metrics", summary="Prometheus metrics")
-    async def metrics(scope, receive, send):
-        body = prometheus_metrics()
-        return await send_response(send, text_plain_response(body))
-
-
+# Habilita o Tracing do OpenTelemetry
 if settings.enable_tracing:
     app = OpenTelemetryMiddleware(
         app,
-        excluded_urls=parse_excluded_urls("/metrics"),
+        excluded_urls=parse_excluded_urls("/metrics,/openapi.json,/docs"),	
         exclude_spans=["send", "receive"],
     )
 
-
-class User(msgspec.Struct):
-    empresa: str
-    valor: int
-
-
-decode = msgspec.json.Decoder(type=User).decode
-encode = msgspec.json.Encoder().encode
-
-
-@post("/cotador", summary="Cotador")
-async def cotador(scope, receive, send):
-    body = await read_body(receive)
-    data = decode(body)
-    result = {"cotacao_final": data.valor * 1.23, "empresa": data.empresa}
-    return await send_response(send, json_response(result))
-
-
-@get("/", summary="HelloWorld")
-async def hello_world(scope, receive, send):
-    return await send_response(send, json_response({"message": "HelloWorld"}))

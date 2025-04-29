@@ -67,15 +67,15 @@ services:
       - LOGGER_LEVEL=info
       - ENDPOINT_OTEL=http://tempo:4317
       - FLAG_LOCAL=false
-      - ENABLE_TRACING=false
-      - ENABLE_METRICS=false
+      - ENABLE_TRACING=true
+      - ENABLE_METRICS=true
       - ENABLE_LOGGER=false
-      - ENABLE_SWAGGER=false
+      - ENABLE_SWAGGER=true
     deploy:
       resources:
         limits:
           memory: 150M
-          cpus: 1.0
+          cpus: 0.5
     logging: *default-logging
 
   grafana:

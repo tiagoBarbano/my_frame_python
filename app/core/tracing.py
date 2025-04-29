@@ -12,7 +12,7 @@ settings = Settings()
 
 """Responsável por habilitar o OpenTelemetry para o Tracing"""
 
-# Amostragem: 5% das requisições (0.05)
+# Amostragem: 10% das requisições (0.10)
 sampler = sampling.ParentBased(sampling.TraceIdRatioBased(0.10))
 resource = Resource.create(attributes={"service.name": settings.app_name})
 tracer = TracerProvider(resource=resource, sampler=sampler)

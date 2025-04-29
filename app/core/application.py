@@ -1,6 +1,7 @@
 import orjson
 
-from app.routing import routes, openapi_spec
+from app.core.metrics import prometheus_metrics
+from app.core.routing import routes, openapi_spec
 from app.config import Settings
 
 settings = Settings()
@@ -13,6 +14,11 @@ async def app(scope, receive, send):
     handler = routes.get((path, method))
     if handler:
         return await handler(scope, receive, send)
+
+    if settings.enable_metrics:
+        if path == "/metrics":
+            body = prometheus_metrics()
+            return await send_response(send, text_plain_response(body))
 
     if settings.enable_swagger:
         if path == "/openapi.json":
