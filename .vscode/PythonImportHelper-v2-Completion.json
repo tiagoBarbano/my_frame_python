@@ -25,22 +25,6 @@
         "documentation": {}
     },
     {
-        "label": "prometheus_metrics",
-        "importPath": "app.core.metrics",
-        "description": "app.core.metrics",
-        "isExtraImport": true,
-        "detail": "app.core.metrics",
-        "documentation": {}
-    },
-    {
-        "label": "PrometheusMiddleware",
-        "importPath": "app.core.metrics",
-        "description": "app.core.metrics",
-        "isExtraImport": true,
-        "detail": "app.core.metrics",
-        "documentation": {}
-    },
-    {
         "label": "routes",
         "importPath": "app.core.routing",
         "description": "app.core.routing",
@@ -73,7 +57,23 @@
         "documentation": {}
     },
     {
-        "label": "Settings",
+        "label": "get_settings",
+        "importPath": "app.config",
+        "description": "app.config",
+        "isExtraImport": true,
+        "detail": "app.config",
+        "documentation": {}
+    },
+    {
+        "label": "get_settings",
+        "importPath": "app.config",
+        "description": "app.config",
+        "isExtraImport": true,
+        "detail": "app.config",
+        "documentation": {}
+    },
+    {
+        "label": "get_settings",
         "importPath": "app.config",
         "description": "app.config",
         "isExtraImport": true,
@@ -89,7 +89,7 @@
         "documentation": {}
     },
     {
-        "label": "Settings",
+        "label": "get_settings",
         "importPath": "app.config",
         "description": "app.config",
         "isExtraImport": true,
@@ -102,30 +102,6 @@
         "description": "app.config",
         "isExtraImport": true,
         "detail": "app.config",
-        "documentation": {}
-    },
-    {
-        "label": "Settings",
-        "importPath": "app.config",
-        "description": "app.config",
-        "isExtraImport": true,
-        "detail": "app.config",
-        "documentation": {}
-    },
-    {
-        "label": "Settings",
-        "importPath": "app.config",
-        "description": "app.config",
-        "isExtraImport": true,
-        "detail": "app.config",
-        "documentation": {}
-    },
-    {
-        "label": "trace",
-        "importPath": "opentelemetry",
-        "description": "opentelemetry",
-        "isExtraImport": true,
-        "detail": "opentelemetry",
         "documentation": {}
     },
     {
@@ -228,6 +204,22 @@
         "importPath": "atexit",
         "description": "atexit",
         "detail": "atexit",
+        "documentation": {}
+    },
+    {
+        "label": "lru_cache",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
+        "label": "lru_cache",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
         "documentation": {}
     },
     {
@@ -425,6 +417,14 @@
         "documentation": {}
     },
     {
+        "label": "PrometheusMiddleware",
+        "importPath": "app.core.metrics",
+        "description": "app.core.metrics",
+        "isExtraImport": true,
+        "detail": "app.core.metrics",
+        "documentation": {}
+    },
+    {
         "label": "*",
         "importPath": "app.router",
         "description": "app.router",
@@ -480,7 +480,7 @@
         "kind": 5,
         "importPath": "app.core.application",
         "description": "app.core.application",
-        "peekOfCode": "settings = Settings()\nasync def app(scope, receive, send):\n    try:\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        handler = routes.get((path, method))\n        if handler:\n            return await handler(scope, receive, send)\n        if settings.enable_metrics:\n            if path == \"/metrics\":",
+        "peekOfCode": "settings = get_settings()\nasync def app(scope, receive, send):\n    try:\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        handler = routes.get((path, method))\n        if handler:\n            return await handler(scope, receive, send)\n        if settings.enable_swagger:\n            if path == \"/openapi.json\":",
         "detail": "app.core.application",
         "documentation": {}
     },
@@ -507,7 +507,7 @@
         "kind": 6,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "class OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,\n        }\n        span = trace.get_current_span()",
+        "peekOfCode": "class OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime(\"%Y-%m-%dT%H:%M:%SZ\", time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,\n        }\n        if record.exc_info:",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -516,7 +516,7 @@
         "kind": 6,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "class LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] == \"http\":\n            log.info(f\"{scope['method']} {scope['path']}\")\n        await self.app(scope, receive, send)",
+        "peekOfCode": "class LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.perf_counter()\n        if scope[\"type\"] == \"http\":\n            log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})\n        status_code = 200\n        body_parts = []\n        async def send_wrapper(message):",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -525,7 +525,7 @@
         "kind": 5,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "settings = Settings()\n_LOG_QUEUE = queue.Queue()\n_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),",
+        "peekOfCode": "settings = get_settings()\n_LOG_QUEUE = queue.Queue()\n_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime(\"%Y-%m-%dT%H:%M:%SZ\", time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -534,7 +534,7 @@
         "kind": 5,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "_LOG_QUEUE = queue.Queue()\n_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,",
+        "peekOfCode": "_LOG_QUEUE = queue.Queue()\n_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime(\"%Y-%m-%dT%H:%M:%SZ\", time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -543,7 +543,7 @@
         "kind": 5,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,\n        }",
+        "peekOfCode": "_SHUTDOWN = object()\nclass OrjsonFormatter(logging.Formatter):\n    __slots__ = ()\n    def format(self, record):\n        log_record = {\n            \"time\": time.strftime(\"%Y-%m-%dT%H:%M:%SZ\", time.gmtime(record.created)),\n            \"level\": record.levelname,\n            \"message\": record.getMessage(),\n            \"logger\": record.name,\n        }",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -552,7 +552,7 @@
         "kind": 5,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "log = _setup_logging()\n_writer_thread = threading.Thread(target=_log_writer, daemon=True)\n_writer_thread.start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] == \"http\":\n            log.info(f\"{scope['method']} {scope['path']}\")",
+        "peekOfCode": "log = _setup_logging()\n_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.perf_counter()\n        if scope[\"type\"] == \"http\":\n            log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -561,7 +561,7 @@
         "kind": 5,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "_writer_thread = threading.Thread(target=_log_writer, daemon=True)\n_writer_thread.start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] == \"http\":\n            log.info(f\"{scope['method']} {scope['path']}\")\n        await self.app(scope, receive, send)",
+        "peekOfCode": "_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.perf_counter()\n        if scope[\"type\"] == \"http\":\n            log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})\n        status_code = 200",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -570,7 +570,7 @@
         "kind": 6,
         "importPath": "app.core.metrics",
         "description": "app.core.metrics",
-        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if (\n            scope[\"type\"] != \"http\"\n            or scope[\"path\"] == \"/metrics\"\n        ):\n            return await self.app(scope, receive, send)",
+        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        status_code = 500",
         "detail": "app.core.metrics",
         "documentation": {}
     },
@@ -588,7 +588,7 @@
         "kind": 5,
         "importPath": "app.core.metrics",
         "description": "app.core.metrics",
-        "peekOfCode": "settings = Settings()\ndef prometheus_metrics():\n    if settings.prometheus_multiproc_dir:\n        registry = CollectorRegistry()\n        multiprocess.MultiProcessCollector(registry)\n        return generate_latest(registry)\n    else:\n        return generate_latest()\nREQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]",
+        "peekOfCode": "settings = get_settings()\ndef prometheus_metrics():\n    if settings.prometheus_multiproc_dir:\n        registry = CollectorRegistry()\n        multiprocess.MultiProcessCollector(registry)\n        return generate_latest(registry)\n    else:\n        return generate_latest()\nREQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]",
         "detail": "app.core.metrics",
         "documentation": {}
     },
@@ -597,7 +597,7 @@
         "kind": 5,
         "importPath": "app.core.metrics",
         "description": "app.core.metrics",
-        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nclass PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if (\n            scope[\"type\"] != \"http\"",
+        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nclass PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)",
         "detail": "app.core.metrics",
         "documentation": {}
     },
@@ -606,7 +606,7 @@
         "kind": 2,
         "importPath": "app.core.routing",
         "description": "app.core.routing",
-        "peekOfCode": "def route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n            \"summary\": summary,\n            \"responses\": {\"200\": {\"description\": \"Sucesso\"}},\n        }\n        routes[(path, method.upper())] = func\n        return func\n    return decorator\nget = lambda path, summary: route(\"get\", path, summary)  # noqa: E731",
+        "peekOfCode": "def route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        if settings.enable_swagger:\n            openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n                \"summary\": summary,\n                \"responses\": {\"200\": {\"description\": \"Sucesso\"}},\n            }\n        routes[(path, method.upper())] = func\n        return func\n    return decorator",
         "detail": "app.core.routing",
         "documentation": {}
     },
@@ -615,7 +615,7 @@
         "kind": 5,
         "importPath": "app.core.routing",
         "description": "app.core.routing",
-        "peekOfCode": "settings = Settings()\nroutes = {}\nopenapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {",
+        "peekOfCode": "settings = Settings()\nroutes = {}\nopenapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        if settings.enable_swagger:",
         "detail": "app.core.routing",
         "documentation": {}
     },
@@ -624,7 +624,7 @@
         "kind": 5,
         "importPath": "app.core.routing",
         "description": "app.core.routing",
-        "peekOfCode": "routes = {}\nopenapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n            \"summary\": summary,",
+        "peekOfCode": "routes = {}\nopenapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        if settings.enable_swagger:\n            openapi_spec[\"paths\"].setdefault(path, {})[method] = {",
         "detail": "app.core.routing",
         "documentation": {}
     },
@@ -633,7 +633,7 @@
         "kind": 5,
         "importPath": "app.core.routing",
         "description": "app.core.routing",
-        "peekOfCode": "openapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n            \"summary\": summary,\n            \"responses\": {\"200\": {\"description\": \"Sucesso\"}},",
+        "peekOfCode": "openapi_spec = {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\"title\": settings.app_name, \"version\": \"1.0.0\"},\n    \"paths\": {},\n}\ndef route(method: str, path: str, summary: str = \"\"):\n    def decorator(func):\n        if settings.enable_swagger:\n            openapi_spec[\"paths\"].setdefault(path, {})[method] = {\n                \"summary\": summary,",
         "detail": "app.core.routing",
         "documentation": {}
     },
@@ -669,7 +669,7 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "settings = Settings()\nclass ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio=0.1):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )",
+        "peekOfCode": "settings = get_settings()\nclass ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio=0.1):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -678,7 +678,7 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "exporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "exporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.05))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -687,7 +687,7 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.05))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -696,7 +696,7 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "tracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "tracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.05))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -706,6 +706,15 @@
         "importPath": "app.config",
         "description": "app.config",
         "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = Field(default=None, validate_default=False)\n    app_name: str\n    logger_level: str = Field(default=\"WARNING\", validate_default=False)\n    endpoint_otel: str = Field(default=\"http://localhost:4317\", validate_default=False)\n    flag_local: bool = Field(default=True, validate_default=False)\n    enable_tracing: bool = Field(default=True, validate_default=False)\n    enable_metrics: bool = Field(default=True, validate_default=False)\n    enable_logger: bool = Field(default=False, validate_default=False)\n    enable_swagger: bool = Field(default=True, validate_default=False)",
+        "detail": "app.config",
+        "documentation": {}
+    },
+    {
+        "label": "get_settings",
+        "kind": 2,
+        "importPath": "app.config",
+        "description": "app.config",
+        "peekOfCode": "def get_settings():\n    return Settings()",
         "detail": "app.config",
         "documentation": {}
     },

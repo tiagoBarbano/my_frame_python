@@ -7,9 +7,9 @@ from prometheus_client import (
     multiprocess,
 )
 
-from app.config import Settings
+from app.config import get_settings
 
-settings = Settings()
+settings = get_settings()
 
 
 def prometheus_metrics():
@@ -33,10 +33,7 @@ class PrometheusMiddleware:
     async def __call__(self, scope, receive, send):
         start_time = time.monotonic_ns()
 
-        if (
-            scope["type"] != "http"
-            or scope["path"] == "/metrics"
-        ):
+        if scope["type"] != "http" or scope["path"] == "/metrics":
             return await self.app(scope, receive, send)
 
         method = scope["method"]

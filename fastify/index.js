@@ -1,5 +1,5 @@
 // const _ = require('./otel.js');
-const fastify = require('fastify')({ logger: true });
+const fastify = require('fastify')({ logger: false });
 // const fastifyMetrics = require('fastify-metrics');
 // const promClient = require('prom-client');
 

@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pydantic import Field
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -15,3 +16,8 @@ class Settings(BaseSettings):
     enable_swagger: bool = Field(default=True, validate_default=False)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+
+@lru_cache()
+def get_settings():
+    return Settings()
