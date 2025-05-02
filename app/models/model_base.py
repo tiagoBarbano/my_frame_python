@@ -19,7 +19,7 @@ class MongoModel(msgspec.Struct, kw_only=True):
         now = datetime.utcnow()
         raw = {**(data or {}), **kwargs}
         return cls(
-            _id = raw.get("_id", str(ObjectId())),
+            _id=raw.get("_id", str(ObjectId())),
             created_at=raw.get("created_at", now),
             updated_at=raw.get("updated_at", now),
             deleted=raw.get("deleted", False),

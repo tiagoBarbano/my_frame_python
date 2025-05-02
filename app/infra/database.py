@@ -22,3 +22,7 @@ class MongoDB:
         if cls._client is None:
             raise RuntimeError("MongoDB client not initialized. Call MongoDB.init first.")
         return cls._db
+
+    @classmethod
+    def close(cls):
+        cls._client.close()

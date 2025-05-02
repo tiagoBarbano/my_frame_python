@@ -28,14 +28,14 @@ async def cotador(scope, receive, send):
 async def cotador_get(scope, receive, send):
     query = parse_qs(scope.get("query_string", b"").decode())
     id = query.get("id", [None])[0]
-    
+
     key_redis = f"cotador:{id}"
     redis_client = RedisClient.get()
     cached_result = await redis_client.get(key_redis)
-    
+
     if cached_result:
         return await send_response(send, json_response(orjson.loads(cached_result)))
-    
+
     result = await User.find_by_id(id=id, db=MongoDB.get_db())
 
     if not result:

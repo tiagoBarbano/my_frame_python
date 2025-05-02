@@ -1,4 +1,5 @@
 import orjson
+import uvloop
 
 from app.core.exception import AppException
 from app.core.routing import routes, openapi_spec
@@ -6,18 +7,37 @@ from app.config import get_settings
 from app.infra.database import MongoDB
 from app.infra.redis import RedisClient
 
+uvloop.install()
+
 settings = get_settings()
+
 
 def startup():
     RedisClient.init()
     MongoDB.init("mongodb://localhost:27017", db_name="mydb")
-    
+
+
+def shutdown():
+    RedisClient.close()
+    MongoDB.close()
+
+
+async def lifespan(scope, receive, send):
+    msg = await receive()
+    if msg["type"] == "lifespan.startup":
+        startup()
+        await send({"type": "lifespan.startup.complete"})
+    elif msg["type"] == "lifespan.shutdown":
+        shutdown()
+        print("Shutting down...")
+        await send({"type": "lifespan.shutdown.complete"})
+
 
 async def app(scope, receive, send):
     try:
         if scope["type"] == "lifespan":
-            startup()
-            
+            await lifespan(scope, receive, send)
+
         method = scope["method"]
         path = scope["path"]
 
@@ -49,7 +69,9 @@ async def app(scope, receive, send):
                 </body>
                 </html>
                 """  # noqa: F541
-                return await send_response(send, text_html_response(index_html.encode("utf-8")))
+                return await send_response(
+                    send, text_html_response(index_html.encode("utf-8"))
+                )
 
         return await send_response(send, json_response({"error": "Not found"}, 404))
     except AppException as ex:
