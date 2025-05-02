@@ -6,7 +6,7 @@ from app.config import Settings
 from app.infra.database import MongoDB
 from app.infra.redis import RedisClient
 
-settings = Settings()
+settings = get_settings()
 
 def startup():
     RedisClient.init("redis://localhost:6379")

@@ -11,10 +11,11 @@ openapi_spec = {
 
 def route(method: str, path: str, summary: str = ""):
     def decorator(func):
-        openapi_spec["paths"].setdefault(path, {})[method] = {
-            "summary": summary,
-            "responses": {"200": {"description": "Sucesso"}},
-        }
+        if settings.enable_swagger:
+            openapi_spec["paths"].setdefault(path, {})[method] = {
+                "summary": summary,
+                "responses": {"200": {"description": "Sucesso"}},
+            }
 
         routes[(path, method.upper())] = func
         return func

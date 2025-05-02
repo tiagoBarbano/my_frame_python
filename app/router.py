@@ -11,6 +11,7 @@ from app.models.user_model import User, decode
 
 
 
+
 @post("/cotador", summary="Cotador")
 async def cotador(scope, receive, send):
     db = MongoDB.get_db()
@@ -25,6 +26,7 @@ async def cotador(scope, receive, send):
 @get("/", summary="HelloWorld")
 async def hello_world(scope, receive, send):
     return await send_response(send, json_response({"message": "HelloWorld"}))
+
 
 @get("/exception", summary="HelloWorld")
 async def exception_handler(scope, receive, send):

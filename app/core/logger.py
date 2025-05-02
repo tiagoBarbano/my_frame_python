@@ -9,40 +9,37 @@ import atexit
 from opentelemetry import trace
 from functools import lru_cache
 
-from app.config import Settings
+from app.config import get_settings
 
 
-settings = Settings()
+settings = get_settings()
 _LOG_QUEUE = queue.Queue()
 _SHUTDOWN = object()
+
 
 class OrjsonFormatter(logging.Formatter):
     __slots__ = ()
 
     def format(self, record):
         log_record = {
-            "time": time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(record.created)),
+            "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(record.created)),
             "level": record.levelname,
             "message": record.getMessage(),
             "logger": record.name,
         }
 
-        span = trace.get_current_span()
-        span_context = span.get_span_context()
-        if span_context and span_context.is_valid:
-            log_record["trace_id"] = format(span_context.trace_id, "032x")
-            log_record["span_id"] = format(span_context.span_id, "016x")
-
         if record.exc_info:
             log_record["exception"] = self.formatException(record.exc_info)
 
-        # Adiciona campos extras
-        standard_keys = logging.LogRecord('', '', '', '', '', '', '', '').__dict__.keys()
+        standard_keys = logging.LogRecord(
+            "", "", "", "", "", "", "", ""
+        ).__dict__.keys()
         for key, value in record.__dict__.items():
             if key not in standard_keys and key not in log_record:
-                log_record[key] = value            
+                log_record[key] = value
 
         return orjson.dumps(log_record, option=orjson.OPT_APPEND_NEWLINE)
+
 
 def _log_writer():
     stream = sys.stdout.buffer
@@ -53,6 +50,10 @@ def _log_writer():
         stream.write(record)
         stream.flush()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9560cf4597435f33e3b3ad98aca2969283c9996c
 @lru_cache()
 def _setup_logging() -> logging.Logger:
     log_level = settings.logger_level.upper()
@@ -75,6 +76,7 @@ def _setup_logging() -> logging.Logger:
 
     return logging.getLogger(settings.app_name)
 
+
 def _shutdown_logging():
     try:
         _LOG_QUEUE.put(_SHUTDOWN)
@@ -82,10 +84,10 @@ def _shutdown_logging():
     except Exception:
         pass
 
+
 log = _setup_logging()
 
-_writer_thread = threading.Thread(target=_log_writer, daemon=True)
-_writer_thread.start()
+_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()
 
 atexit.register(_shutdown_logging)
 
@@ -95,6 +97,34 @@ class LoggerMiddleware:
         self.app = app
 
     async def __call__(self, scope, receive, send):
+        start_time = time.perf_counter()
+
         if scope["type"] == "http":
-            log.info(f"{scope['method']} {scope['path']}")
-        await self.app(scope, receive, send)
+            log.info("start_process", extra={"method": scope["method"], "path": scope["path"]})
+
+        status_code = 200
+        body_parts = []
+
+        async def send_wrapper(message):
+            nonlocal status_code
+            if message["type"] == "http.response.start":
+                status_code = message["status"]
+            elif message["type"] == "http.response.body":
+                body_parts.append(message.get("body", b""))
+            await send(message)
+
+        await self.app(scope, receive, send_wrapper)
+
+        body = b"".join(body_parts)
+        finish_time = time.perf_counter()
+
+        log.info(
+            "finish_process",
+            extra={
+                "method": scope["method"],
+                "path": scope["path"],
+                "body": orjson.loads(body),
+                "status_code": status_code,
+                "time_process": finish_time - start_time,
+            },
+        )

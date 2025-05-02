@@ -5,10 +5,10 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExport
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter  # noqa: F401
 
-from app.config import Settings
+from app.config import get_settings
 
 
-settings = Settings()
+settings = get_settings()
 
 
 class ErrorAwareSampler(sampling.Sampler):
