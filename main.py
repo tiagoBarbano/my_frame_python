@@ -5,6 +5,8 @@ from app.config import Settings
 from app.router import *  # noqa: F403
 
 
+
+
 settings = Settings()
 
 # Define a função principal do aplicativo

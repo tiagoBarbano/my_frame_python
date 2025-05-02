@@ -13,33 +13,33 @@ x-logging: &default-logging
 
 version: "3"
 
-# volumes:
-#   dbdata6:
-#   redis-insight:  
+volumes:
+  dbdata6:
+  redis-insight:  
 
 services:
-  # mongodb:
-  #   image: mongo:latest
-  #   container_name: mongodb
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #   volumes:
-  #     - dbdata6:/data/db
-  #   ports:
-  #     - 27017:27017
-  #   restart: "unless-stopped"
-  #   logging: *default-logging
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - dbdata6:/data/db
+    ports:
+      - 27017:27017
+    restart: "unless-stopped"
+    # logging: *default-logging
 
 
-  # redis:
-  #   image: redis:alpine
-  #   command: ["redis-server", "/etc/redis/redis.conf", --requirepass redis1234]
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - ./redis.conf:/etc/redis/redis.conf
-  #   logging: *default-logging
+  redis:
+    image: redis:alpine
+    command: ["redis-server", "/etc/redis/redis.conf", --requirepass redis1234]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf
+    # logging: *default-logging
 
 
   # redis-insight:

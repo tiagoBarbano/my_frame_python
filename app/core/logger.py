@@ -7,6 +7,7 @@ import queue
 import atexit
 
 from opentelemetry import trace
+from functools import lru_cache
 
 from app.config import Settings
 
@@ -52,6 +53,7 @@ def _log_writer():
         stream.write(record)
         stream.flush()
 
+@lru_cache()
 def _setup_logging() -> logging.Logger:
     log_level = settings.logger_level.upper()
     formatter = OrjsonFormatter()

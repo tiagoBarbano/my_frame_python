@@ -1,7 +1,9 @@
 import msgspec
+from app.models.model_base import MongoModel
 
+class User(MongoModel):
+    __collection__ = "users"
 
-class User(msgspec.Struct):
     empresa: str
     valor: int
 

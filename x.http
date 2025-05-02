@@ -1,0 +1,6 @@
+POST http://localhost:8000/cotador
+
+{
+    "valor": 10,
+    "empresa": "teste"
+}

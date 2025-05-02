@@ -8,6 +8,8 @@ from prometheus_client import (
 )
 
 from app.config import Settings
+from app.core.application import send_response, text_plain_response
+from app.core.routing import get
 
 settings = Settings()
 
@@ -25,6 +27,13 @@ REQUEST_LATENCY = Histogram(
     "http_request_duration_seconds", "Request latency", ["method", "path", "status"]
 )
 
+if settings.enable_metrics:
+
+    @get("/metrics", summary="METRICS")
+    async def hello_world(scope, receive, send):
+        body = prometheus_metrics()
+        return await send_response(send, text_plain_response(body))
+
 
 class PrometheusMiddleware:
     def __init__(self, app):
@@ -36,6 +45,9 @@ class PrometheusMiddleware:
         if (
             scope["type"] != "http"
             or scope["path"] == "/metrics"
+            or scope["path"] == "/docs"
+            or scope["path"] == "/openapi.json"
+            or scope["path"] == "/favicon.ico"
         ):
             return await self.app(scope, receive, send)
 

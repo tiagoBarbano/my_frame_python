@@ -1,26 +1,29 @@
 import orjson
 
 from app.core.exception import AppException
-from app.core.metrics import prometheus_metrics
 from app.core.routing import routes, openapi_spec
 from app.config import Settings
+from app.infra.database import MongoDB
+from app.infra.redis import RedisClient
 
 settings = Settings()
 
+def startup():
+    RedisClient.init("redis://localhost:6379")
+    MongoDB.init("mongodb://localhost:27017", db_name="mydb")
+    
 
 async def app(scope, receive, send):
     try:
+        if scope["type"] == "lifespan":
+            startup()
+            
         method = scope["method"]
         path = scope["path"]
 
         handler = routes.get((path, method))
         if handler:
             return await handler(scope, receive, send)
-
-        if settings.enable_metrics:
-            if path == "/metrics":
-                body = prometheus_metrics()
-                return await send_response(send, text_plain_response(body))
 
         if settings.enable_swagger:
             if path == "/openapi.json":

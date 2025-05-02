@@ -4,6 +4,8 @@ opentelemetry-exporter-otlp-proto-grpc==1.32.1
 opentelemetry-instrumentation==0.53b1
 opentelemetry-instrumentation-asgi==0.53b1
 opentelemetry-instrumentation-logging==0.53b1
+opentelemetry-instrumentation-pymongo==0.53b1
+opentelemetry.instrumentation.redis==0.53b1
 opentelemetry-proto==1.32.1
 opentelemetry-sdk==1.32.1
 msgspec==0.19.0
@@ -11,3 +13,5 @@ pydantic_settings==2.9.1
 granian==2.2.5
 orjson==3.10.16
 prometheus-client==0.21.1
+motor==3.7.0
+redis==6.0.0

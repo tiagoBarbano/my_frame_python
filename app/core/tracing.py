@@ -12,7 +12,7 @@ settings = Settings()
 
 
 class ErrorAwareSampler(sampling.Sampler):
-    def __init__(self, ratio=0.1):
+    def __init__(self, ratio: str):
         self.normal_sampler = sampling.TraceIdRatioBased(ratio)
 
     def should_sample(self, parent_context, trace_id, name, kind, attributes, links):
@@ -36,7 +36,12 @@ exporter = (
 
 
 resource = Resource.create(attributes={"service.name": settings.app_name})
-tracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.1))
+tracer = TracerProvider(
+    resource=resource,
+    sampler=ErrorAwareSampler(ratio=settings.ratio_value)
+    if settings.enable_trace_ratio_based
+    else None,
+)
 
 tracer.add_span_processor(BatchSpanProcessor(exporter))
 trace.set_tracer_provider(tracer)

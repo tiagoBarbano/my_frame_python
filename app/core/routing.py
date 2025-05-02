@@ -2,7 +2,6 @@ from app.config import Settings
 
 settings = Settings()
 routes = {}
-
 openapi_spec = {
     "openapi": "3.0.0",
     "info": {"title": settings.app_name, "version": "1.0.0"},
