@@ -10,7 +10,7 @@ class RedisClient:
     _client: redis.Redis | None = None
 
     @classmethod
-    def init(cls, url: str = "redis://localhost:6379", **kwargs):
+    def init(cls, url: str = "redis://:redis1234@localhost:6379", **kwargs):
         if cls._client is None:
             cls._client = redis.from_url(url, decode_responses=True, **kwargs)
 

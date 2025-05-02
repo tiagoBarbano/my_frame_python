@@ -9,7 +9,7 @@ from app.infra.redis import RedisClient
 settings = get_settings()
 
 def startup():
-    RedisClient.init("redis://localhost:6379")
+    RedisClient.init()
     MongoDB.init("mongodb://localhost:27017", db_name="mydb")
     
 
