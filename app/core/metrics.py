@@ -7,7 +7,7 @@ from prometheus_client import (
     multiprocess,
 )
 
-from app.config import Settings
+from app.config import get_settings
 from app.core.application import send_response, text_plain_response
 from app.core.routing import get
 
@@ -42,7 +42,6 @@ class PrometheusMiddleware:
     async def __call__(self, scope, receive, send):
         start_time = time.monotonic_ns()
 
-<<<<<<< HEAD
         if (
             scope["type"] != "http"
             or scope["path"] == "/metrics"
@@ -50,9 +49,6 @@ class PrometheusMiddleware:
             or scope["path"] == "/openapi.json"
             or scope["path"] == "/favicon.ico"
         ):
-=======
-        if scope["type"] != "http" or scope["path"] == "/metrics":
->>>>>>> 9560cf4597435f33e3b3ad98aca2969283c9996c
             return await self.app(scope, receive, send)
 
         method = scope["method"]

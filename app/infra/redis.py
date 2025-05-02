@@ -1,8 +1,8 @@
 
-from opentelemetry.instrumentation.redis import RedisInstrumentor
 import redis.asyncio as redis
 
-# Instrument redis
+from opentelemetry.instrumentation.redis import RedisInstrumentor
+
 RedisInstrumentor().instrument()
 
 

@@ -2,7 +2,7 @@ import orjson
 
 from app.core.exception import AppException
 from app.core.routing import routes, openapi_spec
-from app.config import Settings
+from app.config import get_settings
 from app.infra.database import MongoDB
 from app.infra.redis import RedisClient
 

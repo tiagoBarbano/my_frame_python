@@ -50,10 +50,6 @@ def _log_writer():
         stream.write(record)
         stream.flush()
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 9560cf4597435f33e3b3ad98aca2969283c9996c
 @lru_cache()
 def _setup_logging() -> logging.Logger:
     log_level = settings.logger_level.upper()

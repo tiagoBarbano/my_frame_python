@@ -42,16 +42,16 @@ services:
     # logging: *default-logging
 
 
-  # redis-insight:
-  #   image: redis/redisinsight:latest
-  #   restart: always
-  #   ports:
-  #     - "5540:5540"
-  #   volumes:
-  #     - redis-insight:/data    
+  redis-insight:
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis-insight:/data    
 
-  #   depends_on:
-  #     - redis
+    depends_on:
+      - redis
   app:
     build:
       context: ../
@@ -76,7 +76,7 @@ services:
         limits:
           memory: 150M
           cpus: 0.5
-    logging: *default-logging
+    # logging: *default-logging
 
   grafana:
     image: grafana/grafana:latest
@@ -88,7 +88,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
-    logging: *default-logging
+    # logging: *default-logging
     
 
   loki:
@@ -107,7 +107,7 @@ services:
     command: -config.file=/etc/promtail/docker-config.yaml
     depends_on:
       - loki
-    logging: *default-logging
+    # logging: *default-logging
 
   prometheus:
     container_name: prometheus
@@ -127,7 +127,7 @@ services:
     ports:
       - "9090:9090"
     extra_hosts: ["host.docker.internal:host-gateway"]
-    logging: *default-logging
+    # logging: *default-logging
     
 
   # jaeger-all-in-one:
@@ -161,7 +161,7 @@ services:
       - "4318:4318"
     depends_on:
       - loki
-    logging: *default-logging
+    # logging: *default-logging
 
   # otelcol:
   #   image: otel/opentelemetry-collector-contrib
