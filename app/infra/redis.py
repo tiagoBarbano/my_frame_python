@@ -1,7 +1,11 @@
-
 import redis.asyncio as redis
 
 from opentelemetry.instrumentation.redis import RedisInstrumentor
+
+from app.config import get_settings
+
+
+settings = get_settings()
 
 RedisInstrumentor().instrument()
 
@@ -10,14 +14,18 @@ class RedisClient:
     _client: redis.Redis | None = None
 
     @classmethod
-    def init(cls, url: str = "redis://:redis1234@localhost:6379", **kwargs):
+    def init(cls, **kwargs):
         if cls._client is None:
-            cls._client = redis.from_url(url, decode_responses=True, **kwargs)
+            cls._client = redis.from_url(
+                settings.redis_url, decode_responses=True, **kwargs
+            )
 
     @classmethod
     def get(cls) -> redis.Redis:
         if cls._client is None:
-            raise RuntimeError("Redis client not initialized. Call RedisClient.init() first.")
+            raise RuntimeError(
+                "Redis client not initialized. Call RedisClient.init() first."
+            )
         return cls._client
 
     @classmethod

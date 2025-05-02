@@ -41,7 +41,7 @@ async def cotador_get(scope, receive, send):
     if not result:
         return await send_response(send, json_response("Recurso não encontrado", 404))
 
-    await redis_client.set(key_redis, orjson.dumps(result), ex=1)
+    await redis_client.set(key_redis, orjson.dumps(result), ex=5)
     return await send_response(send, json_response(result))
 
 

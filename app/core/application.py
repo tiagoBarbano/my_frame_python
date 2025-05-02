@@ -14,7 +14,7 @@ settings = get_settings()
 
 def startup():
     RedisClient.init()
-    MongoDB.init("mongodb://localhost:27017", db_name="mydb")
+    MongoDB.init()
 
 
 def shutdown():
