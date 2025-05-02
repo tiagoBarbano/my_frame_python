@@ -14,11 +14,9 @@ class RedisClient:
     _client: redis.Redis | None = None
 
     @classmethod
-    def init(cls, **kwargs):
+    def init(cls):
         if cls._client is None:
-            cls._client = redis.from_url(
-                settings.redis_url, decode_responses=True, **kwargs
-            )
+            cls._client = redis.from_url(settings.redis_url, decode_responses=True)
 
     @classmethod
     def get(cls) -> redis.Redis:

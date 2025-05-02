@@ -7,12 +7,9 @@ class UserDto(msgspec.Struct, kw_only=True):
     valor: int
 
 
-class User(MongoModel):
+class UserModel(MongoModel):
     __collection__ = "users"
 
     empresa: str
     cotacao_final: float
 
-
-decode = msgspec.json.Decoder().decode
-encode = msgspec.json.Encoder().encode

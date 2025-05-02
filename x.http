@@ -2,17 +2,22 @@ POST http://localhost:8000/cotador
 
 {
     "valor": 10,
-    "empresa": "tetertretre"
+    "empresa": "eeeeeee"
 }
 
 
 ###
 
 
-GET http://localhost:8000/cotador?id=6814f386eda90f420dccf22f
+GET http://localhost:8000/cotador?id=6815119591ecce1d11c2470c
 
 
 ###
 
 
 GET http://localhost:8000/cotadores
+
+###
+
+
+GET http://localhost:8000/

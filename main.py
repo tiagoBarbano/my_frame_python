@@ -2,7 +2,7 @@ import os
 
 from app.core.application import app
 from app.config import Settings
-from app.router import *  # noqa: F403
+from app.routers.router import *  # noqa: F403
 
 
 
