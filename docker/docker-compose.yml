@@ -22,6 +22,8 @@ services:
     image: mongo:latest
     container_name: mongodb
     environment:
+      - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
+      - MONGO_OPTIONS=--enableCompression
       - PUID=1000
       - PGID=1000
     volumes:

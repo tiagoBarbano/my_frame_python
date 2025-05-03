@@ -3,6 +3,7 @@ import orjson
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.infra.database import MongoDB
 from app.models.user_model import UserDto, UserModel
 from app.repository.mongo_repository import MongoRepository
 from app.infra.redis import RedisClient
@@ -12,16 +13,16 @@ from app.infra.redis import RedisClient
 class UserService:
     repository = MongoRepository[UserModel](UserModel)
 
-    async def list_users(self, db: AsyncIOMotorDatabase):
-        return await self.repository.find_all(db)
+    async def list_users(self) -> list[UserModel]:
+        return await self.repository.find_all(db=MongoDB.get_db())
 
-    async def create_user(self, data: UserDto, db: AsyncIOMotorDatabase):
+    async def create_user(self, data: UserDto) -> dict:
         result = {"cotacao_final": data.valor * 1.23, "empresa": data.empresa}
         user = UserModel.create(**result)
-        await self.repository.save(user, db)
+        await self.repository.save(model=user, db=MongoDB.get_db())
         return user.to_dict()
 
-    async def get_user_by_id(self, user_id: str, db: AsyncIOMotorDatabase) -> dict:
+    async def get_user_by_id(self, user_id: str) -> dict:
         redis = RedisClient.get()
         key_redis = f"cotador:{id}"
         cached_result = await redis.get(key_redis)
@@ -29,7 +30,7 @@ class UserService:
         if cached_result:
             return orjson.loads(cached_result)
 
-        result = await self.repository.find_by_id(user_id, db)
+        result = await self.repository.find_by_id(id=user_id, db=MongoDB.get_db())
 
         if not result:
             return None
@@ -38,4 +39,4 @@ class UserService:
         return result.to_dict()
 
     async def soft_delete_user(self, user_id: str, db: AsyncIOMotorDatabase):
-        await self.repository.soft_delete(user_id, db)
+        await self.repository.soft_delete(id=user_id, db=MongoDB.get_db())

@@ -14,7 +14,13 @@ class MongoDB:
     @classmethod
     def init(cls):
         if cls._client is None:
-            cls._client = AsyncIOMotorClient(settings.mongo_url)
+            cls._client = AsyncIOMotorClient(
+                settings.mongo_url,
+                maxPoolSize=100,  # mais conexões simultâneas
+                minPoolSize=10,  # mínimo para manter pronto
+                socketTimeoutMS=10000,  # timeout de socket
+                serverSelectionTimeoutMS=3000,  # evita travas em conexões lentas)
+            )
         cls._db = cls._client[settings.mongo_db]
 
     @classmethod

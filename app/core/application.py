@@ -1,5 +1,4 @@
 import orjson
-import uvloop
 
 from app.core.exception import AppException
 from app.core.routing import routes, openapi_spec
@@ -7,7 +6,6 @@ from app.config import get_settings
 from app.infra.database import MongoDB
 from app.infra.redis import RedisClient
 
-uvloop.install()
 
 settings = get_settings()
 

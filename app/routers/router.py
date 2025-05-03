@@ -8,7 +8,6 @@ from app.core.application import (
     read_body,
     send_response,
 )
-from app.infra.database import MongoDB
 from app.models.user_model import UserDto
 from app.services.user_service import UserService
 
@@ -20,7 +19,7 @@ async def cotador(scope, receive, send):
     body = await read_body(receive)
     data = msgspec.json.decode(body, type=UserDto)
     
-    new_user = await user_service.create_user(data, db=MongoDB.get_db())
+    new_user = await user_service.create_user(data)
 
     return await send_response(send, json_response({"user": new_user}))
 
@@ -30,7 +29,7 @@ async def cotador_get(scope, receive, send):
     query = parse_qs(scope.get("query_string", b"").decode())
     id = query.get("id", [None])[0]
 
-    user_result = await user_service.get_user_by_id(user_id=id, db=MongoDB.get_db())
+    user_result = await user_service.get_user_by_id(user_id=id)
 
     if not user_result:
         return await send_response(send, json_response("Recurso não encontrado", 404))
@@ -39,13 +38,8 @@ async def cotador_get(scope, receive, send):
 
 
 @get("/cotadores", summary="Cotador Get ALL")
-async def cotador_get_all(scope, receive, send):
-    result: list = await user_service.list_users(db=MongoDB.get_db())
-
-    if not result:
-        return await send_response(send, json_response([]))
-
-    result = [user.to_dict() for user in result]
+async def cotador_get_all(scope, receive, send) -> list[dict]:
+    result = await user_service.list_users()
     return await send_response(send, json_response(result))
 
 

@@ -31,10 +31,7 @@ class MongoRepository(Generic[T]):
 
     async def find_all(self, db: AsyncIOMotorDatabase) -> list[T]:
         cursor = self.collection(db).find()
-        result = await cursor.to_list(length=None)
-        if not result:
-            return []
-        return [self.mongo_to_model(res) for res in result]
+        return await cursor.to_list(length=None)
 
     async def soft_delete(self, id: str, db: AsyncIOMotorDatabase):
         now = datetime.utcnow()
