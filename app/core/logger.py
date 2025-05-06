@@ -6,7 +6,6 @@ import threading
 import queue
 import atexit
 
-from opentelemetry import trace
 from functools import lru_cache
 
 from app.config import get_settings
