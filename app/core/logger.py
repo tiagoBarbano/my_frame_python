@@ -93,10 +93,12 @@ class LoggerMiddleware:
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        start_time = time.perf_counter()
-
-        if scope["type"] == "http":
-            log.info("start_process", extra={"method": scope["method"], "path": scope["path"]})
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        
+        start_time = time.perf_counter()        
+        
+        log.info("start_process", extra={"method": scope["method"], "path": scope["path"]})
 
         status_code = 200
         body_parts = []
