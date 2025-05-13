@@ -112,7 +112,6 @@ class LoggerMiddleware:
 
         await self.app(scope, receive, send_wrapper)
 
-        body = b"".join(body_parts)
         finish_time = time.perf_counter()
 
         log.info(
@@ -120,7 +119,6 @@ class LoggerMiddleware:
             extra={
                 "method": scope["method"],
                 "path": scope["path"],
-                "body": orjson.loads(body),
                 "status_code": status_code,
                 "time_process": finish_time - start_time,
             },

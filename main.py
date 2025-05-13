@@ -23,8 +23,10 @@ if settings.enable_logger:
 # Habilita as Metricas do Prometheus
 if settings.enable_metrics:
     from app.core.metrics import PrometheusMiddleware
-    
-    os.makedirs(settings.prometheus_multiproc_dir, exist_ok=True)
+
+    if settings.prometheus_multiproc_dir:
+        os.makedirs(settings.prometheus_multiproc_dir, exist_ok=True)
+        
     app = PrometheusMiddleware(app)
 
 # Habilita o Tracing do OpenTelemetry

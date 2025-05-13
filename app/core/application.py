@@ -43,33 +43,33 @@ async def app(scope, receive, send):
         if handler:
             return await handler(scope, receive, send)
 
-        if settings.enable_swagger:
-            if path == "/openapi.json":
-                return await send_response(send, json_response(openapi_spec))
+        if path == "/openapi.json":
+            return await send_response(send, json_response(openapi_spec))
 
-            if path == "/docs":
-                index_html = f"""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Swagger UI</title>
-                    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
-                </head>
-                <body>
-                    <div id="swagger-ui"></div>
-                    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
-                    <script>
-                    const ui = SwaggerUIBundle({{
-                        url: '/openapi.json',
-                        dom_id: '#swagger-ui',
-                        }});
-                    </script>
-                </body>
-                </html>
-                """  # noqa: F541
-                return await send_response(
-                    send, text_html_response(index_html.encode("utf-8"))
-                )
+        if path == "/docs":
+            index_html = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Swagger UI</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css" />
+    </head>
+    <body>
+        <div id="swagger-ui"></div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js"></script>
+        <script>
+        window.onload = () => {{
+            SwaggerUIBundle({{
+                url: '/openapi.json',
+                dom_id: '#swagger-ui',
+            }});
+        }};
+        </script>
+    </body>
+    </html>"""
+            return await send_response(
+                send, text_html_response(index_html.encode("utf-8"))
+            )
+                
 
         return await send_response(send, json_response({"error": "Not found"}, 404))
     except AppException as ex:

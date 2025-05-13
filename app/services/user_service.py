@@ -1,8 +1,6 @@
 import dataclasses
 import orjson
 
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
 from app.infra.database import MongoDB
 from app.models.user_model import UserDto, UserModel
 from app.repository.mongo_repository import MongoRepository
@@ -38,5 +36,5 @@ class UserService:
         await redis.set(key_redis, orjson.dumps(result.to_dict()), ex=15)
         return result.to_dict()
 
-    async def soft_delete_user(self, user_id: str, db: AsyncIOMotorDatabase):
+    async def soft_delete_user(self, user_id: str):
         await self.repository.soft_delete(id=user_id, db=MongoDB.get_db())

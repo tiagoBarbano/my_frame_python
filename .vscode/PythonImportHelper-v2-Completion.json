@@ -17,14 +17,6 @@
         "documentation": {}
     },
     {
-        "label": "AppException",
-        "importPath": "app.core.exception",
-        "description": "app.core.exception",
-        "isExtraImport": true,
-        "detail": "app.core.exception",
-        "documentation": {}
-    },
-    {
         "label": "routes",
         "importPath": "app.core.routing",
         "description": "app.core.routing",
@@ -34,6 +26,14 @@
     },
     {
         "label": "openapi_spec",
+        "importPath": "app.core.routing",
+        "description": "app.core.routing",
+        "isExtraImport": true,
+        "detail": "app.core.routing",
+        "documentation": {}
+    },
+    {
+        "label": "get",
         "importPath": "app.core.routing",
         "description": "app.core.routing",
         "isExtraImport": true,
@@ -97,11 +97,59 @@
         "documentation": {}
     },
     {
+        "label": "get_settings",
+        "importPath": "app.config",
+        "description": "app.config",
+        "isExtraImport": true,
+        "detail": "app.config",
+        "documentation": {}
+    },
+    {
+        "label": "get_settings",
+        "importPath": "app.config",
+        "description": "app.config",
+        "isExtraImport": true,
+        "detail": "app.config",
+        "documentation": {}
+    },
+    {
         "label": "Settings",
         "importPath": "app.config",
         "description": "app.config",
         "isExtraImport": true,
         "detail": "app.config",
+        "documentation": {}
+    },
+    {
+        "label": "MongoDB",
+        "importPath": "app.infra.database",
+        "description": "app.infra.database",
+        "isExtraImport": true,
+        "detail": "app.infra.database",
+        "documentation": {}
+    },
+    {
+        "label": "MongoDB",
+        "importPath": "app.infra.database",
+        "description": "app.infra.database",
+        "isExtraImport": true,
+        "detail": "app.infra.database",
+        "documentation": {}
+    },
+    {
+        "label": "RedisClient",
+        "importPath": "app.infra.redis",
+        "description": "app.infra.redis",
+        "isExtraImport": true,
+        "detail": "app.infra.redis",
+        "documentation": {}
+    },
+    {
+        "label": "RedisClient",
+        "importPath": "app.infra.redis",
+        "description": "app.infra.redis",
+        "isExtraImport": true,
+        "detail": "app.infra.redis",
         "documentation": {}
     },
     {
@@ -145,7 +193,7 @@
         "documentation": {}
     },
     {
-        "label": "LoggerMiddleware",
+        "label": "log",
         "importPath": "app.core.logger",
         "description": "app.core.logger",
         "isExtraImport": true,
@@ -255,6 +303,54 @@
         "documentation": {}
     },
     {
+        "label": "send_response",
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "isExtraImport": true,
+        "detail": "app.core.application",
+        "documentation": {}
+    },
+    {
+        "label": "text_plain_response",
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "isExtraImport": true,
+        "detail": "app.core.application",
+        "documentation": {}
+    },
+    {
+        "label": "json_response",
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "isExtraImport": true,
+        "detail": "app.core.application",
+        "documentation": {}
+    },
+    {
+        "label": "read_body",
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "isExtraImport": true,
+        "detail": "app.core.application",
+        "documentation": {}
+    },
+    {
+        "label": "send_response",
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "isExtraImport": true,
+        "detail": "app.core.application",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "isExtraImport": true,
+        "detail": "app.core.application",
+        "documentation": {}
+    },
+    {
         "label": "TracerProvider",
         "importPath": "opentelemetry.sdk.trace",
         "description": "opentelemetry.sdk.trace",
@@ -311,6 +407,201 @@
         "documentation": {}
     },
     {
+        "label": "AsyncIOMotorClient",
+        "importPath": "motor.motor_asyncio",
+        "description": "motor.motor_asyncio",
+        "isExtraImport": true,
+        "detail": "motor.motor_asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncIOMotorDatabase",
+        "importPath": "motor.motor_asyncio",
+        "description": "motor.motor_asyncio",
+        "isExtraImport": true,
+        "detail": "motor.motor_asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncIOMotorDatabase",
+        "importPath": "motor.motor_asyncio",
+        "description": "motor.motor_asyncio",
+        "isExtraImport": true,
+        "detail": "motor.motor_asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "PymongoInstrumentor",
+        "importPath": "opentelemetry.instrumentation.pymongo",
+        "description": "opentelemetry.instrumentation.pymongo",
+        "isExtraImport": true,
+        "detail": "opentelemetry.instrumentation.pymongo",
+        "documentation": {}
+    },
+    {
+        "label": "redis.asyncio",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "redis.asyncio",
+        "description": "redis.asyncio",
+        "detail": "redis.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "RedisInstrumentor",
+        "importPath": "opentelemetry.instrumentation.redis",
+        "description": "opentelemetry.instrumentation.redis",
+        "isExtraImport": true,
+        "detail": "opentelemetry.instrumentation.redis",
+        "documentation": {}
+    },
+    {
+        "label": "ObjectId",
+        "importPath": "bson",
+        "description": "bson",
+        "isExtraImport": true,
+        "detail": "bson",
+        "documentation": {}
+    },
+    {
+        "label": "ObjectId",
+        "importPath": "bson",
+        "description": "bson",
+        "isExtraImport": true,
+        "detail": "bson",
+        "documentation": {}
+    },
+    {
+        "label": "msgspec",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "msgspec",
+        "description": "msgspec",
+        "detail": "msgspec",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "ClassVar",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TypeVar",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Generic",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Type",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "MongoModel",
+        "importPath": "app.models.model_base",
+        "description": "app.models.model_base",
+        "isExtraImport": true,
+        "detail": "app.models.model_base",
+        "documentation": {}
+    },
+    {
+        "label": "MongoModel",
+        "importPath": "app.models.model_base",
+        "description": "app.models.model_base",
+        "isExtraImport": true,
+        "detail": "app.models.model_base",
+        "documentation": {}
+    },
+    {
+        "label": "parse_qs",
+        "importPath": "urllib.parse",
+        "description": "urllib.parse",
+        "isExtraImport": true,
+        "detail": "urllib.parse",
+        "documentation": {}
+    },
+    {
+        "label": "UserDto",
+        "importPath": "app.models.user_model",
+        "description": "app.models.user_model",
+        "isExtraImport": true,
+        "detail": "app.models.user_model",
+        "documentation": {}
+    },
+    {
+        "label": "UserDto",
+        "importPath": "app.models.user_model",
+        "description": "app.models.user_model",
+        "isExtraImport": true,
+        "detail": "app.models.user_model",
+        "documentation": {}
+    },
+    {
+        "label": "UserModel",
+        "importPath": "app.models.user_model",
+        "description": "app.models.user_model",
+        "isExtraImport": true,
+        "detail": "app.models.user_model",
+        "documentation": {}
+    },
+    {
+        "label": "UserService",
+        "importPath": "app.services.user_service",
+        "description": "app.services.user_service",
+        "isExtraImport": true,
+        "detail": "app.services.user_service",
+        "documentation": {}
+    },
+    {
+        "label": "dataclasses",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
+        "label": "MongoRepository",
+        "importPath": "app.repository.mongo_repository",
+        "description": "app.repository.mongo_repository",
+        "isExtraImport": true,
+        "detail": "app.repository.mongo_repository",
+        "documentation": {}
+    },
+    {
         "label": "Field",
         "importPath": "pydantic",
         "description": "pydantic",
@@ -332,55 +623,6 @@
         "description": "pydantic_settings",
         "isExtraImport": true,
         "detail": "pydantic_settings",
-        "documentation": {}
-    },
-    {
-        "label": "json_response",
-        "importPath": "app.core.application",
-        "description": "app.core.application",
-        "isExtraImport": true,
-        "detail": "app.core.application",
-        "documentation": {}
-    },
-    {
-        "label": "read_body",
-        "importPath": "app.core.application",
-        "description": "app.core.application",
-        "isExtraImport": true,
-        "detail": "app.core.application",
-        "documentation": {}
-    },
-    {
-        "label": "send_response",
-        "importPath": "app.core.application",
-        "description": "app.core.application",
-        "isExtraImport": true,
-        "detail": "app.core.application",
-        "documentation": {}
-    },
-    {
-        "label": "app",
-        "importPath": "app.core.application",
-        "description": "app.core.application",
-        "isExtraImport": true,
-        "detail": "app.core.application",
-        "documentation": {}
-    },
-    {
-        "label": "decode",
-        "importPath": "app.user_model",
-        "description": "app.user_model",
-        "isExtraImport": true,
-        "detail": "app.user_model",
-        "documentation": {}
-    },
-    {
-        "label": "msgspec",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "msgspec",
-        "description": "msgspec",
-        "detail": "msgspec",
         "documentation": {}
     },
     {
@@ -408,44 +650,38 @@
         "documentation": {}
     },
     {
-        "label": "app.core.tracing",
+        "label": "os",
         "kind": 6,
         "isExtraImport": true,
-        "importPath": "app.core.tracing",
-        "description": "app.core.tracing",
-        "detail": "app.core.tracing",
-        "documentation": {}
-    },
-    {
-        "label": "PrometheusMiddleware",
-        "importPath": "app.core.metrics",
-        "description": "app.core.metrics",
-        "isExtraImport": true,
-        "detail": "app.core.metrics",
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
         "documentation": {}
     },
     {
         "label": "*",
-        "importPath": "app.router",
-        "description": "app.router",
+        "importPath": "app.routers.router",
+        "description": "app.routers.router",
         "isExtraImport": true,
-        "detail": "app.router",
+        "detail": "app.routers.router",
         "documentation": {}
     },
     {
-        "label": "OpenTelemetryMiddleware",
-        "importPath": "opentelemetry.instrumentation.asgi",
-        "description": "opentelemetry.instrumentation.asgi",
-        "isExtraImport": true,
-        "detail": "opentelemetry.instrumentation.asgi",
+        "label": "startup",
+        "kind": 2,
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "peekOfCode": "def startup():\n    RedisClient.init()\n    MongoDB.init()\ndef shutdown():\n    RedisClient.close()\n    MongoDB.close()\nasync def lifespan(scope, receive, send):\n    msg = await receive()\n    if msg[\"type\"] == \"lifespan.startup\":\n        startup()",
+        "detail": "app.core.application",
         "documentation": {}
     },
     {
-        "label": "parse_excluded_urls",
-        "importPath": "opentelemetry.util.http",
-        "description": "opentelemetry.util.http",
-        "isExtraImport": true,
-        "detail": "opentelemetry.util.http",
+        "label": "shutdown",
+        "kind": 2,
+        "importPath": "app.core.application",
+        "description": "app.core.application",
+        "peekOfCode": "def shutdown():\n    RedisClient.close()\n    MongoDB.close()\nasync def lifespan(scope, receive, send):\n    msg = await receive()\n    if msg[\"type\"] == \"lifespan.startup\":\n        startup()\n        await send({\"type\": \"lifespan.startup.complete\"})\n    elif msg[\"type\"] == \"lifespan.shutdown\":\n        shutdown()",
+        "detail": "app.core.application",
         "documentation": {}
     },
     {
@@ -480,7 +716,7 @@
         "kind": 5,
         "importPath": "app.core.application",
         "description": "app.core.application",
-        "peekOfCode": "settings = get_settings()\nasync def app(scope, receive, send):\n    try:\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        handler = routes.get((path, method))\n        if handler:\n            return await handler(scope, receive, send)\n        if settings.enable_swagger:\n            if path == \"/openapi.json\":",
+        "peekOfCode": "settings = get_settings()\ndef startup():\n    RedisClient.init()\n    MongoDB.init()\ndef shutdown():\n    RedisClient.close()\n    MongoDB.close()\nasync def lifespan(scope, receive, send):\n    msg = await receive()\n    if msg[\"type\"] == \"lifespan.startup\":",
         "detail": "app.core.application",
         "documentation": {}
     },
@@ -516,7 +752,7 @@
         "kind": 6,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "class LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.perf_counter()\n        if scope[\"type\"] == \"http\":\n            log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})\n        status_code = 200\n        body_parts = []\n        async def send_wrapper(message):",
+        "peekOfCode": "class LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] != \"http\":\n            return await self.app(scope, receive, send)\n        start_time = time.perf_counter()        \n        log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})\n        status_code = 200\n        body_parts = []",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -552,7 +788,7 @@
         "kind": 5,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "log = _setup_logging()\n_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.perf_counter()\n        if scope[\"type\"] == \"http\":\n            log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})",
+        "peekOfCode": "log = _setup_logging()\n_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] != \"http\":\n            return await self.app(scope, receive, send)\n        start_time = time.perf_counter()        ",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -561,7 +797,7 @@
         "kind": 5,
         "importPath": "app.core.logger",
         "description": "app.core.logger",
-        "peekOfCode": "_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.perf_counter()\n        if scope[\"type\"] == \"http\":\n            log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})\n        status_code = 200",
+        "peekOfCode": "_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()\natexit.register(_shutdown_logging)\nclass LoggerMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        if scope[\"type\"] != \"http\":\n            return await self.app(scope, receive, send)\n        start_time = time.perf_counter()        \n        log.info(\"start_process\", extra={\"method\": scope[\"method\"], \"path\": scope[\"path\"]})",
         "detail": "app.core.logger",
         "documentation": {}
     },
@@ -570,7 +806,7 @@
         "kind": 6,
         "importPath": "app.core.metrics",
         "description": "app.core.metrics",
-        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)\n        method = scope[\"method\"]\n        path = scope[\"path\"]\n        status_code = 500",
+        "peekOfCode": "class PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if (\n            scope[\"type\"] != \"http\"\n            or scope[\"path\"] == \"/metrics\"\n            or scope[\"path\"] == \"/docs\"\n            or scope[\"path\"] == \"/openapi.json\"",
         "detail": "app.core.metrics",
         "documentation": {}
     },
@@ -597,7 +833,7 @@
         "kind": 5,
         "importPath": "app.core.metrics",
         "description": "app.core.metrics",
-        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nclass PrometheusMiddleware:\n    def __init__(self, app):\n        self.app = app\n    async def __call__(self, scope, receive, send):\n        start_time = time.monotonic_ns()\n        if scope[\"type\"] != \"http\" or scope[\"path\"] == \"/metrics\":\n            return await self.app(scope, receive, send)",
+        "peekOfCode": "REQUEST_LATENCY = Histogram(\n    \"http_request_duration_seconds\", \"Request latency\", [\"method\", \"path\", \"status\"]\n)\nif settings.enable_metrics:\n    @get(\"/metrics\", summary=\"METRICS\")\n    async def hello_world(scope, receive, send):\n        body = prometheus_metrics()\n        return await send_response(send, text_plain_response(body))\nclass PrometheusMiddleware:\n    def __init__(self, app):",
         "detail": "app.core.metrics",
         "documentation": {}
     },
@@ -660,7 +896,7 @@
         "kind": 6,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "class ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio=0.1):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )\n    def get_description(self):",
+        "peekOfCode": "class ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio: str):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )\n    def get_description(self):",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -669,7 +905,7 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "settings = get_settings()\nclass ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio=0.1):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )",
+        "peekOfCode": "settings = get_settings()\nclass ErrorAwareSampler(sampling.Sampler):\n    def __init__(self, ratio: str):\n        self.normal_sampler = sampling.TraceIdRatioBased(ratio)\n    def should_sample(self, parent_context, trace_id, name, kind, attributes, links):\n        if attributes and attributes.get(\"force_sample\") is True:\n            return sampling.SamplingResult(sampling.Decision.RECORD_AND_SAMPLE)\n        return self.normal_sampler.should_sample(\n            parent_context, trace_id, name, kind, attributes, links\n        )",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -678,7 +914,7 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "exporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.05))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "exporter = (\n    ConsoleSpanExporter()\n    if settings.flag_local\n    else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)\n)\nresource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(\n    resource=resource,\n    sampler=ErrorAwareSampler(ratio=settings.ratio_value)\n    if settings.enable_trace_ratio_based",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -687,7 +923,7 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.05))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "resource = Resource.create(attributes={\"service.name\": settings.app_name})\ntracer = TracerProvider(\n    resource=resource,\n    sampler=ErrorAwareSampler(ratio=settings.ratio_value)\n    if settings.enable_trace_ratio_based\n    else None,\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.core.tracing",
         "documentation": {}
     },
@@ -696,8 +932,107 @@
         "kind": 5,
         "importPath": "app.core.tracing",
         "description": "app.core.tracing",
-        "peekOfCode": "tracer = TracerProvider(resource=resource, sampler=ErrorAwareSampler(ratio=0.05))\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
+        "peekOfCode": "tracer = TracerProvider(\n    resource=resource,\n    sampler=ErrorAwareSampler(ratio=settings.ratio_value)\n    if settings.enable_trace_ratio_based\n    else None,\n)\ntracer.add_span_processor(BatchSpanProcessor(exporter))\ntrace.set_tracer_provider(tracer)\nLoggingInstrumentor().instrument(tracer_provider=tracer)",
         "detail": "app.core.tracing",
+        "documentation": {}
+    },
+    {
+        "label": "MongoDB",
+        "kind": 6,
+        "importPath": "app.infra.database",
+        "description": "app.infra.database",
+        "peekOfCode": "class MongoDB:\n    _client: AsyncIOMotorClient | None = None\n    @classmethod\n    def init(cls):\n        if cls._client is None:\n            cls._client = AsyncIOMotorClient(\n                settings.mongo_url,\n                maxPoolSize=100,  # mais conexões simultâneas\n                minPoolSize=10,  # mínimo para manter pronto\n                socketTimeoutMS=10000,  # timeout de socket",
+        "detail": "app.infra.database",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "kind": 5,
+        "importPath": "app.infra.database",
+        "description": "app.infra.database",
+        "peekOfCode": "settings = get_settings()\nPymongoInstrumentor().instrument()\nclass MongoDB:\n    _client: AsyncIOMotorClient | None = None\n    @classmethod\n    def init(cls):\n        if cls._client is None:\n            cls._client = AsyncIOMotorClient(\n                settings.mongo_url,\n                maxPoolSize=100,  # mais conexões simultâneas",
+        "detail": "app.infra.database",
+        "documentation": {}
+    },
+    {
+        "label": "RedisClient",
+        "kind": 6,
+        "importPath": "app.infra.redis",
+        "description": "app.infra.redis",
+        "peekOfCode": "class RedisClient:\n    _client: redis.Redis | None = None\n    @classmethod\n    def init(cls):\n        if cls._client is None:\n            cls._client = redis.from_url(settings.redis_url, decode_responses=True)\n    @classmethod\n    def get(cls) -> redis.Redis:\n        if cls._client is None:\n            raise RuntimeError(",
+        "detail": "app.infra.redis",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "kind": 5,
+        "importPath": "app.infra.redis",
+        "description": "app.infra.redis",
+        "peekOfCode": "settings = get_settings()\nRedisInstrumentor().instrument()\nclass RedisClient:\n    _client: redis.Redis | None = None\n    @classmethod\n    def init(cls):\n        if cls._client is None:\n            cls._client = redis.from_url(settings.redis_url, decode_responses=True)\n    @classmethod\n    def get(cls) -> redis.Redis:",
+        "detail": "app.infra.redis",
+        "documentation": {}
+    },
+    {
+        "label": "MongoModel",
+        "kind": 6,
+        "importPath": "app.models.model_base",
+        "description": "app.models.model_base",
+        "peekOfCode": "class MongoModel(msgspec.Struct, kw_only=True):\n    _id: str | None = None\n    created_at: datetime | None = None\n    updated_at: datetime | None = None\n    deleted: bool = False\n    __collection__: ClassVar[str] = \"\"\n    @classmethod\n    def create(cls, data: dict = None, **kwargs):\n        now = datetime.utcnow()\n        raw = {**(data or {}), **kwargs}",
+        "detail": "app.models.model_base",
+        "documentation": {}
+    },
+    {
+        "label": "UserDto",
+        "kind": 6,
+        "importPath": "app.models.user_model",
+        "description": "app.models.user_model",
+        "peekOfCode": "class UserDto(msgspec.Struct, kw_only=True):\n    empresa: str\n    valor: int\nclass UserModel(MongoModel):\n    __collection__ = \"users\"\n    empresa: str\n    cotacao_final: float",
+        "detail": "app.models.user_model",
+        "documentation": {}
+    },
+    {
+        "label": "UserModel",
+        "kind": 6,
+        "importPath": "app.models.user_model",
+        "description": "app.models.user_model",
+        "peekOfCode": "class UserModel(MongoModel):\n    __collection__ = \"users\"\n    empresa: str\n    cotacao_final: float",
+        "detail": "app.models.user_model",
+        "documentation": {}
+    },
+    {
+        "label": "MongoRepository",
+        "kind": 6,
+        "importPath": "app.repository.mongo_repository",
+        "description": "app.repository.mongo_repository",
+        "peekOfCode": "class MongoRepository(Generic[T]):\n    def __init__(self, model_cls: Type[T]):\n        self.model_cls = model_cls\n    def collection(self, db: AsyncIOMotorDatabase):\n        return db[self.model_cls.__collection__]\n    def mongo_to_model(self, doc: dict) -> T:\n        doc = dict(doc)\n        if \"_id\" in doc:\n            doc[\"_id\"] = str(doc[\"_id\"])\n        return self.model_cls(**doc)",
+        "detail": "app.repository.mongo_repository",
+        "documentation": {}
+    },
+    {
+        "label": "T",
+        "kind": 5,
+        "importPath": "app.repository.mongo_repository",
+        "description": "app.repository.mongo_repository",
+        "peekOfCode": "T = TypeVar(\"T\", bound=MongoModel)\nclass MongoRepository(Generic[T]):\n    def __init__(self, model_cls: Type[T]):\n        self.model_cls = model_cls\n    def collection(self, db: AsyncIOMotorDatabase):\n        return db[self.model_cls.__collection__]\n    def mongo_to_model(self, doc: dict) -> T:\n        doc = dict(doc)\n        if \"_id\" in doc:\n            doc[\"_id\"] = str(doc[\"_id\"])",
+        "detail": "app.repository.mongo_repository",
+        "documentation": {}
+    },
+    {
+        "label": "user_service",
+        "kind": 5,
+        "importPath": "app.routers.router",
+        "description": "app.routers.router",
+        "peekOfCode": "user_service = UserService()\n@post(\"/cotador\", summary=\"Cotador\")\nasync def cotador(scope, receive, send):\n    body = await read_body(receive)\n    data = msgspec.json.decode(body, type=UserDto)\n    new_user = await user_service.create_user(data)\n    return await send_response(send, json_response({\"user\": new_user}))\n@get(\"/cotador\", summary=\"Cotador Get\")\nasync def cotador_get(scope, receive, send):\n    query = parse_qs(scope.get(\"query_string\", b\"\").decode())",
+        "detail": "app.routers.router",
+        "documentation": {}
+    },
+    {
+        "label": "UserService",
+        "kind": 6,
+        "importPath": "app.services.user_service",
+        "description": "app.services.user_service",
+        "peekOfCode": "class UserService:\n    repository = MongoRepository[UserModel](UserModel)\n    async def list_users(self) -> list[UserModel]:\n        return await self.repository.find_all(db=MongoDB.get_db())\n    async def create_user(self, data: UserDto) -> dict:\n        result = {\"cotacao_final\": data.valor * 1.23, \"empresa\": data.empresa}\n        user = UserModel.create(**result)\n        await self.repository.save(model=user, db=MongoDB.get_db())\n        return user.to_dict()\n    async def get_user_by_id(self, user_id: str) -> dict:",
+        "detail": "app.services.user_service",
         "documentation": {}
     },
     {
@@ -705,7 +1040,7 @@
         "kind": 6,
         "importPath": "app.config",
         "description": "app.config",
-        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = Field(default=None, validate_default=False)\n    app_name: str\n    logger_level: str = Field(default=\"WARNING\", validate_default=False)\n    endpoint_otel: str = Field(default=\"http://localhost:4317\", validate_default=False)\n    flag_local: bool = Field(default=True, validate_default=False)\n    enable_tracing: bool = Field(default=True, validate_default=False)\n    enable_metrics: bool = Field(default=True, validate_default=False)\n    enable_logger: bool = Field(default=False, validate_default=False)\n    enable_swagger: bool = Field(default=True, validate_default=False)",
+        "peekOfCode": "class Settings(BaseSettings):\n    prometheus_multiproc_dir: str | None = Field(default=None, validate_default=False)\n    app_name: str = Field(default=\"My Granian FrameWork\", validate_default=False)\n    logger_level: str = Field(default=\"INFO\", validate_default=False)\n    endpoint_otel: str = Field(default=\"http://localhost:4317\", validate_default=False)\n    flag_local: bool = Field(default=False, validate_default=False)\n    enable_tracing: bool = Field(default=False, validate_default=False)\n    enable_metrics: bool = Field(default=False, validate_default=False)\n    enable_logger: bool = Field(default=True, validate_default=False)\n    enable_swagger: bool = Field(default=False, validate_default=False)",
         "detail": "app.config",
         "documentation": {}
     },
@@ -716,33 +1051,6 @@
         "description": "app.config",
         "peekOfCode": "def get_settings():\n    return Settings()",
         "detail": "app.config",
-        "documentation": {}
-    },
-    {
-        "label": "User",
-        "kind": 6,
-        "importPath": "app.user_model",
-        "description": "app.user_model",
-        "peekOfCode": "class User(msgspec.Struct):\n    empresa: str\n    valor: int\ndecode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode",
-        "detail": "app.user_model",
-        "documentation": {}
-    },
-    {
-        "label": "decode",
-        "kind": 5,
-        "importPath": "app.user_model",
-        "description": "app.user_model",
-        "peekOfCode": "decode = msgspec.json.Decoder(type=User).decode\nencode = msgspec.json.Encoder().encode",
-        "detail": "app.user_model",
-        "documentation": {}
-    },
-    {
-        "label": "encode",
-        "kind": 5,
-        "importPath": "app.user_model",
-        "description": "app.user_model",
-        "peekOfCode": "encode = msgspec.json.Encoder().encode",
-        "detail": "app.user_model",
         "documentation": {}
     },
     {
@@ -759,7 +1067,7 @@
         "kind": 5,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "settings = Settings()\n# Define a função principal do aplicativo\napp = app\n# Configuração dos Middlewares\n# Habilita o Middleware de logger\nif settings.enable_logger:\n    app = LoggerMiddleware(app)\n# Habilita as Metricas do Prometheus\nif settings.enable_metrics:\n    app = PrometheusMiddleware(app)",
+        "peekOfCode": "settings = Settings()\n# Define a função principal do aplicativo\napp = app\n# Configuração dos Middlewares\n# Habilita o Middleware de logger\nif settings.enable_logger:\n    from app.core.logger import LoggerMiddleware\n    app = LoggerMiddleware(app)\n# Habilita as Metricas do Prometheus\nif settings.enable_metrics:",
         "detail": "main",
         "documentation": {}
     },
@@ -768,7 +1076,7 @@
         "kind": 5,
         "importPath": "main",
         "description": "main",
-        "peekOfCode": "app = app\n# Configuração dos Middlewares\n# Habilita o Middleware de logger\nif settings.enable_logger:\n    app = LoggerMiddleware(app)\n# Habilita as Metricas do Prometheus\nif settings.enable_metrics:\n    app = PrometheusMiddleware(app)\n# Habilita o Tracing do OpenTelemetry\nif settings.enable_tracing:",
+        "peekOfCode": "app = app\n# Configuração dos Middlewares\n# Habilita o Middleware de logger\nif settings.enable_logger:\n    from app.core.logger import LoggerMiddleware\n    app = LoggerMiddleware(app)\n# Habilita as Metricas do Prometheus\nif settings.enable_metrics:\n    from app.core.metrics import PrometheusMiddleware\n    os.makedirs(settings.prometheus_multiproc_dir, exist_ok=True)",
         "detail": "main",
         "documentation": {}
     }

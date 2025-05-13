@@ -29,7 +29,7 @@ REQUEST_LATENCY = Histogram(
 
 if settings.enable_metrics:
 
-    @get("/metrics", summary="METRICS")
+    @get("/metrics", summary="METRICS", response_model=None)
     async def hello_world(scope, receive, send):
         body = prometheus_metrics()
         return await send_response(send, text_plain_response(body))
