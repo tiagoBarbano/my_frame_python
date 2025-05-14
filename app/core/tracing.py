@@ -12,6 +12,7 @@ settings = get_settings()
 
 
 class ErrorAwareSampler(sampling.Sampler):
+    """Sampler that respects the force_sample attribute in attributes."""
     def __init__(self, ratio: str):
         self.normal_sampler = sampling.TraceIdRatioBased(ratio)
 

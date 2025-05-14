@@ -1,4 +1,4 @@
-FROM python:3.13.3-slim
+FROM python:3.13.3-alpine
 RUN mkdir src
 
 ENV LC_ALL=C.UTF-8
@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir --upgrade certifi
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 EXPOSE 8000
-CMD ["granian", "main:app", "--interface", "asginl", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+CMD ["python", "main.py"]

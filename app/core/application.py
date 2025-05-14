@@ -1,111 +1,59 @@
-import orjson
-
 from app.core.exception import AppException
-from app.core.routing import openapi_spec, routes_by_method
+from app.core.routing import openapi_spec, routes_by_method, routes
 from app.config import get_settings
-from app.infra.database import MongoDB
-from app.infra.redis import RedisClient
+from app.core.swagger import serve_swagger_ui
+from app.infra.lifespan import lifespan
+from app.core.utils import send_response, json_response, text_html_response
 
 
 settings = get_settings()
 
-
-def startup():
-    RedisClient.init()
-    MongoDB.init()
-
-
-def shutdown():
-    RedisClient.close()
-    MongoDB.close()
-
-
-async def lifespan(scope, receive, send):
-    msg = await receive()
-    if msg["type"] == "lifespan.startup":
-        startup()
-        await send({"type": "lifespan.startup.complete"})
-    elif msg["type"] == "lifespan.shutdown":
-        shutdown()
-        print("Shutting down...")
-        await send({"type": "lifespan.shutdown.complete"})
-
-
 async def app(scope, receive, send):
+    """
+        ASGI application callable.
+        This function handles incoming requests and routes them to the appropriate handler.
+        It also manages the lifespan of the application and handles exceptions.
+        The function takes the ASGI scope, receive channel, and send channel as input.
+        It first checks if the scope type is "lifespan" and calls the lifespan function.
+        Then, it retrieves the HTTP method and path from the scope.
+        It checks for an exact route match, a regex route match, and handles OpenAPI JSON and Swagger UI requests.
+        If no match is found, it returns a 404 Not Found response.
+        If an AppException is raised, it returns the error message and status code.
+    """
+    
     try:
         if scope["type"] == "lifespan":
             await lifespan(scope, receive, send)
-
+            
         method = scope["method"]
         path = scope["path"]
 
-        handler = {}
+        # 1. Rota exata
+        handler = routes.get((path, method))
+        if handler:
+            return await handler(scope, receive, send)
 
+        # 2. Rota com regex
         for regex, path_template, handler in routes_by_method[method.upper()]:
             match = regex.match(path)
+            
             if match:
                 scope["path_params"] = match.groupdict()
                 return await handler(scope, receive, send)
 
+        # 3. OpenAPI JSON
         if path == "/openapi.json":
             return await send_response(send, json_response(openapi_spec))
 
+        # 4. Swagger UI
         if path == "/docs":
-            index_html = f"""<!DOCTYPE html>
-    <html>
-    <head>
-        <title>Swagger UI</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css" />
-    </head>
-    <body>
-        <div id="swagger-ui"></div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js"></script>
-        <script>
-        window.onload = () => {{
-            SwaggerUIBundle({{
-                url: '/openapi.json',
-                dom_id: '#swagger-ui',
-            }});
-        }};
-        </script>
-    </body>
-    </html>"""  # noqa: F541
             return await send_response(
-                send, text_html_response(index_html.encode("utf-8"))
+                send, text_html_response(await serve_swagger_ui(), status=200)
             )
 
+        # 5. 404 Not Found
         return await send_response(send, json_response({"error": "Not found"}, 404))
     except AppException as ex:
         body = ex.message
         status_code = ex.status_code
         return await send_response(send, json_response(body, status=status_code))
-
-
-def json_response(data, status=200):
-    return status, [(b"content-type", b"application/json")], [orjson.dumps(data)]
-
-
-def text_plain_response(data, status=200):
-    return status, [(b"content-type", b"text/plain")], [data]
-
-
-def text_html_response(data, status=200):
-    return status, [(b"content-type", b"text/html")], [data]
-
-
-async def read_body(receive):
-    body = b""
-    while True:
-        message = await receive()
-        if message["type"] == "http.request":
-            body += message.get("body", b"")
-            if not message.get("more_body", False):
-                break
-    return body
-
-
-async def send_response(send, response):
-    status, headers, body = response
-    await send({"type": "http.response.start", "status": status, "headers": headers})
-    for chunk in body:
-        await send({"type": "http.response.body", "body": chunk})

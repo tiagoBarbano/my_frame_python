@@ -17,6 +17,12 @@ _SHUTDOWN = object()
 
 
 class OrjsonFormatter(logging.Formatter):
+    """
+    Custom JSON formatter for logging.
+    This formatter uses orjson to serialize log records into JSON format.
+    It includes the timestamp, log level, message, and logger name.
+    It also handles exceptions and any additional attributes in the log record.
+    """
     __slots__ = ()
 
     def format(self, record):
@@ -51,6 +57,13 @@ def _log_writer():
 
 @lru_cache()
 def _setup_logging() -> logging.Logger:
+    """
+    Setup logging for the application.
+    This function configures the logging settings based on the application settings.
+    It creates a logger with the specified log level and adds a custom handler to it.
+    The logger is used to log messages in JSON format using the OrjsonFormatter.
+    """
+    
     log_level = settings.logger_level.upper()
     formatter = OrjsonFormatter()
 
@@ -88,6 +101,7 @@ atexit.register(_shutdown_logging)
 
 
 class LoggerMiddleware:
+    """Middleware to log request and response details."""
     def __init__(self, app):
         self.app = app
 

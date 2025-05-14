@@ -11,6 +11,7 @@ class Types(Enum):
 
 
 class BaseParams(msgspec.Struct, kw_only=True):
+    """Base Params"""
     name: str
     required: bool = msgspec.field(default=False)
     type_field: str
@@ -43,6 +44,7 @@ class PathParams(BaseParams, kw_only=True):
     """Path Params"""
 
     _in: str = msgspec.field(default="path", name="in")
+    required: bool = msgspec.field(default=True)
 
 
 class CookieParams(msgspec.Struct, kw_only=True):

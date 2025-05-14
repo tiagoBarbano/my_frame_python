@@ -54,6 +54,7 @@ services:
 
     depends_on:
       - redis
+
   app:
     build:
       context: ../
@@ -69,15 +70,19 @@ services:
       - LOGGER_LEVEL=info
       - ENDPOINT_OTEL=http://tempo:4317
       - FLAG_LOCAL=false
-      - ENABLE_TRACING=true
-      - ENABLE_METRICS=true
+      - ENABLE_TRACING=false
+      - ENABLE_METRICS=false
       - ENABLE_LOGGER=false
       - ENABLE_SWAGGER=true
+      - WORKER=2
+      - redis_url=redis://:redis1234@redis:6379
+      - mongo_url=mongodb://mongodb:27017
+      - granian_runtime_mode=st
     deploy:
       resources:
         limits:
           memory: 150M
-          cpus: 0.5
+          cpus: 2.0
     # logging: *default-logging
 
   grafana:

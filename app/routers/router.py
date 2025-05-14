@@ -3,11 +3,9 @@ import msgspec
 from jsonschema import ValidationError
 from urllib.parse import parse_qs
 
-import orjson
-
 from app.core.params import HeaderParams, QueryParams, PathParams
 from app.core.routing import post, get
-from app.core.application import (
+from app.core.utils import (
     json_response,
     read_body,
     send_response,
@@ -33,10 +31,9 @@ user_service = UserService()
 async def cotador(scope, receive, send):
     try:
         body = await read_body(receive)
-        body_dict = orjson.loads(body)
 
         data = UserRequestDto(
-            empresa=body_dict.get("empresa"), valor=body_dict.get("valor")
+            empresa=body.get("empresa"), valor=body.get("valor")
         )
 
         new_user = await user_service.create_user(data)
@@ -57,7 +54,7 @@ async def cotador(scope, receive, send):
     summary="Cotador Get",
     tags=["cotador"],
     query_params=[
-        QueryParams(name="id", type_field="string", description="id do cliente")
+        QueryParams(name="id", type_field="string", required=True, description="id do cliente")
     ],
 )
 async def cotador_get(scope, receive, send):
@@ -77,7 +74,7 @@ async def cotador_get(scope, receive, send):
     summary="Cotador Get",
     tags=["cotador"],
     path_params=[
-        PathParams(name="id", type_field="string", description="id do cliente")
+        PathParams(name="id", type_field="string", required=True, description="id do cliente")
     ],
     headers=[HeaderParams(name="teste", type_field="string")],
 )
@@ -105,7 +102,7 @@ async def cotador_get_all(scope, receive, send) -> list[dict]:
     query = parse_qs(scope.get("query_string", b"").decode())
     page = int(query.get("page", [None])[0])
     limit = int(query.get("limite", [None])[0])
-        
+
     result = await user_service.list_users(page=page, limit=limit)
     return await send_response(send, json_response(result))
 

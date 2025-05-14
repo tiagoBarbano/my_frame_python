@@ -6,6 +6,7 @@ from typing import ClassVar
 
 
 class MongoModel(msgspec.Struct, kw_only=True):
+    """MongoDB Model Base Class"""
     _id: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
@@ -15,6 +16,7 @@ class MongoModel(msgspec.Struct, kw_only=True):
 
     @classmethod
     def create(cls, data: dict = None, **kwargs):
+        """Create a new instance of the model."""
         now = datetime.utcnow()
         raw = {**(data or {}), **kwargs}
         return cls(
@@ -30,4 +32,5 @@ class MongoModel(msgspec.Struct, kw_only=True):
         )
 
     def to_dict(self):
+        """Convert the model to a dictionary."""
         return msgspec.to_builtins(self)

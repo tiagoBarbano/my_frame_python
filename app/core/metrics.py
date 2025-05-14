@@ -1,4 +1,3 @@
-import os
 import time
 
 from prometheus_client import (
@@ -9,13 +8,14 @@ from prometheus_client import (
 )
 
 from app.config import get_settings
-from app.core.application import send_response, text_plain_response
+from app.core.utils import send_response, text_plain_response
 from app.core.routing import get
 
 settings = get_settings()
 
 
 def prometheus_metrics():
+    """Generate Prometheus metrics for the application."""
     if settings.prometheus_multiproc_dir:
         registry = CollectorRegistry()
         multiprocess.MultiProcessCollector(registry, "metrics")
@@ -37,6 +37,7 @@ if settings.enable_metrics:
 
 
 class PrometheusMiddleware:
+    """Middleware to measure request latency and expose metrics."""
     def __init__(self, app):
         self.app = app
 

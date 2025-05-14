@@ -1,11 +1,11 @@
 from collections import defaultdict
 import msgspec
 from app.config import Settings
-from app.core._utils import compile_path_to_regex
+from app.core.utils import compile_path_to_regex
 from app.core.params import HeaderParams, PathParams, QueryParams, CookieParams
 
 settings = Settings()
-routes = []
+routes = {}
 routes_by_method = defaultdict(list)
 
 openapi_spec = {
@@ -30,6 +30,7 @@ def route(
     cookie_params: list[CookieParams] = None,
 ):
     def decorator(func):
+        """Decorator para registrar rotas e gerar documentação OpenAPI."""
         if settings.enable_swagger:
             request_content = None
             response_content = None
@@ -104,9 +105,10 @@ def route(
             }
 
         regex_pattern = compile_path_to_regex(path)
-        routes.append((regex_pattern, path, method.upper(), func))
         routes_by_method[method.upper()].append((regex_pattern, path, func))
-        # routes[(regex_pattern, path, method.upper())] = func
+
+        routes[(path, method.upper())] = func
+
         return func
 
     return decorator
