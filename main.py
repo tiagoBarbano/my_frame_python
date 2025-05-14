@@ -10,8 +10,6 @@ from app.core.application import app
 settings = Settings()
 
 
-
-
 if __name__ == "__main__":
     workers = multiprocessing.cpu_count()
 

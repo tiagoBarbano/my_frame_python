@@ -92,9 +92,21 @@ async def cotador_gest(scope, receive, send):
     return await send_response(send, json_response(user_result))
 
 
-@get("/cotadores", summary="Cotador Get ALL", tags=["cotador"])
+@get(
+    "/cotadores",
+    summary="Cotador Get ALL",
+    tags=["cotador"],
+    query_params=[
+        QueryParams(name="page", required=True, type_field="integer"),
+        QueryParams(name="limite", required=True, type_field="integer"),
+    ],
+)
 async def cotador_get_all(scope, receive, send) -> list[dict]:
-    result = await user_service.list_users()
+    query = parse_qs(scope.get("query_string", b"").decode())
+    page = int(query.get("page", [None])[0])
+    limit = int(query.get("limite", [None])[0])
+        
+    result = await user_service.list_users(page=page, limit=limit)
     return await send_response(send, json_response(result))
 
 

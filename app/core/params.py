@@ -1,13 +1,8 @@
+from typing import Any
 import msgspec
 
 from enum import Enum
 
-
-class ParamTypes(Enum):
-    query = "query"
-    header = "header"
-    path = "path"
-    cookie = "cookie"
 
 class Types(Enum):
     string = "string"
@@ -15,32 +10,42 @@ class Types(Enum):
     integer = "integer"
 
 
-class HeaderParams(msgspec.Struct, kw_only=True):
+class BaseParams(msgspec.Struct, kw_only=True):
+    name: str
+    required: bool = msgspec.field(default=False)
+    type_field: str
+    description: str | None = None
+    example: Any = None
+    deprecated: bool = False
+    allow_empty_value: bool = False
+    maxLength: int | None = None
+    minLength: int | None = None
+    enum: list[Any] | None = None
+    pattern: str | None = None
+
+    def encode_dict(self) -> dict:
+        return msgspec.to_builtins(self)
+
+
+class HeaderParams(BaseParams, kw_only=True):
     """Header Params"""
 
-    name: str
     _in: str = msgspec.field(default="header", name="in")
-    required: bool = msgspec.field(default=True)
-    type_field: str
-    description: str | None = None
-    
 
-class QueryParams(msgspec.Struct, kw_only=True):
+
+class QueryParams(BaseParams, kw_only=True):
     """Query Params"""
 
-    name: str
     _in: str = msgspec.field(default="query", name="in")
-    required: bool = msgspec.field(default=True)
-    type_field: str
-    description: str | None = None
-    
 
-class PathParams(msgspec.Struct, kw_only=True):
+
+class PathParams(BaseParams, kw_only=True):
     """Path Params"""
 
-    name: str
     _in: str = msgspec.field(default="path", name="in")
-    required: bool = msgspec.field(default=True)
-    type_field: str
-    description: str | None = None
-    
+
+
+class CookieParams(msgspec.Struct, kw_only=True):
+    """Cookie Parameter"""
+
+    _in: str = msgspec.field(default="cookie", name="in")

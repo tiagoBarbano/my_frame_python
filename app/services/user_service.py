@@ -12,8 +12,8 @@ from app.infra.redis import RedisClient
 class UserService:
     repository = MongoRepository[UserModel](UserModel)
 
-    async def list_users(self) -> list[UserModel]:
-        return await self.repository.find_all(db=MongoDB.get_db())
+    async def list_users(self, page: int, limit: int) -> list[UserModel]:
+        return await self.repository.find_all(page=page, limit=limit, db=MongoDB.get_db())
 
     async def create_user(self, data: UserRequestDto) -> dict:
         result = {"cotacao_final": data.valor * 1.23, "empresa": data.empresa}

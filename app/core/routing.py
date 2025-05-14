@@ -2,7 +2,7 @@ from collections import defaultdict
 import msgspec
 from app.config import Settings
 from app.core._utils import compile_path_to_regex
-from app.core.params import HeaderParams, PathParams, QueryParams
+from app.core.params import HeaderParams, PathParams, QueryParams, CookieParams
 
 settings = Settings()
 routes = []
@@ -27,6 +27,7 @@ def route(
     tags: list[str] = None,
     query_params: list[QueryParams] = None,
     path_params: list[PathParams] = None,
+    cookie_params: list[CookieParams] = None,
 ):
     def decorator(func):
         if settings.enable_swagger:
@@ -70,39 +71,19 @@ def route(
 
             if headers:
                 for header in headers:
-                    parameters.append(
-                        {
-                            "name": header.name,
-                            "in": header._in,
-                            "required": header.required,
-                            "schema": {"type": header.type_field},
-                            "description": header.description,
-                        }
-                    )
+                    parameters.append(header.encode_dict())
 
             if query_params:
                 for q_param in query_params:
-                    parameters.append(
-                        {
-                            "name": q_param.name,
-                            "in": q_param._in,
-                            "required": q_param.required,
-                            "schema": {"type": q_param.type_field},
-                            "description": q_param.description,
-                        }
-                    )
+                    parameters.append(q_param.encode_dict())
 
             if path_params:
                 for p_param in path_params:
-                    parameters.append(
-                        {
-                            "name": p_param.name,
-                            "in": p_param._in,
-                            "required": p_param.required,
-                            "schema": {"type": p_param.type_field},
-                            "description": p_param.description,
-                        }
-                    )
+                    parameters.append(p_param.encode_dict())
+
+            if cookie_params:
+                for p_param in path_params:
+                    parameters.append(p_param.encode_dict())                    
 
             openapi_spec["paths"].setdefault(path, {})[method] = {
                 "summary": summary,
@@ -141,7 +122,8 @@ get = (  # noqa: E731
     headers=None,
     tags=None,
     query_params=None,
-    path_params=None: route(
+    path_params=None,
+    cookie_params=None: route(
         "get",
         path,
         summary,
@@ -152,6 +134,7 @@ get = (  # noqa: E731
         tags,
         query_params,
         path_params,
+        cookie_params,
     )
 )
 post = (  # noqa: E731
@@ -163,7 +146,8 @@ post = (  # noqa: E731
     headers=None,
     tags=None,
     query_params=None,
-    path_params=None: route(
+    path_params=None,
+    cookie_params=None: route(
         "post",
         path,
         summary,
@@ -174,5 +158,6 @@ post = (  # noqa: E731
         tags,
         query_params,
         path_params,
+        cookie_params,
     )
 )

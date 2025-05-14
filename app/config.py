@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     app_name: str = Field(default="My Granian FrameWork", validate_default=False)
     logger_level: str = Field(default="INFO", validate_default=False)
     endpoint_otel: str = Field(default="http://localhost:4317", validate_default=False)
-    flag_local: bool = Field(default=True, validate_default=False)
+    flag_local: bool = Field(default=False, validate_default=False)
     enable_tracing: bool = Field(default=True, validate_default=False)
     enable_metrics: bool = Field(default=True, validate_default=False)
     enable_logger: bool = Field(default=False, validate_default=False)
