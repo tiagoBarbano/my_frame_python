@@ -1,15 +1,18 @@
+import msgspec
+
+from jsonschema import ValidationError
 from urllib.parse import parse_qs
 
-import msgspec
 import orjson
 
+from app.core.params import HeaderParams, QueryParams, PathParams
 from app.core.routing import post, get
 from app.core.application import (
     json_response,
     read_body,
     send_response,
 )
-from app.models.user_model import UserDto, validate_all_fields
+from app.dto.user_dto import UserRequestDto, UserResponseDto
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
@@ -20,25 +23,27 @@ user_service = UserService()
     "/cotador",
     summary="Cotador",
     description="EndPoint responsável por cadastrar cotacoes",
-    request_model=UserDto,
-    response_model=UserDto,
+    request_model=UserRequestDto,
+    response_model=UserResponseDto,
     headers=[
-        {"name": "X-Token", "type": "string", "description": "Token de acesso"},
-        {"name": "X-Customer-Id", "type": "integer", "description": "ID do cliente"}
-    ]    
+        HeaderParams(name="X-Token", type_field="string", description="Token de acesso")
+    ],
+    tags=["cotador"],
 )
 async def cotador(scope, receive, send):
     try:
         body = await read_body(receive)
-        data = validate_all_fields(orjson.loads(body), UserDto)
+        body_dict = orjson.loads(body)
 
-        # new_user = await user_service.create_user(data)
-        if not msgspec.json.decode(orjson.dumps(data), type=UserDto):
-            raise ValueError("Invalid data")
+        data = UserRequestDto(
+            empresa=body_dict.get("empresa"), valor=body_dict.get("valor")
+        )
 
-        return await send_response(send, json_response(data))
-    except (msgspec.ValidationError, ValueError) as e:
-        log.error(f"Validation error: {e}")
+        new_user = await user_service.create_user(data)
+
+        return await send_response(send, json_response(new_user))
+    except (msgspec.ValidationError, ValueError, TypeError, ValidationError) as e:
+        log.error(f"Validation error: {e.args[0]}")
         return await send_response(
             send, json_response({"error": e.args[0]}, status=422)
         )
@@ -47,7 +52,14 @@ async def cotador(scope, receive, send):
         return await send_response(send, json_response({"error": str(e)}, status=500))
 
 
-@get("/cotador", summary="Cotador Get")
+@get(
+    "/cotador",
+    summary="Cotador Get",
+    tags=["cotador"],
+    query_params=[
+        QueryParams(name="id", type_field="string", description="id do cliente")
+    ],
+)
 async def cotador_get(scope, receive, send):
     query = parse_qs(scope.get("query_string", b"").decode())
     id = query.get("id", [None])[0]
@@ -60,22 +72,32 @@ async def cotador_get(scope, receive, send):
     return await send_response(send, json_response(user_result))
 
 
-@get("/cotadores", summary="Cotador Get ALL")
+@get(
+    "/cotadorr/{id}",
+    summary="Cotador Get",
+    tags=["cotador"],
+    path_params=[
+        PathParams(name="id", type_field="string", description="id do cliente")
+    ],
+    headers=[HeaderParams(name="teste", type_field="string")],
+)
+async def cotador_gest(scope, receive, send):
+    item_id = scope["path_params"]["id"]
+
+    user_result = await user_service.get_user_by_id(user_id=item_id)
+
+    if not user_result:
+        return await send_response(send, json_response("Recurso não encontrado", 404))
+
+    return await send_response(send, json_response(user_result))
+
+
+@get("/cotadores", summary="Cotador Get ALL", tags=["cotador"])
 async def cotador_get_all(scope, receive, send) -> list[dict]:
     result = await user_service.list_users()
     return await send_response(send, json_response(result))
 
 
-@get("/", summary="HelloWorld")
+@get("/", summary="HelloWorld", tags=["helloWorld"])
 async def hello_world(scope, receive, send):
     return await send_response(send, json_response({"message": "HelloWorld"}))
-
-
-@get("/schema", summary="Schema", request_model=UserDto, response_model=UserDto)
-async def teste_schema(scope, receive, send):
-    schema = msgspec.json.schema(list[UserDto])
-    schema_components = msgspec.json.schema_components(list[UserDto])
-
-    # Print out that schema as JSON
-    print(schema_components)
-    return await send_response(send, json_response(schema))

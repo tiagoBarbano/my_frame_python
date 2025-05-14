@@ -29,9 +29,27 @@ class MongoRepository(Generic[T]):
             return None
         return self.mongo_to_model(result)
 
-    async def find_all(self, db: AsyncIOMotorDatabase) -> list[T]:
-        cursor = self.collection(db).find()
-        return await cursor.to_list(length=None)
+    async def find_all(
+        self, db: AsyncIOMotorDatabase, page: int = 1, limit: int = 10
+    ) -> list[T]:
+        data = (
+            await self.collection(db)
+            .find()
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .to_list()
+        )
+
+        total_items = await self.collection(db).count_documents({})
+        total_pages = (total_items + limit - 1) // limit
+
+        return {
+            "data": data,
+            "page": page,
+            "limit": limit,
+            "total_items": total_items,
+            "total_pages": total_pages,
+        }
 
     async def soft_delete(self, id: str, db: AsyncIOMotorDatabase):
         now = datetime.utcnow()

@@ -2,7 +2,8 @@ import dataclasses
 import orjson
 
 from app.infra.database import MongoDB
-from app.models.user_model import UserDto, UserModel
+from app.dto.user_dto import UserRequestDto
+from app.models.user_model import UserModel
 from app.repository.mongo_repository import MongoRepository
 from app.infra.redis import RedisClient
 
@@ -14,7 +15,7 @@ class UserService:
     async def list_users(self) -> list[UserModel]:
         return await self.repository.find_all(db=MongoDB.get_db())
 
-    async def create_user(self, data: UserDto) -> dict:
+    async def create_user(self, data: UserRequestDto) -> dict:
         result = {"cotacao_final": data.valor * 1.23, "empresa": data.empresa}
         user = UserModel.create(**result)
         await self.repository.save(model=user, db=MongoDB.get_db())

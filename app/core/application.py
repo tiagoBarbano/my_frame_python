@@ -1,7 +1,7 @@
 import orjson
 
 from app.core.exception import AppException
-from app.core.routing import routes, openapi_spec
+from app.core.routing import openapi_spec, routes_by_method
 from app.config import get_settings
 from app.infra.database import MongoDB
 from app.infra.redis import RedisClient
@@ -39,9 +39,13 @@ async def app(scope, receive, send):
         method = scope["method"]
         path = scope["path"]
 
-        handler = routes.get((path, method))
-        if handler:
-            return await handler(scope, receive, send)
+        handler = {}
+
+        for regex, path_template, handler in routes_by_method[method.upper()]:
+            match = regex.match(path)
+            if match:
+                scope["path_params"] = match.groupdict()
+                return await handler(scope, receive, send)
 
         if path == "/openapi.json":
             return await send_response(send, json_response(openapi_spec))
@@ -65,11 +69,10 @@ async def app(scope, receive, send):
         }};
         </script>
     </body>
-    </html>"""
+    </html>"""  # noqa: F541
             return await send_response(
                 send, text_html_response(index_html.encode("utf-8"))
             )
-                
 
         return await send_response(send, json_response({"error": "Not found"}, 404))
     except AppException as ex:

@@ -19,11 +19,9 @@
             "name": "Python Debugger: Granian",
             "type": "debugpy",
             "request": "launch",
-            "module": "granian",
+            "module": "python",
             "args": [
-                "--interface",
-                "asgi",
-                "main:app"
+                "main.py"
             ],
             "jinja": true
         },
@@ -34,6 +32,14 @@
             "mode": "auto",
             "args": [],
             "program": "/home/f0113800/dev/my_frame_granian/golang/main.go"
+        },
+        {
+            "type": "python",
+            "name": "main",
+            "request": "launch",
+            "justMyCode": false,
+            "args": [],
+            "program": "/home/f0113800/dev/my_frame_granian/main.py"
         }
     ]
 

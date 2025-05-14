@@ -1,3 +1,4 @@
+import os
 import time
 
 from prometheus_client import (
@@ -17,7 +18,7 @@ settings = get_settings()
 def prometheus_metrics():
     if settings.prometheus_multiproc_dir:
         registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry)
+        multiprocess.MultiProcessCollector(registry, "metrics")
         return generate_latest(registry)
     else:
         return generate_latest()
@@ -29,7 +30,7 @@ REQUEST_LATENCY = Histogram(
 
 if settings.enable_metrics:
 
-    @get("/metrics", summary="METRICS", response_model=None)
+    @get("/metrics", summary="METRICS", tags=["METRICS"], response_model=None)
     async def hello_world(scope, receive, send):
         body = prometheus_metrics()
         return await send_response(send, text_plain_response(body))
