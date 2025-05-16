@@ -1,139 +1,140 @@
-x-logging: &default-logging
-  driver: loki
-  options:
-    loki-url: "http://localhost:3100/api/prom/push"
-    no-file: "false"
-    keep-file: "true"
-    loki-pipeline-stages: |
-      - multiline:
-          firstline: '^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}'
-          max_wait_time: 3s
-      - regex:
-          expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2},d{3}) (?P<message>(?s:.*))$$'
+# x-logging: &default-logging
+#   driver: loki
+#   options:
+#     loki-url: "http://localhost:3100/api/prom/push"
+#     no-file: "false"
+#     keep-file: "true"
+#     loki-pipeline-stages: |
+#       - multiline:
+#           firstline: '^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}'
+#           max_wait_time: 3s
+#       - regex:
+#           expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2},d{3}) (?P<message>(?s:.*))$$'
 
 version: "3"
 
 volumes:
   dbdata6:
   redis-insight:  
+  mongo-data:
 
-services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    environment:
-      - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
-      - MONGO_OPTIONS=--enableCompression
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - dbdata6:/data/db
-    ports:
-      - 27017:27017
-    restart: "unless-stopped"
+# services:
+#   mongodb:
+#     image: mongo:latest
+#     container_name: mongodb
+#     environment:
+#       - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
+#       - MONGO_OPTIONS=--enableCompression
+#       - PUID=1000
+#       - PGID=1000
+#     volumes:
+#       - dbdata6:/data/db
+#     ports:
+#       - 27017:27017
+#     restart: "unless-stopped"
+#     # logging: *default-logging
+
+
+  # redis:
+  #   image: redis:alpine
+  #   command: ["redis-server", "/etc/redis/redis.conf", --requirepass redis1234]
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - ./redis.conf:/etc/redis/redis.conf
+  #   # logging: *default-logging
+
+
+  # redis-insight:
+  #   image: redis/redisinsight:latest
+  #   restart: always
+  #   ports:
+  #     - "5540:5540"
+  #   volumes:
+  #     - redis-insight:/data    
+
+  #   depends_on:
+  #     - redis
+
+  # app:
+  #   build:
+  #     context: ../
+  #   ports:
+  #     - '8000:8000'
+  #   depends_on:
+  #     - grafana
+  #     - prometheus
+  #     - tempo
+  #   environment:
+  #     - PROMETHEUS_MULTIPROC_DIR=metrics
+  #     - APP_NAME=MY_FRAME_GRANIAN
+  #     - LOGGER_LEVEL=info
+  #     - ENDPOINT_OTEL=http://tempo:4317
+  #     - FLAG_LOCAL=false
+  #     - ENABLE_TRACING=false
+  #     - ENABLE_METRICS=false
+  #     - ENABLE_LOGGER=false
+  #     - ENABLE_SWAGGER=true
+  #     - WORKER=2
+  #     - redis_url=redis://:redis1234@redis:6379
+  #     - mongo_url=mongodb://mongodb:27017
+  #     - granian_runtime_mode=st
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 150M
+  #         cpus: 2.0
     # logging: *default-logging
 
-
-  redis:
-    image: redis:alpine
-    command: ["redis-server", "/etc/redis/redis.conf", --requirepass redis1234]
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./redis.conf:/etc/redis/redis.conf
-    # logging: *default-logging
-
-
-  redis-insight:
-    image: redis/redisinsight:latest
-    restart: always
-    ports:
-      - "5540:5540"
-    volumes:
-      - redis-insight:/data    
-
-    depends_on:
-      - redis
-
-  app:
-    build:
-      context: ../
-    ports:
-      - '8000:8000'
-    depends_on:
-      - grafana
-      - prometheus
-      - tempo
-    environment:
-      - PROMETHEUS_MULTIPROC_DIR=metrics
-      - APP_NAME=MY_FRAME_GRANIAN
-      - LOGGER_LEVEL=info
-      - ENDPOINT_OTEL=http://tempo:4317
-      - FLAG_LOCAL=false
-      - ENABLE_TRACING=false
-      - ENABLE_METRICS=false
-      - ENABLE_LOGGER=false
-      - ENABLE_SWAGGER=true
-      - WORKER=2
-      - redis_url=redis://:redis1234@redis:6379
-      - mongo_url=mongodb://mongodb:27017
-      - granian_runtime_mode=st
-    deploy:
-      resources:
-        limits:
-          memory: 150M
-          cpus: 2.0
-    # logging: *default-logging
-
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - 3000:3000
-    volumes:
-      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
-    environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_DISABLE_LOGIN_FORM=true
-    # logging: *default-logging
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+  #   environment:
+  #     - GF_AUTH_ANONYMOUS_ENABLED=true
+  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  #     - GF_AUTH_DISABLE_LOGIN_FORM=true
+  #   # logging: *default-logging
     
 
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - 3100:3100
-    command: -config.file=/etc/loki/local-config.yaml
+  # loki:
+  #   image: grafana/loki:latest
+  #   ports:
+  #     - 3100:3100
+  #   command: -config.file=/etc/loki/local-config.yaml
 
-  promtail:
-    image: grafana/promtail:latest
-    container_name: promtail
-    volumes:
-      - ./promtail.yaml:/etc/promtail/docker-config.yaml
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -config.file=/etc/promtail/docker-config.yaml
-    depends_on:
-      - loki
+  # promtail:
+  #   image: grafana/promtail:latest
+  #   container_name: promtail
+  #   volumes:
+  #     - ./promtail.yaml:/etc/promtail/docker-config.yaml
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: -config.file=/etc/promtail/docker-config.yaml
+  #   depends_on:
+  #     - loki
     # logging: *default-logging
 
-  prometheus:
-    container_name: prometheus
-    hostname: prometheus
-    image: prom/prometheus:latest
-    command:
-      - --web.console.templates=/etc/prometheus/consoles
-      - --web.console.libraries=/etc/prometheus/console_libraries
-      - --storage.tsdb.retention.time=1h
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
-      - --web.enable-lifecycle
-      - --web.route-prefix=/
-      - --enable-feature=exemplar-storage
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    extra_hosts: ["host.docker.internal:host-gateway"]
+  # prometheus:
+  #   container_name: prometheus
+  #   hostname: prometheus
+  #   image: prom/prometheus:latest
+  #   command:
+  #     - --web.console.templates=/etc/prometheus/consoles
+  #     - --web.console.libraries=/etc/prometheus/console_libraries
+  #     - --storage.tsdb.retention.time=1h
+  #     - --config.file=/etc/prometheus/prometheus.yml
+  #     - --storage.tsdb.path=/prometheus
+  #     - --web.enable-lifecycle
+  #     - --web.route-prefix=/
+  #     - --enable-feature=exemplar-storage
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "9090:9090"
+  #   extra_hosts: ["host.docker.internal:host-gateway"]
     # logging: *default-logging
     
 
@@ -160,14 +161,14 @@ services:
   #     - METRICS_STORAGE_TYPE=prometheus
   #   logging: *default-logging
 
-  tempo:
-    image: grafana/tempo:2.3.1
-    command: [ "--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--auth.enabled=false", "service_graphs.enabled=true"]
-    ports:
-      - "4317:4317"
-      - "4318:4318"
-    depends_on:
-      - loki
+  # tempo:
+  #   image: grafana/tempo:2.3.1
+  #   command: [ "--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--auth.enabled=false", "service_graphs.enabled=true"]
+  #   ports:
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #   depends_on:
+  #     - loki
     # logging: *default-logging
 
   # otelcol:
@@ -272,3 +273,70 @@ services:
   #     POSTGRES_DB: test-db
   #   ports:
   #     - '5432:5432'
+
+
+  mongo:
+    image: mongo:4.4
+    container_name: gravitee-mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.3
+    container_name: gravitee-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+
+  gateway:
+    image: graviteeio/apim-gateway:4.0.0
+    container_name: gravitee-gateway
+    depends_on:
+      - mongo
+      - elasticsearch
+    environment:
+      - gravitee_management_mongodb_uri=mongodb://mongo:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000
+      - gravitee_ratelimit_mongodb_uri=mongodb://mongo:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000    
+      - gravitee_reporters_elasticsearch_endpoints_0=http://elasticsearch:9200     
+    ports:
+      - "8082:8082"  # porta do gateway para suas APIs
+
+  management_api:
+    image: graviteeio/apim-management-api:4.0.0
+
+    container_name: gravitee-management-api
+    depends_on:
+      - mongo
+      - elasticsearch
+    environment:
+      - gravitee_management_mongodb_uri=mongodb://mongo:27017/gravitee?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000    
+      - gravitee_analytics_elasticsearch_endpoints_0=http://elasticsearch:9200
+    ports:
+      - "8083:8083"
+
+  management_ui:
+    image: graviteeio/apim-management-ui:4.0.0
+    container_name: gravitee-management-ui
+    depends_on:
+      - management_api
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200      
+    ports:
+      - "8084:8080"  # UI de administração
+
+  portal_ui:
+    image: graviteeio/apim-portal-ui:4.0.0
+    container_name: gravitee-portal-ui
+    depends_on:
+      - management_api
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200      
+    ports:
+      - "8085:8080"  # portal do desenvolvedor (acesso externo)
+

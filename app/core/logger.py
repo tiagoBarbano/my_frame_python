@@ -2,18 +2,20 @@ import logging
 import sys
 import orjson
 import time
-import threading
-import queue
-import atexit
 
 from functools import lru_cache
 
 from app.config import get_settings
 
+import asyncio
+
 
 settings = get_settings()
-_LOG_QUEUE = queue.Queue()
+_LOG_QUEUE = asyncio.Queue()
 _SHUTDOWN = object()
+_STANDARD_KEYS = frozenset(
+    logging.LogRecord("", "", "", "", "", "", "", "").__dict__.keys()
+)
 
 
 class OrjsonFormatter(logging.Formatter):
@@ -23,37 +25,70 @@ class OrjsonFormatter(logging.Formatter):
     It includes the timestamp, log level, message, and logger name.
     It also handles exceptions and any additional attributes in the log record.
     """
+
     __slots__ = ()
 
     def format(self, record):
+        # Usa cache local de métodos
+        record_dict = record.__dict__
         log_record = {
-            "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(record.created)),
+            "time": record.created,
             "level": record.levelname,
             "message": record.getMessage(),
             "logger": record.name,
         }
 
+        # Evita chamada cara se não tiver exceção
         if record.exc_info:
             log_record["exception"] = self.formatException(record.exc_info)
+            log_record["exception_type"] = record.exc_info[0].__name__
 
-        standard_keys = logging.LogRecord(
-            "", "", "", "", "", "", "", ""
-        ).__dict__.keys()
-        for key, value in record.__dict__.items():
-            if key not in standard_keys and key not in log_record:
-                log_record[key] = value
+        # Adiciona extras (campos customizados)
+        for key in record_dict:
+            if key not in _STANDARD_KEYS and key not in log_record:
+                log_record[key] = record_dict[key]
 
         return orjson.dumps(log_record, option=orjson.OPT_APPEND_NEWLINE)
 
 
-def _log_writer():
+async def _log_writer():
     stream = sys.stdout.buffer
-    while True:
-        record = _LOG_QUEUE.get()
-        if record is _SHUTDOWN:
-            break
-        stream.write(record)
-        stream.flush()
+    write = stream.write
+    flush = stream.flush
+
+    BATCH_SIZE = 100
+    FLUSH_INTERVAL = 0.05  # segundos
+
+    buffer = []
+
+    try:
+        while True:
+            try:
+                record = await asyncio.wait_for(
+                    _LOG_QUEUE.get(), timeout=FLUSH_INTERVAL
+                )
+                if record is _SHUTDOWN:
+                    break
+                buffer.append(record)
+
+                if len(buffer) >= BATCH_SIZE:
+                    write(b"".join(buffer))
+                    flush()
+                    buffer.clear()
+
+            except asyncio.TimeoutError:
+                if buffer:
+                    write(b"".join(buffer))
+                    flush()
+                    buffer.clear()
+
+    except asyncio.CancelledError:
+        pass
+
+    if buffer:
+        write(b"".join(buffer))
+        flush()
+
 
 @lru_cache()
 def _setup_logging() -> logging.Logger:
@@ -63,19 +98,24 @@ def _setup_logging() -> logging.Logger:
     It creates a logger with the specified log level and adds a custom handler to it.
     The logger is used to log messages in JSON format using the OrjsonFormatter.
     """
-    
+
     log_level = settings.logger_level.upper()
     formatter = OrjsonFormatter()
 
     class QueueHandler(logging.Handler):
+        def __init__(self, queue, formatter):
+            super().__init__()
+            self.queue = queue
+            self.formatter = formatter
+
         def emit(self, record):
             try:
-                msg = formatter.format(record)
-                _LOG_QUEUE.put_nowait(msg)
+                msg = self.formatter.format(record)
+                self.queue.put_nowait(msg)
             except Exception:
-                pass
+                self.handleError(record)
 
-    handler = QueueHandler()
+    handler = QueueHandler(_LOG_QUEUE, formatter)
 
     root = logging.getLogger()
     root.setLevel(log_level)
@@ -85,33 +125,24 @@ def _setup_logging() -> logging.Logger:
     return logging.getLogger(settings.app_name)
 
 
-def _shutdown_logging():
-    try:
-        _LOG_QUEUE.put(_SHUTDOWN)
-        _writer_thread.join()
-    except Exception:
-        pass
-
-
 log = _setup_logging()
-
-_writer_thread = threading.Thread(target=_log_writer, daemon=True).start()
-
-atexit.register(_shutdown_logging)
 
 
 class LoggerMiddleware:
     """Middleware to log request and response details."""
+
     def __init__(self, app):
         self.app = app
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
-        
-        start_time = time.perf_counter()        
-        
-        log.info("start_process", extra={"method": scope["method"], "path": scope["path"]})
+
+        start_time = time.perf_counter()
+
+        log.info(
+            "start_process", extra={"method": scope["method"], "path": scope["path"]}
+        )
 
         status_code = 200
         body_parts = []
@@ -126,7 +157,7 @@ class LoggerMiddleware:
 
         await self.app(scope, receive, send_wrapper)
 
-        finish_time = time.perf_counter()
+        time_process = time.perf_counter() - start_time
 
         log.info(
             "finish_process",
@@ -134,6 +165,6 @@ class LoggerMiddleware:
                 "method": scope["method"],
                 "path": scope["path"],
                 "status_code": status_code,
-                "time_process": finish_time - start_time,
+                "time_process": time_process,
             },
         )

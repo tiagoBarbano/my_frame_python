@@ -4,8 +4,11 @@ import orjson
 
 from jsonschema import Draft7Validator, ValidationError
 
-
 from functools import lru_cache
+
+CONTENT_TYPE_TEXT_HTML_HEADER = [(b"content-type", b"text/html")]
+CONTENT_TYPE_TEXT_PLAIN_HEADER = [(b"content-type", b"text/plain")]
+CONTENT_TYPE_APPLICATION_JSON_HEADER = [(b"content-type", b"application/json")]
 
 
 @lru_cache(maxsize=128)
@@ -71,36 +74,57 @@ def compile_path_to_regex(path_template):
     return re.compile(f"^{pattern}$")
 
 
-def json_response(data, status=200):
+def json_response(data, status=200, headers: dict[str,str]=None):
     """
     Return a response with JSON content type.
     This function takes the response data and status code as input
     and returns a tuple containing the status code, headers, and body.
     The headers include the content type set to "application/json".
     """
+    headers_response = (
+        [(k.encode("utf-8"), v.encode("utf-8")) for k, v in headers.items()]
+        if headers
+        else []
+    )
+    headers_response.extend(CONTENT_TYPE_APPLICATION_JSON_HEADER)
 
-    return status, [(b"content-type", b"application/json")], [orjson.dumps(data)]
+    return status, headers_response, [orjson.dumps(data)]
 
 
-def text_plain_response(data, status=200):
+def text_plain_response(data, status=200, headers=None):
     """
     Return a response with plain text content type.
     This function takes the response data and status code as input
     and returns a tuple containing the status code, headers, and body.
     The headers include the content type set to "text/plain".
     """
-    
-    return status, [(b"content-type", b"text/plain")], [data]
+
+    headers_response = (
+        [(k.encode("utf-8"), v.encode("utf-8")) for k, v in headers.items()]
+        if headers
+        else []
+    )
+    headers_response.extend(CONTENT_TYPE_TEXT_PLAIN_HEADER)
+
+    return status, headers_response, [data]
 
 
-def text_html_response(data, status=200):
+def text_html_response(data, status=200, headers=None):
     """
     Return a response with HTML content type.
     This function takes the response data and status code as input
     and returns a tuple containing the status code, headers, and body.
     The headers include the content type set to "text/html".
     """
-    return status, [(b"content-type", b"text/html")], [data]
+
+    headers_response = (
+        [(k.encode("utf-8"), v.encode("utf-8")) for k, v in headers.items()]
+        if headers
+        else []
+    )
+    headers_response.extend(CONTENT_TYPE_TEXT_HTML_HEADER)
+
+    return status, headers_response, [data]
 
 
 async def read_body(receive) -> dict:
@@ -131,5 +155,4 @@ async def send_response(send, response):
 
     status, headers, body = response
     await send({"type": "http.response.start", "status": status, "headers": headers})
-    for chunk in body:
-        await send({"type": "http.response.body", "body": chunk})
+    await send({"type": "http.response.body", "body": body[0]})

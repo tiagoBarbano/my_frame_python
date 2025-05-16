@@ -42,7 +42,7 @@ class PrometheusMiddleware:
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        start_time = time.monotonic_ns()
+        start_time = time.perf_counter_ns()
 
         if (
             scope["type"] != "http"
@@ -65,5 +65,5 @@ class PrometheusMiddleware:
 
         await self.app(scope, receive, send_wrapper)
 
-        duration = (time.monotonic_ns() - start_time) / 1_000_000_000
+        duration = (time.perf_counter_ns() - start_time) / 1_000_000_000
         REQUEST_LATENCY.labels(method, path, str(status_code)).observe(duration)

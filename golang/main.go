@@ -23,7 +23,7 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Limitar a 1 CPU
-	runtime.GOMAXPROCS(4)
+	runtime.GOMAXPROCS(1)
 
 	// Criar o canal de logs com buffer para evitar bloqueios
 	// logChannel = make(chan string, 100)

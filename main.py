@@ -10,6 +10,12 @@ from app.core.application import app
 settings = Settings()
 
 
+if settings.enable_logger:
+    from app.core.logger import LoggerMiddleware
+
+    app = LoggerMiddleware(app)
+
+
 if __name__ == "__main__":
     workers = multiprocessing.cpu_count()
 
@@ -26,10 +32,6 @@ if __name__ == "__main__":
     ).serve()
 
 
-if settings.enable_logger:
-    from app.core.logger import LoggerMiddleware
-
-    app = LoggerMiddleware(app)
 
 # Habilita as Metricas do Prometheus
 if settings.enable_metrics:

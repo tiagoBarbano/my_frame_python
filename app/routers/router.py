@@ -1,14 +1,17 @@
 import msgspec
+import time
 
 from jsonschema import ValidationError
 from urllib.parse import parse_qs
 
+from app.core.exception import AppException
 from app.core.params import HeaderParams, QueryParams, PathParams
 from app.core.routing import post, get
 from app.core.utils import (
     json_response,
     read_body,
     send_response,
+    validate_schema_dict,
 )
 from app.dto.user_dto import UserRequestDto, UserResponseDto
 from app.services.user_service import UserService
@@ -58,6 +61,8 @@ async def cotador(scope, receive, send):
     ],
 )
 async def cotador_get(scope, receive, send):
+    start_process = time.perf_counter()
+    
     query = parse_qs(scope.get("query_string", b"").decode())
     id = query.get("id", [None])[0]
 
@@ -66,7 +71,9 @@ async def cotador_get(scope, receive, send):
     if not user_result:
         return await send_response(send, json_response("Recurso não encontrado", 404))
 
-    return await send_response(send, json_response(user_result))
+    time_process = time.perf_counter() - start_process
+    raise AppException("Erro de teste", status_code=500, headers={"time_process": f"{time_process:.7f} segs"})
+    # return await send_response(send, json_response(user_result, headers={"time_process": f"{time_process:.7f} segs"}))
 
 
 @get(
@@ -110,3 +117,7 @@ async def cotador_get_all(scope, receive, send) -> list[dict]:
 @get("/", summary="HelloWorld", tags=["helloWorld"])
 async def hello_world(scope, receive, send):
     return await send_response(send, json_response({"message": "HelloWorld"}))
+
+@get("/exception", summary="Exception", tags=["helloWorld"])
+async def exception(scope, receive, send):
+    raise AppException("Erro de teste", status_code=500)

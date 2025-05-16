@@ -54,6 +54,7 @@ async def app(scope, receive, send):
         # 5. 404 Not Found
         return await send_response(send, json_response({"error": "Not found"}, 404))
     except AppException as ex:
-        body = ex.message
+        body = ex.detail
         status_code = ex.status_code
-        return await send_response(send, json_response(body, status=status_code))
+        headers = ex.headers
+        return await send_response(send, json_response(data=body, status=status_code, headers=headers))
