@@ -4,12 +4,6 @@ import msgspec
 from enum import Enum
 
 
-class Types(Enum):
-    string = "string"
-    float = "float"
-    integer = "integer"
-
-
 class BaseParams(msgspec.Struct, kw_only=True):
     """Base Params"""
     name: str
@@ -23,6 +17,7 @@ class BaseParams(msgspec.Struct, kw_only=True):
     minLength: int | None = None
     enum: list[Any] | None = None
     pattern: str | None = None
+    default: Any = None  # ← valor padrão adicional
 
     def encode_dict(self) -> dict:
         return msgspec.to_builtins(self)

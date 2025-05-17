@@ -1,7 +1,6 @@
 from typing import TypeVar, Generic, Type
 from bson import ObjectId
-from datetime import datetime
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from datetime import datetime, timezone
 from app.infra.database import MongoManager
 from app.models.model_base import MongoModel
 
@@ -50,9 +49,9 @@ class MongoRepository(Generic[T]):
                 "total_pages": total_pages,
             }
 
-    async def soft_delete(self, id: str, db: AsyncIOMotorDatabase):
-        now = datetime.utcnow()
-        with db[self.collection_name] as db:
+    async def soft_delete(self, id: str):
+        now = datetime.now(timezone.utc)
+        async with MongoManager.get_database() as db:
             await self.collection(db).update_one(
                 {"_id": ObjectId(id)},
                 {"$set": {"deleted": True, "updated_at": now}},

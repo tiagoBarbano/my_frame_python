@@ -24,20 +24,16 @@ async def app(scope, receive, send):
     try:
         if scope["type"] == "lifespan":
             await lifespan(scope, receive, send)
-            
+
         method = scope["method"]
         path = scope["path"]
 
-        # 1. Rota exata
-        handler = routes.get((path, method))
-        if handler:
+        if handler := routes.get((path, method)):
             return await handler(scope, receive, send)
 
         # 2. Rota com regex
         for regex, path_template, handler in routes_by_method[method.upper()]:
-            match = regex.match(path)
-            
-            if match:
+            if match := regex.match(path):
                 scope["path_params"] = match.groupdict()
                 return await handler(scope, receive, send)
 

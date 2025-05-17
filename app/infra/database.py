@@ -24,8 +24,7 @@ class MongoManager:
     async def get_database(cls):
         client = cls.get_client()
         try:
-            db = client[settings.mongo_db]
-            yield db
+            yield client[settings.mongo_db]
         except(ConnectionFailure, ConfigurationError, OperationFailure) as ex:
             client.close()
             log.error(f"MongoDB connection error: {ex}")

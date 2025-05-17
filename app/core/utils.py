@@ -31,10 +31,18 @@ async def validate_schema_dict(body, ModelDto):
     data = orjson.loads(body) if isinstance(body, bytes) else body
     validator = get_validator(ModelDto)
 
-    erros = sorted(validator.iter_errors(data), key=lambda e: e.path)
-    if erros:
-        message_error = [e.args[0] for e in erros]
-        raise ValidationError(message=message_error)
+    if erros := sorted(validator.iter_errors(data), key=lambda e: e.path):
+        message_error = []
+        message_error.extend(
+            {
+                "field": e.json_path,
+                "message": e.message,
+                "validator": e.validator,
+            }
+            for e in erros
+        )
+        error = {"detail": message_error, "body": body}
+        raise ValidationError(message=error)
 
     return ModelDto(**data).encode_dict()
 
@@ -52,10 +60,18 @@ async def validate_schema_object(body, ModelDto):
     data = orjson.loads(body) if isinstance(body, bytes) else body
     validator = get_validator(ModelDto)
 
-    erros = sorted(validator.iter_errors(data), key=lambda e: e.path)
-    if erros:
-        message_error = [e.args[0] for e in erros]
-        raise ValidationError(message=message_error)
+    if erros := sorted(validator.iter_errors(data), key=lambda e: e.path):
+        message_error = []
+        message_error.extend(
+            {
+                "field": e.json_path,
+                "message": e.message,
+                "validator": e.validator,
+            }
+            for e in erros
+        )
+        error = {"detail": message_error, "body": body}
+        raise ValidationError(message=error)
 
     return ModelDto(**data)
 
@@ -74,7 +90,7 @@ def compile_path_to_regex(path_template):
     return re.compile(f"^{pattern}$")
 
 
-def json_response(data, status=200, headers: dict[str,str]=None):
+def json_response(data, status=200, headers: dict[str, str] = None):
     """
     Return a response with JSON content type.
     This function takes the response data and status code as input

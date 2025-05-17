@@ -1,7 +1,7 @@
 from bson import ObjectId
 import msgspec
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import ClassVar
 
 
@@ -17,7 +17,7 @@ class MongoModel(msgspec.Struct, kw_only=True):
     @classmethod
     def create(cls, data: dict = None, **kwargs):
         """Create a new instance of the model."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         raw = {**(data or {}), **kwargs}
         return cls(
             _id=raw.get("_id", str(ObjectId())),

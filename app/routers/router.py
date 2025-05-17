@@ -11,8 +11,10 @@ from app.core.utils import (
     json_response,
     read_body,
     send_response,
+    validate_schema_dict,
 )
-from app.dto.user_dto import UserRequestDto, UserResponseDto
+from app.dto.user_dto import CotadorListResponse, UserRequestDto, UserResponseDto
+from app.models.user_model import UserModel
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
@@ -34,9 +36,8 @@ async def cotador(scope, receive, send):
     try:
         body = await read_body(receive)
 
-        data = UserRequestDto(
-            empresa=body.get("empresa"), valor=body.get("valor")
-        )
+        data_validated = await validate_schema_dict(body, UserRequestDto)
+        data = UserRequestDto(empresa=body.get("empresa"), valor=body.get("valor"))
 
         new_user = await user_service.create_user(data)
 
@@ -55,31 +56,42 @@ async def cotador(scope, receive, send):
     "/user",
     summary="Cotador Get",
     tags=["cotador"],
+    response_model=UserResponseDto,
     query_params=[
-        QueryParams(name="id", type_field="string", required=True, description="id do cliente")
+        QueryParams(
+            name="id", type_field="string", required=True, description="id do cliente"
+        )
     ],
 )
 async def cotador_get(scope, receive, send):
     start_process = time.perf_counter()
-    
-    query = parse_qs(scope.get("query_string", b"").decode())
-    id = query.get("id", [None])[0]
 
-    user_result = await user_service.get_user_by_id(user_id=id)
+    query = parse_qs(scope.get("query_string", b"").decode())
+    _id = query.get("id", [None])[0]
+
+    user_result = await user_service.get_user_by_id(user_id=_id)
 
     if not user_result:
         return await send_response(send, json_response("Recurso não encontrado", 404))
 
     time_process = time.perf_counter() - start_process
-    return await send_response(send, json_response(user_result, headers={"time_process": f"{time_process:.7f} segs"}))
+    return await send_response(
+        send,
+        json_response(
+            user_result, headers={"time_process": f"{time_process:.7f} segs"}
+        ),
+    )
 
 
 @get(
     "/user/{id}",
     summary="Cotador Get",
     tags=["cotador"],
+    response_model=UserModel,
     path_params=[
-        PathParams(name="id", type_field="string", required=True, description="id do cliente")
+        PathParams(
+            name="id", type_field="string", required=True, description="id do cliente"
+        )
     ],
     headers=[HeaderParams(name="teste", type_field="string")],
 )
@@ -98,15 +110,16 @@ async def cotador_gest(scope, receive, send):
     "/cotadores",
     summary="Cotador Get ALL",
     tags=["cotador"],
+    response_model=CotadorListResponse,
     query_params=[
-        QueryParams(name="page", required=True, type_field="integer"),
-        QueryParams(name="limite", required=True, type_field="integer"),
+        QueryParams(name="page", required=True, type_field="integer", default=1),
+        QueryParams(name="limite", required=True, type_field="integer", default=10),
     ],
 )
 async def cotador_get_all(scope, receive, send) -> list[dict]:
     query = parse_qs(scope.get("query_string", b"").decode())
-    page = int(query.get("page", [None])[0])
-    limit = int(query.get("limite", [None])[0])
+    page = int(query.get("page", ["1"])[0])
+    limit = int(query.get("limite", ["10"])[0])
 
     result = await user_service.list_users(page=page, limit=limit)
     return await send_response(send, json_response(result))
@@ -116,6 +129,13 @@ async def cotador_get_all(scope, receive, send) -> list[dict]:
 async def hello_world(scope, receive, send):
     return await send_response(send, json_response({"message": "HelloWorld"}))
 
+
 @get("/exception", summary="Exception", tags=["helloWorld"])
 async def exception(scope, receive, send):
-    raise AppException("Erro de teste", status_code=500)
+    raise AppException(
+        {
+            "error": "Erro de teste",
+            "error_detail": "Teste para avaliar a classe de erro genérica",
+        },
+        status_code=500,
+    )

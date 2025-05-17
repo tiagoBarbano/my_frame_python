@@ -9,13 +9,13 @@ POST http://localhost:8000/cotador
 ###
 
 
-GET http://localhost:8000/cotador?id=6824a20df7dd58da13144a72
+GET http://localhost:8000/user?id=6815743912fe6b4b94acb739
 
 
 ###
 
 
-GET http://localhost:8000/cotadorr/6824a20df7dd58da13144a72
+GET http://localhost:8000/user/6815743912fe6b4b94acb739
 
 
 ###
@@ -25,4 +25,4 @@ GET http://localhost:8000/cotadores
 ###
 
 
-GET http://localhost:8000/
+GET http://localhost:8000/openapi.json

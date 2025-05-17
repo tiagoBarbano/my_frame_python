@@ -16,12 +16,11 @@ settings = get_settings()
 
 def prometheus_metrics():
     """Generate Prometheus metrics for the application."""
-    if settings.prometheus_multiproc_dir:
-        registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry, "metrics")
-        return generate_latest(registry)
-    else:
+    if not settings.prometheus_multiproc_dir:
         return generate_latest()
+    registry = CollectorRegistry()
+    multiprocess.MultiProcessCollector(registry, "metrics")
+    return generate_latest(registry)
 
 
 REQUEST_LATENCY = Histogram(

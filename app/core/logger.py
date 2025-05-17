@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import sys
 import orjson
@@ -61,7 +62,7 @@ async def _log_writer():
 
     buffer = []
 
-    try:
+    with contextlib.suppress(asyncio.CancelledError):
         while True:
             try:
                 record = await asyncio.wait_for(
@@ -81,9 +82,6 @@ async def _log_writer():
                     write(b"".join(buffer))
                     flush()
                     buffer.clear()
-
-    except asyncio.CancelledError:
-        pass
 
     if buffer:
         write(b"".join(buffer))
