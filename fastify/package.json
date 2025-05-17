@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@fastify/mongodb": "^9.0.2",
     "@fastify/otel": "^0.7.0",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/instrumentation-fastify": "^0.45.0",

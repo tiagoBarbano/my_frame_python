@@ -1,13 +1,13 @@
 import redis.asyncio as redis
 
-from opentelemetry.instrumentation.redis import RedisInstrumentor
+# from opentelemetry.instrumentation.redis import RedisInstrumentor
 
 from app.config import get_settings
 
 
 settings = get_settings()
 
-RedisInstrumentor().instrument()
+# RedisInstrumentor().instrument()
 
 
 class RedisClient:

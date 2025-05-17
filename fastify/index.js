@@ -13,6 +13,30 @@ const fastify = require('fastify')({ logger: false });
 // });
 
 
+fastify.register(require('@fastify/mongodb'), {
+  // force to close the mongodb connection when app stopped
+  // the default value is false
+  forceClose: true,
+
+  url: 'mongodb://localhost:27017/cotador'
+})
+
+fastify.get('/user/:id', async function (req, reply) {
+  // Or this.mongo.client.db('mydb').collection('users')
+  const users = this.mongo.db.collection('users')
+  
+  // console.log(users)
+  // if the id is an ObjectId format, you need to create a new ObjectId
+  // const id = new this.mongo.ObjectId(req.params.id)
+  try {
+    const user = await users.findOne({"_id": req.params.id})
+    return user
+  } catch (err) {
+    return err
+  }
+})
+
+
 fastify.get('/', async (request, reply) => {
   // const end = httpRequestDurationMicroseconds.startTimer();
 

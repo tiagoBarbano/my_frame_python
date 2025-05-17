@@ -2,6 +2,7 @@ from typing import TypeVar, Generic, Type
 from bson import ObjectId
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from app.infra.database import MongoManager
 from app.models.model_base import MongoModel
 
 T = TypeVar("T", bound=MongoModel)
@@ -10,9 +11,7 @@ T = TypeVar("T", bound=MongoModel)
 class MongoRepository(Generic[T]):
     def __init__(self, model_cls: Type[T]):
         self.model_cls = model_cls
-
-    def collection(self, db: AsyncIOMotorDatabase):
-        return db[self.model_cls.__collection__]
+        self.collection_name = model_cls.__collection__
 
     def mongo_to_model(self, doc: dict) -> T:
         doc = dict(doc)
@@ -20,40 +19,41 @@ class MongoRepository(Generic[T]):
             doc["_id"] = str(doc["_id"])
         return self.model_cls(**doc)
 
-    async def save(self, model: T, db: AsyncIOMotorDatabase):
-        return await self.collection(db).insert_one(model.to_dict())
+    async def save(self, model: T):
+        async with MongoManager.get_database() as db:
+            return await db[self.collection_name].insert_one(model.to_dict())
 
-    async def find_by_id(self, id: str, db: AsyncIOMotorDatabase) -> T | None:
-        result = await self.collection(db).find_one({"_id": id})
-        if not result:
-            return None
-        return self.mongo_to_model(result)
+    async def find_by_id(self, id: str) -> T | None:
+        async with MongoManager.get_database() as db:
+            return await db[self.collection_name].find_one({"_id": id})
 
     async def find_all(
-        self, db: AsyncIOMotorDatabase, page: int = 1, limit: int = 10
+        self, page: int = 1, limit: int = 10
     ) -> list[T]:
-        data = (
-            await self.collection(db)
-            .find()
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .to_list()
-        )
+        async with MongoManager.get_database() as db:
+            data = (
+                await db[self.collection_name]
+                .find()
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .to_list()
+            )
 
-        total_items = await self.collection(db).count_documents({})
-        total_pages = (total_items + limit - 1) // limit
+            total_items = await db[self.collection_name].count_documents({})
+            total_pages = (total_items + limit - 1) // limit
 
-        return {
-            "data": data,
-            "page": page,
-            "limit": limit,
-            "total_items": total_items,
-            "total_pages": total_pages,
-        }
+            return {
+                "data": data,
+                "page": page,
+                "limit": limit,
+                "total_items": total_items,
+                "total_pages": total_pages,
+            }
 
     async def soft_delete(self, id: str, db: AsyncIOMotorDatabase):
         now = datetime.utcnow()
-        await self.collection(db).update_one(
-            {"_id": ObjectId(id)},
-            {"$set": {"deleted": True, "updated_at": now}},
-        )
+        with db[self.collection_name] as db:
+            await self.collection(db).update_one(
+                {"_id": ObjectId(id)},
+                {"$set": {"deleted": True, "updated_at": now}},
+            )

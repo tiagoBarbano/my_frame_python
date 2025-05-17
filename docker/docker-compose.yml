@@ -18,31 +18,31 @@ volumes:
   redis-insight:  
   mongo-data:
 
-# services:
-#   mongodb:
-#     image: mongo:latest
-#     container_name: mongodb
-#     environment:
-#       - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
-#       - MONGO_OPTIONS=--enableCompression
-#       - PUID=1000
-#       - PGID=1000
-#     volumes:
-#       - dbdata6:/data/db
-#     ports:
-#       - 27017:27017
-#     restart: "unless-stopped"
-#     # logging: *default-logging
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
+      - MONGO_OPTIONS=--enableCompression
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - dbdata6:/data/db
+    ports:
+      - 27017:27017
+    restart: "unless-stopped"
+    # logging: *default-logging
 
 
-  # redis:
-  #   image: redis:alpine
-  #   command: ["redis-server", "/etc/redis/redis.conf", --requirepass redis1234]
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - ./redis.conf:/etc/redis/redis.conf
-  #   # logging: *default-logging
+  redis:
+    image: redis:alpine
+    command: ["redis-server", "/etc/redis/redis.conf", --requirepass redis1234]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf
+    # logging: *default-logging
 
 
   # redis-insight:
@@ -338,5 +338,5 @@ volumes:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200      
     ports:
-      - "8085:8080"  # portal do desenvolvedor (acesso externo)
+      - "8086:8080"  # portal do desenvolvedor (acesso externo)
 

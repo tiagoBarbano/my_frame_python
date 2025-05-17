@@ -1,10 +1,12 @@
+import http
+
 from typing import Mapping
 from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
+from app.config import get_settings
 from app.core.logger import log
 
-import http
-
+settings = get_settings()
 tracer = trace.get_tracer("error.tracer")
 
 
@@ -16,9 +18,10 @@ class AppException(Exception):
         self.status_code = status_code
         self.headers = headers
 
-        with tracer.start_span(f"error.{status_code}", attributes={"force_sample": True}) as span:
-            span.set_status(Status(StatusCode.ERROR, detail))
-            span.record_exception(self)
+        if settings.enable_tracing:
+            with tracer.start_span(f"error.{status_code}", attributes={"force_sample": True}) as span:
+                span.set_status(Status(StatusCode.ERROR, detail))
+                span.record_exception(self)
 
         log.error(self.detail, extra={"status_code":status_code})
         super().__init__(detail)

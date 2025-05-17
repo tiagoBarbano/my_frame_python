@@ -11,7 +11,6 @@ from app.core.utils import (
     json_response,
     read_body,
     send_response,
-    validate_schema_dict,
 )
 from app.dto.user_dto import UserRequestDto, UserResponseDto
 from app.services.user_service import UserService
@@ -53,7 +52,7 @@ async def cotador(scope, receive, send):
 
 
 @get(
-    "/cotador",
+    "/user",
     summary="Cotador Get",
     tags=["cotador"],
     query_params=[
@@ -72,12 +71,11 @@ async def cotador_get(scope, receive, send):
         return await send_response(send, json_response("Recurso não encontrado", 404))
 
     time_process = time.perf_counter() - start_process
-    raise AppException("Erro de teste", status_code=500, headers={"time_process": f"{time_process:.7f} segs"})
-    # return await send_response(send, json_response(user_result, headers={"time_process": f"{time_process:.7f} segs"}))
+    return await send_response(send, json_response(user_result, headers={"time_process": f"{time_process:.7f} segs"}))
 
 
 @get(
-    "/cotadorr/{id}",
+    "/user/{id}",
     summary="Cotador Get",
     tags=["cotador"],
     path_params=[

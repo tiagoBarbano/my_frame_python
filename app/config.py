@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     enable_tracing: bool = Field(default=False, validate_default=False)
     enable_metrics: bool = Field(default=False, validate_default=False)
     enable_logger: bool = Field(default=False, validate_default=False)
-    enable_swagger: bool = Field(default=True, validate_default=False)
+    enable_swagger: bool = Field(default=False, validate_default=False)
     enable_trace_ratio_based: bool = Field(default=True, validate_default=False)
     ratio_value: str = Field(default=0.05, validate_default=False)
     redis_url: str = Field(default="redis://:redis1234@localhost:6379", validate_default=False)

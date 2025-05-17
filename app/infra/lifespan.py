@@ -1,6 +1,7 @@
 import asyncio
 from app.core.logger import _log_writer
-from app.infra.database import MongoDB
+
+from app.infra.database import MongoManager
 from app.infra.redis import RedisClient
 
 
@@ -8,13 +9,7 @@ def startup():
     """Startup middleware for initializing resources."""
     asyncio.create_task(_log_writer())
     RedisClient.init()
-    MongoDB.init()
-
-
-def shutdown():
-    """Shutdown middleware for cleaning up resources."""
-    RedisClient.close()
-    MongoDB.close()
+    MongoManager.init_client("mongodb://localhost:27017")
 
 
 async def lifespan(scope, receive, send):
@@ -23,7 +18,4 @@ async def lifespan(scope, receive, send):
     if msg["type"] == "lifespan.startup":
         startup()
         await send({"type": "lifespan.startup.complete"})
-    elif msg["type"] == "lifespan.shutdown":
-        shutdown()
-        print("Shutting down...")
-        await send({"type": "lifespan.shutdown.complete"})
+
