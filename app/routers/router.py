@@ -36,8 +36,7 @@ async def cotador(scope, receive, send):
     try:
         body = await read_body(receive)
 
-        data_validated = await validate_schema_dict(body, UserRequestDto)
-        data = UserRequestDto(empresa=body.get("empresa"), valor=body.get("valor"))
+        data = await validate_schema_dict(body, UserRequestDto)
 
         new_user = await user_service.create_user(data)
 
