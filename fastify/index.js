@@ -37,17 +37,28 @@ fastify.get('/user/:id', async function (req, reply) {
 })
 
 
+fastify.get('/users', async function (req, reply) {
+  // Or this.mongo.client.db('mydb').collection('users')
+  const users = this.mongo.db.collection('users')
+  
+  // console.log(users)
+  // if the id is an ObjectId format, you need to create a new ObjectId
+  // const id = new this.mongo.ObjectId(req.params.id)
+  try {
+    const user = await users.find({}).toArray()
+    return user
+  } catch (err) {
+    return err
+  }
+})
+
+
+
 fastify.get('/', async (request, reply) => {
   // const end = httpRequestDurationMicroseconds.startTimer();
-
-  try {
     const response = { message: 'Hello World' };
     // end({ status_code: 200 });
     return response;
-  } catch (error) {
-    // end({ status_code: 500 });
-    throw error;
-  }
 });
 
 const start = async () => {

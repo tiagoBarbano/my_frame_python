@@ -22,16 +22,21 @@ services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
-    environment:
-      - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
-      - MONGO_OPTIONS=--enableCompression
-      - PUID=1000
-      - PGID=1000
+    # environment:
+    #   - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
+    #   - MONGO_OPTIONS=--enableCompression
+    #   - PUID=1000
+    #   - PGID=1000
     volumes:
       - dbdata6:/data/db
     ports:
       - 27017:27017
     restart: "unless-stopped"
+    deploy:
+      resources:
+        limits:
+          memory: 3000M
+          cpus: 1.0    
     # logging: *default-logging
 
 
@@ -42,6 +47,11 @@ services:
       - "6379:6379"
     volumes:
       - ./redis.conf:/etc/redis/redis.conf
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: 0.5         
     # logging: *default-logging
 
 

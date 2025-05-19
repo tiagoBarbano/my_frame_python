@@ -33,7 +33,7 @@ func main() {
 
 	http.HandleFunc("/", helloHandler)
 
-	addr := ":8080"
+	addr := ":8081"
 	// logChannel <- fmt.Sprintf("Servidor rodando em http://localhost%s usando 1 CPU")
 
 	err := http.ListenAndServe(addr, nil)

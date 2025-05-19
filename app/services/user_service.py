@@ -1,11 +1,9 @@
 import dataclasses
 
-import orjson
-
 from app.dto.user_dto import UserRequestDto
 from app.models.user_model import UserModel
 from app.repository.mongo_repository import MongoRepository
-from app.infra.redis import RedisClient
+from app.infra.redis import redis_cache
 
 
 @dataclasses.dataclass(slots=True)
@@ -21,20 +19,10 @@ class UserService:
         await self.repository.save(model=user)
         return user.to_dict()
 
+    @redis_cache(ttl=60, key_prefix="user", key_fn=lambda user_id, **_: f"id:{user_id}", use_cache=False)
     async def get_user_by_id(self, user_id: str) -> dict:
-        redis = RedisClient.get()
-        key_redis = f"cotador:{id}"
-        cached_result = await redis.get(key_redis)
-
-        if cached_result:
-            return orjson.loads(cached_result)
-
         result = await self.repository.find_by_id(id=user_id)
 
-        if not result:
-            return None
-
-        await redis.set(key_redis, orjson.dumps(result), ex=15)
         return result
 
     async def soft_delete_user(self, user_id: str):

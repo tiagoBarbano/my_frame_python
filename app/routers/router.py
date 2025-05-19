@@ -90,9 +90,8 @@ async def cotador_get(scope, receive, send):
     path_params=[
         PathParams(
             name="id", type_field="string", required=True, description="id do cliente"
-        )
+        ),
     ],
-    headers=[HeaderParams(name="teste", type_field="string")],
 )
 async def cotador_gest(scope, receive, send):
     item_id = scope["path_params"]["id"]

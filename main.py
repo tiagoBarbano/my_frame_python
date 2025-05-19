@@ -1,6 +1,7 @@
 import multiprocessing
 import os
 
+from app.infra.lifespan import shutdown
 from app.routers.router import *  # noqa: F403
 
 from granian import Granian
@@ -29,6 +30,7 @@ if __name__ == "__main__":
         interface="asgi",
         http="1",
         websockets=False,
+        # on_shutdown=shutdown
     ).serve()
 
 
