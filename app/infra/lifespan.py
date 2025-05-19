@@ -1,27 +1,31 @@
 import asyncio
-from app.core.logger import _log_writer
+from app.core.logger import _log_writer, _shutdown_logging
 
 from app.infra.redis import RedisClient
 from app.infra.database import MongoManager
 
 
-async def startup():
+async def startup() -> None:
     """Startup middleware for initializing resources."""
     asyncio.create_task(_log_writer())
     RedisClient.init()
 
 
-async def shutdown():
+async def shutdown() -> None:
     """Shutdown middleware for cleaning up resources."""
-    RedisClient.close()
-    MongoManager.close()
+    await RedisClient.close()
+    await MongoManager.close()
+    await _shutdown_logging()
 
 
-
-async def lifespan(scope, receive, send):
-    """Lifespan middleware for startup and shutdown events."""
-    msg = await receive()
-    if msg["type"] == "lifespan.startup":
-        await startup()
-        await send({"type": "lifespan.startup.complete"})
-
+async def lifespan(scope, receive, send) -> None:
+    while True:
+        """Lifespan middleware for startup and shutdown events."""
+        msg = await receive()
+        if msg["type"] == "lifespan.startup":
+            await startup()
+            await send({"type": "lifespan.startup.complete"})
+        elif msg["type"] == "lifespan.shutdown":
+            await shutdown()
+            await send({"type": "lifespan.shutdown.complete"})
+            return

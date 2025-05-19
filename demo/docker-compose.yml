@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  webflux-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webflux-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://localhost:27017/cotador
+    restart: unless-stopped

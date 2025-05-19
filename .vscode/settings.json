@@ -1,0 +1,9 @@
+{
+    "maven.view": "hierarchical",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "java.compile.nullAnalysis.mode": "automatic"
+}

@@ -1,7 +1,6 @@
 import multiprocessing
 import os
 
-from app.infra.lifespan import shutdown
 from app.routers.router import *  # noqa: F403
 
 from granian import Granian
@@ -24,15 +23,18 @@ if __name__ == "__main__":
         "main:app",
         address="0.0.0.0",
         port=8000,
-        workers=settings.worker if settings.worker else workers,
-        backlog=16384,
-        runtime_mode=settings.granian_runtime_mode,
         interface="asgi",
+        workers=settings.worker or workers,
+        runtime_mode="st",
+        runtime_threads=1,
+        loop="uvloop",
+        task_impl="asyncio",
         http="1",
         websockets=False,
-        # on_shutdown=shutdown
+        # backlog=500000,
+        backpressure=50000,
+        log_enabled=False,
     ).serve()
-
 
 
 # Habilita as Metricas do Prometheus

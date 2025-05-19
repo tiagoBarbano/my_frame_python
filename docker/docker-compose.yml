@@ -66,35 +66,60 @@ services:
   #   depends_on:
   #     - redis
 
-  # app:
-  #   build:
-  #     context: ../
-  #   ports:
-  #     - '8000:8000'
-  #   depends_on:
-  #     - grafana
-  #     - prometheus
-  #     - tempo
-  #   environment:
-  #     - PROMETHEUS_MULTIPROC_DIR=metrics
-  #     - APP_NAME=MY_FRAME_GRANIAN
-  #     - LOGGER_LEVEL=info
-  #     - ENDPOINT_OTEL=http://tempo:4317
-  #     - FLAG_LOCAL=false
-  #     - ENABLE_TRACING=false
-  #     - ENABLE_METRICS=false
-  #     - ENABLE_LOGGER=false
-  #     - ENABLE_SWAGGER=true
-  #     - WORKER=2
-  #     - redis_url=redis://:redis1234@redis:6379
-  #     - mongo_url=mongodb://mongodb:27017
-  #     - granian_runtime_mode=st
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 150M
-  #         cpus: 2.0
+  app-granian:
+    build:
+      context: ../
+    ports:
+      - '8000:8000'
+    # depends_on:
+    #   - grafana
+    #   - prometheus
+    #   - tempo
+    environment:
+      - PROMETHEUS_MULTIPROC_DIR=metrics
+      - APP_NAME=MY_FRAME_GRANIAN
+      - LOGGER_LEVEL=info
+      - ENDPOINT_OTEL=http://tempo:4317
+      - FLAG_LOCAL=false
+      - ENABLE_TRACING=false
+      - ENABLE_METRICS=false
+      - ENABLE_LOGGER=false
+      - ENABLE_SWAGGER=true
+      - WORKER=1
+      - redis_url=redis://:redis1234@redis:6379
+      - mongo_url=mongodb://mongodb:27017
+    deploy:
+      resources:
+        limits:   
+          memory: 100M
+          cpus: 0.5
     # logging: *default-logging
+
+  app-fastify:
+    build:
+      context: ../fastify
+    ports:
+      - '3000:3000'
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: 0.5
+
+  webflux-app:
+    build:
+      context: ../demo
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: 0.5  
+
 
   # grafana:
   #   image: grafana/grafana:latest

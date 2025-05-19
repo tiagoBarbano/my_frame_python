@@ -7,10 +7,10 @@ from typing import Callable, Any, Optional
 from redis.exceptions import RedisError
 from contextlib import asynccontextmanager
 import redis.asyncio as redis
-
 # from opentelemetry.instrumentation.redis import RedisInstrumentor
 
 from app.config import get_settings
+from app.core.logger import log
 
 
 settings = get_settings()
@@ -45,6 +45,7 @@ class RedisClient:
         if cls._client:
             await cls._client.close()
             cls._client = None
+            log.info("Redis connection closed.")
 
 
 def redis_cache(

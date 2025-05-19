@@ -18,7 +18,7 @@ fastify.register(require('@fastify/mongodb'), {
   // the default value is false
   forceClose: true,
 
-  url: 'mongodb://localhost:27017/cotador'
+  url: 'mongodb://mongodb:27017/cotador'
 })
 
 fastify.get('/user/:id', async function (req, reply) {
@@ -63,7 +63,7 @@ fastify.get('/', async (request, reply) => {
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 3001 });
+    await fastify.listen({ port: 3000, host: '0.0.0.0'});
     console.log('Server is running at http://localhost:3001');
     console.log('Prometheus metrics available at http://localhost:3001/metrics');
   } catch (err) {

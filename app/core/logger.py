@@ -88,6 +88,10 @@ async def _log_writer():
         flush()
 
 
+async def _shutdown_logging():
+    await _LOG_QUEUE.put(_SHUTDOWN)
+
+
 @lru_cache()
 def _setup_logging() -> logging.Logger:
     """

@@ -42,9 +42,9 @@ class MongoManager:
             raise
 
     @classmethod
-    def close(cls):
+    async def close(cls):
         if cls._client:
-            cls._client.close()
+            await cls._client.close()
             cls._client = None
             log.info("MongoDB connection closed.")
         else:
