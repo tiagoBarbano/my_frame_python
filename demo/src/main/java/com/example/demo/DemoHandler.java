@@ -26,8 +26,12 @@ public class DemoHandler {
     public Mono<ServerResponse> findByUser(ServerRequest request) {
         String id = request.pathVariable("id");
         return repository.findById(id)
+                .doOnNext(user -> log.info("Usuário encontrado: " + user))
                 .flatMap(user -> ServerResponse.ok().bodyValue(user))
-                .switchIfEmpty(ServerResponse.notFound().build());
+                .switchIfEmpty(
+                    ServerResponse.notFound().build()
+                        .doOnSuccess(v -> log.warning("Usuário com id " + id + " não encontrado"))
+                );
     }
 
     public Mono<ServerResponse> findAllUsers(ServerRequest request) {

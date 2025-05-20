@@ -1,8 +1,9 @@
 // const _ = require('./otel.js');
+const log = require('pino')({ level: 'info' })
 const fastify = require('fastify')({ logger: false });
 // const fastifyMetrics = require('fastify-metrics');
 // const promClient = require('prom-client');
-
+log.info('does not have request information')
 // fastify.register(fastifyMetrics, { endpoint: '/metrics'});
 
 // const httpRequestDurationMicroseconds = new promClient.Histogram({
@@ -30,6 +31,7 @@ fastify.get('/user/:id', async function (req, reply) {
   // const id = new this.mongo.ObjectId(req.params.id)
   try {
     const user = await users.findOne({"_id": req.params.id})
+    log.info(user)
     return user
   } catch (err) {
     return err
