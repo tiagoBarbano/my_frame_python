@@ -2,9 +2,8 @@ from typing import TypeVar, Generic, Type
 from bson import ObjectId
 from datetime import datetime, timezone
 from app.infra.database import MongoManager
-from app.models.model_base import MongoModel
 
-T = TypeVar("T", bound=MongoModel)
+T = TypeVar("T")
 
 
 class MongoRepository(Generic[T]):
@@ -26,9 +25,7 @@ class MongoRepository(Generic[T]):
         async with MongoManager.get_database() as db:
             return await db[self.collection_name].find_one({"_id": id})
 
-    async def find_all(
-        self, page: int = 1, limit: int = 10
-    ) -> list[T]:
+    async def find_all(self, page: int = 1, limit: int = 10) -> list[T]:
         async with MongoManager.get_database() as db:
             data = (
                 await db[self.collection_name]
@@ -39,15 +36,19 @@ class MongoRepository(Generic[T]):
             )
 
             total_items = await db[self.collection_name].count_documents({})
-            total_pages = (total_items + limit - 1) // limit
 
-            return {
-                "data": data,
-                "page": page,
-                "limit": limit,
-                "total_items": total_items,
-                "total_pages": total_pages,
-            }
+            return data, total_items
+
+    async def upsert(self, id: str, data: dict) -> T:
+        async with MongoManager.get_database() as db:
+            data["_id"] = id
+
+            await db[self.collection_name].update_one(
+                {"_id": id}, {"$set": data}, upsert=True
+            )
+
+            updated = await db[self.collection_name].find_one({"_id": id})
+            return updated or None
 
     async def soft_delete(self, id: str):
         now = datetime.now(timezone.utc)

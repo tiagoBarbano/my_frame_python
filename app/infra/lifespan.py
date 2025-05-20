@@ -9,6 +9,7 @@ async def startup() -> None:
     """Startup middleware for initializing resources."""
     asyncio.create_task(_log_writer())
     RedisClient.init()
+    MongoManager.init()
 
 
 async def shutdown() -> None:

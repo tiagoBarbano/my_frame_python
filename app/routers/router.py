@@ -11,10 +11,9 @@ from app.core.utils import (
     json_response,
     read_body,
     send_response,
-    validate_schema_dict,
+    validate_schema_object,
 )
 from app.dto.user_dto import CotadorListResponse, UserRequestDto, UserResponseDto
-from app.models.user_model import UserModel
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
@@ -36,7 +35,7 @@ async def cotador(scope, receive, send):
     try:
         body = await read_body(receive)
 
-        data = await validate_schema_dict(body, UserRequestDto)
+        data = await validate_schema_object(body, UserRequestDto)
 
         new_user = await user_service.create_user(data)
 
@@ -86,7 +85,7 @@ async def cotador_get(scope, receive, send):
     "/user/{id}",
     summary="Cotador Get",
     tags=["cotador"],
-    response_model=UserModel,
+    response_model=UserResponseDto,
     path_params=[
         PathParams(
             name="id", type_field="string", required=True, description="id do cliente"
