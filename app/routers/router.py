@@ -100,6 +100,7 @@ async def cotador_gest(scope, receive, send):
     if not user_result:
         return await send_response(send, json_response("Recurso não encontrado", 404))
 
+    log.info(f"User found: {user_result}")
     return await send_response(send, json_response(user_result))
 
 

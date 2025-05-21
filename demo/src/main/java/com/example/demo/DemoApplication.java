@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoApplication {
 
 	public static void main(String[] args) {
-		System.setProperty("reactor.netty.ioWorkerCount", "1");
+		System.setProperty("reactor.netty.ioWorkerCount", "4");
 
 		SpringApplication.run(DemoApplication.class, args);
 	}
