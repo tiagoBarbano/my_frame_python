@@ -1,6 +1,6 @@
 import dataclasses
 
-from app.dto.user_dto import CotadorListResponse, UserRequestDto, UserResponseDto
+from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
 from app.models.user_model import UserModel
 from app.repository.mongo_repository import MongoRepository
 from app.infra.redis import redis_cache
@@ -8,20 +8,25 @@ from app.infra.redis import redis_cache
 
 @dataclasses.dataclass(slots=True)
 class UserService:
-    repository = MongoRepository[UserModel](UserModel)
+    repository: MongoRepository[UserModel] = dataclasses.field(init=False)
+
+    def __post_init__(self):
+        self.repository = MongoRepository(UserModel)
 
     async def list_users(self, page: int, limit: int) -> list[UserModel]:
         data, total_items = await self.repository.find_all(page=page, limit=limit)
         items = [
             UserResponseDto(
-                empresa=doc["empresa"], cotacao_final=doc["cotacao_final"]
+                _id=doc["_id"],
+                empresa=doc["empresa"],
+                cotacao_final=doc["cotacao_final"],
             ).encode_dict()
             for doc in data
         ]
 
         total_pages = (total_items + limit - 1) // limit
 
-        return CotadorListResponse(
+        return UserListResponse(
             data=items,
             page=page,
             limit=limit,
