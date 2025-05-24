@@ -25,7 +25,7 @@ if __name__ == "__main__":
         port=8000,
         interface="asgi",
         workers=settings.worker or workers,
-        runtime_mode="mt",
+        runtime_mode="st",
         runtime_threads=1,
         loop="uvloop",
         task_impl="asyncio",

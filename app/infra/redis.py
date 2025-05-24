@@ -96,6 +96,7 @@ def redis_cache(
                     return result
 
             except RedisError as e:
+                log.error(str(e), stack_info=True)
                 return await func(*args, **kwargs)
 
         return wrapper

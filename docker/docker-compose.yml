@@ -83,7 +83,7 @@ services:
       - LOGGER_LEVEL=info
       - ENDPOINT_OTEL=http://tempo:4317
       - FLAG_LOCAL=false
-      - ENABLE_TRACING=false
+      - ENABLE_TRACING=True
       - ENABLE_METRICS=false
       - ENABLE_LOGGER=false
       - ENABLE_SWAGGER=true
@@ -116,6 +116,14 @@ services:
       - "8080:8080"
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=demo
+      - OTEL_TRACES_SAMPLER=always_on
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=demo
+      - OTEL_PROPAGATORS=tracecontext,baggage,      
     restart: unless-stopped
     deploy:
       resources:
@@ -155,25 +163,25 @@ services:
       - loki
     logging: *default-logging
 
-  # prometheus:
-  #   container_name: prometheus
-  #   hostname: prometheus
-  #   image: prom/prometheus:latest
-  #   command:
-  #     - --web.console.templates=/etc/prometheus/consoles
-  #     - --web.console.libraries=/etc/prometheus/console_libraries
-  #     - --storage.tsdb.retention.time=1h
-  #     - --config.file=/etc/prometheus/prometheus.yml
-  #     - --storage.tsdb.path=/prometheus
-  #     - --web.enable-lifecycle
-  #     - --web.route-prefix=/
-  #     - --enable-feature=exemplar-storage
-  #   volumes:
-  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
-  #   ports:
-  #     - "9090:9090"
-  #   extra_hosts: ["host.docker.internal:host-gateway"]
-    # logging: *default-logging
+  prometheus:
+    container_name: prometheus
+    hostname: prometheus
+    image: prom/prometheus:latest
+    command:
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --storage.tsdb.retention.time=1h
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+      - --enable-feature=exemplar-storage
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    logging: *default-logging
     
 
   # jaeger-all-in-one:
@@ -199,15 +207,16 @@ services:
   #     - METRICS_STORAGE_TYPE=prometheus
   #   logging: *default-logging
 
-  # tempo:
-  #   image: grafana/tempo:2.3.1
-  #   command: [ "--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--auth.enabled=false", "service_graphs.enabled=true"]
-  #   ports:
-  #     - "4317:4317"
-  #     - "4318:4318"
-  #   depends_on:
-  #     - loki
-    # logging: *default-logging
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--multitenancy.enabled=false", "--auth.enabled=false"]
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - loki
+    logging: *default-logging
 
   # otelcol:
   #   image: otel/opentelemetry-collector-contrib

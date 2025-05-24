@@ -1,17 +1,17 @@
-// const _ = require('./otel.js');
+const _ = require('./otel.js');
 const log = require('pino')({ level: 'info' })
 const fastify = require('fastify')({ logger: false });
-// const fastifyMetrics = require('fastify-metrics');
-// const promClient = require('prom-client');
-log.info('does not have request information')
-// fastify.register(fastifyMetrics, { endpoint: '/metrics'});
+const fastifyMetrics = require('fastify-metrics');
+const promClient = require('prom-client');
 
-// const httpRequestDurationMicroseconds = new promClient.Histogram({
-//   name: 'http_request_duration_seconds_teste',
-//   help: 'Histogram of HTTP request durations in seconds',
-//   labelNames: ['status_code'],
-//   buckets: [0.1, 0.3, 0.5, 1, 2, 5, 10]
-// });
+fastify.register(fastifyMetrics, { endpoint: '/metrics'});
+
+const httpRequestDurationMicroseconds = new promClient.Histogram({
+  name: 'http_request_duration_seconds_teste',
+  help: 'Histogram of HTTP request durations in seconds',
+  labelNames: ['status_code'],
+  buckets: [0.1, 0.3, 0.5, 1, 2, 5, 10]
+});
 
 
 fastify.register(require('@fastify/mongodb'), {
@@ -23,7 +23,6 @@ fastify.register(require('@fastify/mongodb'), {
 })
 
 fastify.get('/user/:id', async function (req, reply) {
-  // Or this.mongo.client.db('mydb').collection('users')
   const users = this.mongo.db.collection('users')
   
   // console.log(users)
@@ -40,12 +39,8 @@ fastify.get('/user/:id', async function (req, reply) {
 
 
 fastify.get('/users', async function (req, reply) {
-  // Or this.mongo.client.db('mydb').collection('users')
   const users = this.mongo.db.collection('users')
   
-  // console.log(users)
-  // if the id is an ObjectId format, you need to create a new ObjectId
-  // const id = new this.mongo.ObjectId(req.params.id)
   try {
     const user = await users.find({}).toArray()
     return user
@@ -57,17 +52,17 @@ fastify.get('/users', async function (req, reply) {
 
 
 fastify.get('/', async (request, reply) => {
-  // const end = httpRequestDurationMicroseconds.startTimer();
+  const end = httpRequestDurationMicroseconds.startTimer();
     const response = { message: 'Hello World' };
-    // end({ status_code: 200 });
+    end({ status_code: 200 });
     return response;
 });
 
 const start = async () => {
   try {
     await fastify.listen({ port: 3000, host: '0.0.0.0'});
-    console.log('Server is running at http://localhost:3001');
-    console.log('Prometheus metrics available at http://localhost:3001/metrics');
+    console.log('Server is running at http://localhost:3000');
+    console.log('Prometheus metrics available at http://localhost:3000/metrics');
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

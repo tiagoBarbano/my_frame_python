@@ -19,9 +19,9 @@ class Settings(BaseSettings):
     redis_url: str = Field(default="redis://:redis1234@localhost:6379", validate_default=False)
     mongo_url: str = Field(default="mongodb://localhost:27017", validate_default=False)
     mongo_db: str = Field(default="cotador", validate_default=False)
-    redis_ttl: int = Field(default=10, validate_default=False)
-    worker: int = Field(default=None, validate_default=False)
-    granian_runtime_mode: str = Field(default="mt", validate_default=False)
+    redis_ttl: int = Field(default=60, validate_default=False)
+    worker: int = Field(default=1, validate_default=False)
+    granian_runtime_mode: str = Field(default="st", validate_default=False)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
