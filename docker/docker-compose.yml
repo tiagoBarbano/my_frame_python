@@ -18,18 +18,20 @@ version: "3"
 
 volumes:
   dbdata6:
-  redis-insight:  
+  redis-insight:
   mongo-data:
+  tempo-data:
+
 
 services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
-    # environment:
-    #   - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
-    #   - MONGO_OPTIONS=--enableCompression
-    #   - PUID=1000
-    #   - PGID=1000
+    environment:
+      - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
+      - MONGO_OPTIONS=--enableCompression
+      - PUID=1000
+      - PGID=1000
     volumes:
       - dbdata6:/data/db
     ports:
@@ -39,13 +41,12 @@ services:
       resources:
         limits:
           memory: 3000M
-          cpus: 1.0    
+          cpus: 1.0
     logging: *default-logging
-
 
   redis:
     image: redis:alpine
-    command: ["redis-server", "/etc/redis/redis.conf", --requirepass redis1234]
+    command: [ "redis-server", "/etc/redis/redis.conf", --requirepass redis1234 ]
     ports:
       - "6379:6379"
     volumes:
@@ -54,9 +55,8 @@ services:
       resources:
         limits:
           memory: 300M
-          cpus: 0.5         
+          cpus: 1.0
     logging: *default-logging
-
 
   redis-insight:
     image: redis/redisinsight:latest
@@ -64,7 +64,7 @@ services:
     ports:
       - "5540:5540"
     volumes:
-      - redis-insight:/data    
+      - redis-insight:/data
     depends_on:
       - redis
 
@@ -73,26 +73,27 @@ services:
       context: ../
     ports:
       - '8000:8000'
-    # depends_on:
-    #   - grafana 
-    #   - prometheus
-    #   - tempo
+    depends_on:
+      - grafana
+      - prometheus
+      - tempo
     environment:
       - PROMETHEUS_MULTIPROC_DIR=metrics
       - APP_NAME=MY_FRAME_GRANIAN
       - LOGGER_LEVEL=info
       - ENDPOINT_OTEL=http://tempo:4317
       - FLAG_LOCAL=false
-      - ENABLE_TRACING=True
-      - ENABLE_METRICS=false
+      - ENABLE_TRACING=true
+      - ENABLE_METRICS=true
       - ENABLE_LOGGER=false
       - ENABLE_SWAGGER=true
       - WORKER=2
       - redis_url=redis://:redis1234@redis:6379
       - mongo_url=mongodb://mongodb:27017
+      - granian_runtime_mode=mt
     deploy:
       resources:
-        limits:   
+        limits:
           memory: 500M
           cpus: 2.0
     logging: *default-logging
@@ -102,6 +103,18 @@ services:
       context: ../fastify
     ports:
       - '3000:3000'
+    environment:
+      - PORT=3000
+      - TEMPO_URL=http://tempo:4317
+      - SERVICE_NAME=api-fastify
+      - HOST_REDIS=redis
+      - PORT_REDIS=6379
+      - PS_REDIS=redis1234
+      - MONGODB_URL=mongodb://mongodb:27017
+    depends_on:
+      - grafana
+      - prometheus
+      - tempo
     deploy:
       resources:
         limits:
@@ -109,28 +122,28 @@ services:
           cpus: 2.0
     logging: *default-logging
 
-  webflux-app:
-    build:
-      context: ../demo
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
-      - OTEL_EXPORTER_OTLP_INSECURE=true
-      - OTEL_RESOURCE_ATTRIBUTES=service.name=demo
-      - OTEL_TRACES_SAMPLER=always_on
-      - OTEL_TRACES_EXPORTER=otlp
-      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-      - OTEL_SERVICE_NAME=demo
-      - OTEL_PROPAGATORS=tracecontext,baggage,      
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 500M
-          cpus: 2.0
-    logging: *default-logging
+  # webflux-app:
+  #   build:
+  #     context: ../demo
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - grafana
+  #     - prometheus
+  #     - tempo
+  #   environment:
+  #     - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
+  #     - SPRING_DATA_REDIS_HOST=redis
+  #     - SPRING_DATA_REDIS_PORT=6379
+  #     - SPRING_DATA_REDIS_PASSWORD=redis1234
+  #     - OTEL_PROPAGATORS=tracecontext,baggage,
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 500M
+  #         cpus: 2.0
+  #   logging: *default-logging
 
   grafana:
     image: grafana/grafana:latest
@@ -142,8 +155,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
-    # logging: *default-logging
-    
+    logging: *default-logging
 
   loki:
     image: grafana/loki:latest
@@ -180,10 +192,25 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    extra_hosts: ["host.docker.internal:host-gateway"]
+    extra_hosts: [ "host.docker.internal:host-gateway" ]
     logging: *default-logging
-    
 
+  tempo:
+    image: grafana/tempo:2.3.1
+    command: ["--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--auth.enabled=false",  "--ingester.max-traces-per-user=50000", "--ingester.max-block-duration=30s", "service_graphs.enabled=true"]
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - loki
+    volumes:
+      - tempo-data:/var/tempo      
+    logging: &default-logging
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
   # jaeger-all-in-one:
   #   image: jaegertracing/all-in-one
   #   volumes:
@@ -206,17 +233,6 @@ services:
   #     - SAMPLING_CONFIG_TYPE=adaptive
   #     - METRICS_STORAGE_TYPE=prometheus
   #   logging: *default-logging
-
-  tempo:
-    image: grafana/tempo:latest
-    command: [ "--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--multitenancy.enabled=false", "--auth.enabled=false"]
-    ports:
-      - "3200:3200"
-      - "4317:4317"
-      - "4318:4318"
-    depends_on:
-      - loki
-    logging: *default-logging
 
   # otelcol:
   #   image: otel/opentelemetry-collector-contrib

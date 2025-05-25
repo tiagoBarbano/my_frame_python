@@ -25,4 +25,13 @@ ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/release
 EXPOSE 8080
 
 # Comando de execução com o agente OpenTelemetry
-ENTRYPOINT ["java", "-javaagent:/app/opentelemetry-javaagent.jar", "-jar", "/app/app.jar"]
+ENTRYPOINT [ \
+"java", \
+"-javaagent:/app/opentelemetry-javaagent.jar", \
+"-Dotel.service.name=demo-app", \
+"-Dotel.exporter.otlp.endpoint=http://tempo:4317", \
+"-Dotel.exporter.otlp.protocol=grpc", \
+"-Dotel.metrics.exporter=none", \
+"-Dotel.logs.exporter=none", \
+"-jar", "/app/app.jar" \
+]

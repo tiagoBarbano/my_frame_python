@@ -25,7 +25,7 @@ if __name__ == "__main__":
         port=8000,
         interface="asgi",
         workers=settings.worker or workers,
-        runtime_mode="st",
+        runtime_mode=settings.granian_runtime_mode,
         runtime_threads=1,
         loop="uvloop",
         task_impl="asyncio",

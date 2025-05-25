@@ -1,13 +1,14 @@
-
+from dataclasses import dataclass
 import functools
 import hashlib
 import inspect
+import zlib
 import orjson
 from typing import Callable, Any, Optional
 from redis.exceptions import RedisError
 from contextlib import asynccontextmanager
 import redis.asyncio as redis
-# from opentelemetry.instrumentation.redis import RedisInstrumentor
+from opentelemetry.instrumentation.redis import RedisInstrumentor
 
 from app.config import get_settings
 from app.core.logger import log
@@ -15,20 +16,34 @@ from app.core.logger import log
 
 settings = get_settings()
 
-# RedisInstrumentor().instrument()
+RedisInstrumentor().instrument(
+    command_list_hook=lambda cmd: log.debug(f"Redis command: {cmd}")
+)
 
+
+@dataclass(slots=True)
 class RedisClient:
-    _client: redis.Redis| None = None
+    _pool: redis.ConnectionPool | None = None
+    _client: redis.Redis | None = None
 
     @classmethod
     def init(cls):
         """Inicializa o client dentro do loop correto."""
-        cls._client = redis.from_url(settings.redis_url, decode_responses=True)
+        cls._pool = redis.ConnectionPool.from_url(
+            settings.redis_url,
+            max_connections=500,
+            socket_timeout=2,  # tempo para operações
+            socket_connect_timeout=2,  # tempo para conectar
+            retry_on_timeout=True,
+        )
+        cls._client = redis.Redis(connection_pool=cls._pool, decode_responses=False)
 
     @classmethod
     def get(cls) -> redis.Redis:
         if cls._client is None:
-            raise RuntimeError("Redis client not initialized. Call RedisClient.init() first.")
+            raise RuntimeError(
+                "Redis client not initialized. Call RedisClient.init() first."
+            )
         return cls._client
 
     @classmethod
@@ -48,6 +63,14 @@ class RedisClient:
             log.info("Redis connection closed.")
 
 
+def compress(data: bytes) -> bytes:
+    return zlib.compress(data, level=3)
+
+
+def decompress(data: bytes) -> bytes:
+    return zlib.decompress(data)
+
+
 def redis_cache(
     ttl: int = 60,
     key_prefix: str = "cache",
@@ -63,9 +86,10 @@ def redis_cache(
     - key_fn: função opcional para gerar a chave de cache personalizada
             exemplo: key_fn=lambda user_id, **_: f"id:{user_id}"
     """
+
     def decorator(func: Callable):
         sig = inspect.signature(func)
-        
+
         @functools.wraps(func)
         async def wrapper(*args, **kwargs) -> Any:
             if not use_cache:
@@ -75,7 +99,7 @@ def redis_cache(
                 bound = sig.bind(*args, **kwargs)
                 bound.apply_defaults()
                 arguments = bound.arguments
-                
+
                 if key_fn:
                     redis_key = f"{key_prefix}:{key_fn(**arguments)}"
                 else:
@@ -100,5 +124,5 @@ def redis_cache(
                 return await func(*args, **kwargs)
 
         return wrapper
+
     return decorator
-            

@@ -1,4 +1,4 @@
-# from opentelemetry.instrumentation.pymongo import PymongoInstrumentor
+from opentelemetry.instrumentation.pymongo import PymongoInstrumentor
 from pymongo import AsyncMongoClient
 from pymongo.errors import ConfigurationError, ConnectionFailure, OperationFailure
 from contextlib import asynccontextmanager
@@ -8,7 +8,7 @@ from app.config import get_settings
 
 settings = get_settings()
 
-# PymongoInstrumentor().instrument()
+PymongoInstrumentor().instrument()
 
 
 class MongoManager:
