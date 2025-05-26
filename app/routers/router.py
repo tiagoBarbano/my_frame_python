@@ -13,7 +13,8 @@ from app.core.utils import (
     send_response,
     validate_schema_object,
 )
-from app.dto.user_dto import CotadorListResponse, UserRequestDto, UserResponseDto
+from app.dto.user_dto import UserRequestDto, UserResponseDto, UserListResponse
+from app.infra.proxy_handler import SessionManager
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
@@ -108,7 +109,7 @@ async def cotador_gest(scope, receive, send):
     "/cotadores",
     summary="Cotador Get ALL",
     tags=["cotador"],
-    response_model=CotadorListResponse,
+    response_model=UserListResponse,
     query_params=[
         QueryParams(name="page", required=True, type_field="integer", default=1),
         QueryParams(name="limite", required=True, type_field="integer", default=10),
@@ -137,3 +138,35 @@ async def exception(scope, receive, send):
         },
         status_code=500,
     )
+
+
+@get("/actiontype", summary="actiontype", tags=["actiontype"])
+async def get_cep(scope, receive, send):
+    try:
+        start_process = time.perf_counter()
+
+        async with SessionManager.connection() as session:
+            async with session.get(
+                "https://apps.jornada-precos.dev.awsporto/python-corp-snps-brms-core/action_type",
+                verify_ssl=False,
+            ) as response:
+                user_result = await response.json()
+
+        time_process = time.perf_counter() - start_process
+        return await send_response(
+            send,
+            json_response(
+                user_result, headers={"time_process": f"{time_process:.7f} segs"}
+            ),
+        )
+    except Exception as ex:
+        log.error(ex)
+        time_process = time.perf_counter() - start_process
+        return await send_response(
+            send,
+            json_response(
+                str(ex),
+                headers={"time_process": f"{time_process:.7f} segs"},
+                status=500,
+            ),
+        )

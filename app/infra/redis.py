@@ -1,4 +1,3 @@
-
 import functools
 import hashlib
 import inspect
@@ -7,7 +6,7 @@ from typing import Callable, Any, Optional
 from redis.exceptions import RedisError
 from contextlib import asynccontextmanager
 import redis.asyncio as redis
-# from opentelemetry.instrumentation.redis import RedisInstrumentor
+from opentelemetry.instrumentation.redis import RedisInstrumentor
 
 from app.config import get_settings
 from app.core.logger import log
@@ -15,10 +14,11 @@ from app.core.logger import log
 
 settings = get_settings()
 
-# RedisInstrumentor().instrument()
+RedisInstrumentor().instrument()
+
 
 class RedisClient:
-    _client: redis.Redis| None = None
+    _client: redis.Redis | None = None
 
     @classmethod
     def init(cls):
@@ -28,7 +28,9 @@ class RedisClient:
     @classmethod
     def get(cls) -> redis.Redis:
         if cls._client is None:
-            raise RuntimeError("Redis client not initialized. Call RedisClient.init() first.")
+            raise RuntimeError(
+                "Redis client not initialized. Call RedisClient.init() first."
+            )
         return cls._client
 
     @classmethod
@@ -63,9 +65,10 @@ def redis_cache(
     - key_fn: função opcional para gerar a chave de cache personalizada
             exemplo: key_fn=lambda user_id, **_: f"id:{user_id}"
     """
+
     def decorator(func: Callable):
         sig = inspect.signature(func)
-        
+
         @functools.wraps(func)
         async def wrapper(*args, **kwargs) -> Any:
             if not use_cache:
@@ -75,7 +78,7 @@ def redis_cache(
                 bound = sig.bind(*args, **kwargs)
                 bound.apply_defaults()
                 arguments = bound.arguments
-                
+
                 if key_fn:
                     redis_key = f"{key_prefix}:{key_fn(**arguments)}"
                 else:
@@ -95,9 +98,9 @@ def redis_cache(
 
                     return result
 
-            except RedisError as e:
+            except RedisError:
                 return await func(*args, **kwargs)
 
         return wrapper
+
     return decorator
-            
