@@ -44,7 +44,7 @@ class UserService:
         ttl=60,
         key_prefix="user",
         key_fn=lambda user_id, **_: f"id:{user_id}",
-        use_cache=False,
+        use_cache=True,
     )
     async def get_user_by_id(self, user_id: str) -> dict:
         result = await self.repository.find_by_id(id=user_id)

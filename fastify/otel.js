@@ -1,26 +1,39 @@
-const { NodeSDK } = require('@opentelemetry/sdk-node');
-const { ConsoleSpanExporter, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-const { resourceFromAttributes } = require('@opentelemetry/resources');
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+import { MongoDBInstrumentation } from '@opentelemetry/instrumentation-mongodb';
+import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis';
+import { NodeTracerProvider, BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { FastifyOtelInstrumentation } from '@fastify/otel';
 
-// Cria SDK completo
-const sdk = new NodeSDK({
+const traceExporter = new OTLPTraceExporter({
+   url: 'http://tempo:4317', // Replace with your OTLP endpoint
+   // url: 'http://localhost:4317', // Replace with your OTLP endpoint
+})
+
+const provider = new NodeTracerProvider({
    resource: resourceFromAttributes({
-      [SemanticResourceAttributes.SERVICE_NAME]: 'basic-service',
+      [SemanticResourceAttributes.SERVICE_NAME]: 'fastify-service',
+      [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
    }),
-   traceExporter: new ConsoleSpanExporter(),
-   // spanProcessor: new BatchSpanProcessor(new ConsoleSpanExporter(), {
-   //    // Configurações para o BatchSpanProcessor
-   //    maxQueueSize: 1000,  // O número máximo de spans que podem ficar na fila
-   //    scheduledDelayMillis: 5000,  // Intervalo de tempo entre o envio dos lotes (em ms)
-   //    exportTimeoutMillis: 30000,  // Timeout para exportação de cada lote
-   //    maxExportBatchSize: 100,  // Número máximo de spans por lote
-   // }),
-   instrumentations: [
-      new HttpInstrumentation(),
+   spanProcessors: [
+      new BatchSpanProcessor(traceExporter)
    ],
 });
 
-// Inicia o SDK
-sdk.start()
+const fastifyOtelInstrumentation = new FastifyOtelInstrumentation({
+   registerOnInitialization: true,
+});
+
+provider.register();
+
+registerInstrumentations({
+   instrumentations: [
+      new HttpInstrumentation(),
+      new IORedisInstrumentation(),
+      new MongoDBInstrumentation(),
+   ],
+   tracerProvider: provider,
+});

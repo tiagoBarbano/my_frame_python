@@ -13,8 +13,7 @@ from app.core.utils import (
     send_response,
     validate_schema_object,
 )
-from app.dto.user_dto import UserRequestDto, UserResponseDto, UserListResponse
-from app.infra.proxy_handler import SessionManager
+from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
@@ -101,7 +100,6 @@ async def cotador_gest(scope, receive, send):
     if not user_result:
         return await send_response(send, json_response("Recurso não encontrado", 404))
 
-    log.info(f"User found: {user_result}")
     return await send_response(send, json_response(user_result))
 
 

@@ -1,6 +1,8 @@
+from dataclasses import dataclass
 import functools
 import hashlib
 import inspect
+import zlib
 import orjson
 from typing import Callable, Any, Optional
 from redis.exceptions import RedisError
@@ -17,13 +19,22 @@ settings = get_settings()
 RedisInstrumentor().instrument()
 
 
+@dataclass(slots=True)
 class RedisClient:
+    _pool: redis.ConnectionPool | None = None
     _client: redis.Redis | None = None
 
     @classmethod
     def init(cls):
         """Inicializa o client dentro do loop correto."""
-        cls._client = redis.from_url(settings.redis_url, decode_responses=True)
+        cls._pool = redis.ConnectionPool.from_url(
+            settings.redis_url,
+            max_connections=500,
+            socket_timeout=2,  # tempo para operações
+            socket_connect_timeout=2,  # tempo para conectar
+            retry_on_timeout=True,
+        )
+        cls._client = redis.Redis(connection_pool=cls._pool, decode_responses=False)
 
     @classmethod
     def get(cls) -> redis.Redis:
@@ -48,6 +59,14 @@ class RedisClient:
             await cls._client.close()
             cls._client = None
             log.info("Redis connection closed.")
+
+
+def compress(data: bytes) -> bytes:
+    return zlib.compress(data, level=3)
+
+
+def decompress(data: bytes) -> bytes:
+    return zlib.decompress(data)
 
 
 def redis_cache(
@@ -98,7 +117,8 @@ def redis_cache(
 
                     return result
 
-            except RedisError:
+            except RedisError as e:
+                log.error(str(e), stack_info=True)
                 return await func(*args, **kwargs)
 
         return wrapper
