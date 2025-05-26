@@ -14,6 +14,7 @@ from app.core.utils import (
     validate_schema_object,
 )
 from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
+from app.infra.proxy_handler import SessionManager
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
