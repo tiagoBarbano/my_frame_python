@@ -16,9 +16,7 @@ from app.core.logger import log
 
 settings = get_settings()
 
-RedisInstrumentor().instrument(
-    command_list_hook=lambda cmd: log.debug(f"Redis command: {cmd}")
-)
+RedisInstrumentor().instrument()
 
 
 @dataclass(slots=True)

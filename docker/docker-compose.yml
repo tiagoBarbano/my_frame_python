@@ -14,13 +14,14 @@ x-logging: &default-logging
       - regex:
           expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2},d{3}) (?P<message>(?s:.*))$$'
 
-version: "3"
+# version: "3"
 
 volumes:
   dbdata6:
   redis-insight:
   mongo-data:
   tempo-data:
+  pm2-data:
 
 
 services:
@@ -54,7 +55,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 300M
+          memory: 3000M
           cpus: 1.0
     logging: *default-logging
 
@@ -102,7 +103,8 @@ services:
     build:
       context: ../fastify
     ports:
-      - '3000:3000'
+      - "3000:3000"
+      - "9209:9209"
     environment:
       - PORT=3000
       - TEMPO_URL=http://tempo:4317
@@ -115,6 +117,8 @@ services:
       - grafana
       - prometheus
       - tempo
+    volumes:
+      - pm2-data:/root/.pm2  # Compartilha dados com o sidecar      
     deploy:
       resources:
         limits:
@@ -122,28 +126,29 @@ services:
           cpus: 2.0
     logging: *default-logging
 
-  # webflux-app:
-  #   build:
-  #     context: ../demo
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - grafana
-  #     - prometheus
-  #     - tempo
-  #   environment:
-  #     - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
-  #     - SPRING_DATA_REDIS_HOST=redis
-  #     - SPRING_DATA_REDIS_PORT=6379
-  #     - SPRING_DATA_REDIS_PASSWORD=redis1234
-  #     - OTEL_PROPAGATORS=tracecontext,baggage,
-  #   restart: unless-stopped
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 500M
-  #         cpus: 2.0
-  #   logging: *default-logging
+
+  webflux-app:
+    build:
+      context: ../demo
+    ports:
+      - "8080:8080"
+    depends_on:
+      - grafana
+      - prometheus
+      - tempo
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=redis1234
+      - OTEL_PROPAGATORS=tracecontext,baggage,
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+          cpus: 2.0
+    logging: *default-logging
 
   grafana:
     image: grafana/grafana:latest

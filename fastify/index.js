@@ -1,4 +1,5 @@
 import './otel.js';
+// import { fastifyOtelInstrumentation } from './otel.js';
 import 'dotenv/config';
 import pino from 'pino';
 import Fastify from 'fastify';
@@ -12,7 +13,7 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 const log = pino({ level: 'info' });
 
 const fastify = Fastify({ logger: false });
-
+// await fastify.register(fastifyOtelInstrumentation.plugin());
 await fastify.register(import('fastify-healthcheck'))
 await fastify.register(fastifySwagger);
 await fastify.register(fastifySwaggerUi, {
@@ -31,16 +32,16 @@ await fastify.register(fastifySwaggerUi, {
   transformSpecificationClone: true
 })
 await fastify.register(fastifyRedis, {
-  // host: 'redis',
-  host: 'localhost',
+  host: 'redis',
+  // host: 'localhost',
   port: 6379,
   password: 'redis1234',
   db: 0,
 });
 await fastify.register(fastifyMongo, {
   forceClose: true,
-  // url: 'mongodb://mongodb:27017/cotador',
-  url: 'mongodb://localhost:27017/cotador',
+  url: 'mongodb://mongodb:27017/cotador',
+  // url: 'mongodb://localhost:27017/cotador',
 });
 await fastify.register(fastifyMetrics, {
   endpoint: '/metrics',
@@ -115,7 +116,7 @@ fastify.get(
     }
   },
   cacheable({
-    keyBuilder: (req) => `user:${req.params.id}`,
+    keyBuilder: (req) => `user:id:${req.params.id}`,
     ttlSeconds: 120,
   })(async function (req, reply) {
     try {
@@ -125,6 +126,7 @@ fastify.get(
         log.info(`User not found: ${req.params.id}`);
         return reply.code(204).send();
       }
+      return user;
     } catch (err) {
       return reply.code(500).send({ error: 'Erro ao buscar usuário' });
     }
