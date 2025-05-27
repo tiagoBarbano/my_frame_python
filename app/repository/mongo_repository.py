@@ -2,6 +2,7 @@ from typing import TypeVar, Generic, Type
 from bson import ObjectId
 from datetime import datetime, timezone
 from app.infra.database import MongoManager
+import asyncio
 
 T = TypeVar("T")
 
@@ -27,17 +28,14 @@ class MongoRepository(Generic[T]):
 
     async def find_all(self, page: int = 1, limit: int = 10) -> list[T]:
         async with MongoManager.get_database() as db:
-            data = (
-                await db[self.collection_name]
+            return await asyncio.gather(
+                db[self.collection_name]
                 .find()
                 .skip((page - 1) * limit)
                 .limit(limit)
-                .to_list()
+                .to_list(),
+                db[self.collection_name].count_documents({}),
             )
-
-            total_items = await db[self.collection_name].count_documents({})
-
-            return data, total_items
 
     async def upsert(self, id: str, data: dict) -> T:
         async with MongoManager.get_database() as db:

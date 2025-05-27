@@ -69,86 +69,83 @@ services:
     depends_on:
       - redis
 
-  app-granian:
-    build:
-      context: ../
-    ports:
-      - '8000:8000'
-    depends_on:
-      - grafana
-      - prometheus
-      - tempo
-    environment:
-      - PROMETHEUS_MULTIPROC_DIR=metrics
-      - APP_NAME=MY_FRAME_GRANIAN
-      - LOGGER_LEVEL=info
-      - ENDPOINT_OTEL=http://tempo:4317
-      - FLAG_LOCAL=false
-      - ENABLE_TRACING=true
-      - ENABLE_METRICS=true
-      - ENABLE_LOGGER=false
-      - ENABLE_SWAGGER=true
-      - WORKER=2
-      - redis_url=redis://:redis1234@redis:6379
-      - mongo_url=mongodb://mongodb:27017
-      - granian_runtime_mode=mt
-    deploy:
-      resources:
-        limits:
-          memory: 500M
-          cpus: 2.0
-    logging: *default-logging
+  # app-granian:
+  #   build:
+  #     context: ../
+  #   ports:
+  #     - '8000:8000'
+  #   depends_on:
+  #     - grafana
+  #     - prometheus
+  #     - tempo
+  #   environment:
+  #     - PROMETHEUS_MULTIPROC_DIR=metrics
+  #     - APP_NAME=MY_FRAME_GRANIAN
+  #     - LOGGER_LEVEL=info
+  #     - ENDPOINT_OTEL=http://tempo:4317
+  #     - FLAG_LOCAL=false
+  #     - ENABLE_TRACING=true
+  #     - ENABLE_METRICS=true
+  #     - ENABLE_LOGGER=false
+  #     - ENABLE_SWAGGER=true
+  #     - WORKER=2
+  #     - redis_url=redis://:redis1234@redis:6379
+  #     - mongo_url=mongodb://mongodb:27017
+  #     - granian_runtime_mode=mt
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 500M
+  #         cpus: 2.0
+  #   logging: *default-logging
 
-  app-fastify:
-    build:
-      context: ../fastify
-    ports:
-      - "3000:3000"
-      - "9209:9209"
-    environment:
-      - PORT=3000
-      - TEMPO_URL=http://tempo:4317
-      - SERVICE_NAME=api-fastify
-      - HOST_REDIS=redis
-      - PORT_REDIS=6379
-      - PS_REDIS=redis1234
-      - MONGODB_URL=mongodb://mongodb:27017
-    depends_on:
-      - grafana
-      - prometheus
-      - tempo
-    volumes:
-      - pm2-data:/root/.pm2  # Compartilha dados com o sidecar      
-    deploy:
-      resources:
-        limits:
-          memory: 500M
-          cpus: 2.0
-    logging: *default-logging
+  # app-fastify:
+  #   build:
+  #     context: ../fastify
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - PORT=3000
+  #     - TEMPO_URL=http://tempo:4317
+  #     - SERVICE_NAME=api-fastify
+  #     - HOST_REDIS=redis
+  #     - PORT_REDIS=6379
+  #     - PS_REDIS=redis1234
+  #     - MONGODB_URL=mongodb://mongodb:27017
+  #   depends_on:
+  #     - grafana
+  #     - prometheus
+  #     - tempo
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 500M
+  #         cpus: 2.0
+  #   logging: *default-logging
 
 
-  webflux-app:
-    build:
-      context: ../demo
-    ports:
-      - "8080:8080"
-    depends_on:
-      - grafana
-      - prometheus
-      - tempo
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
-      - SPRING_DATA_REDIS_HOST=redis
-      - SPRING_DATA_REDIS_PORT=6379
-      - SPRING_DATA_REDIS_PASSWORD=redis1234
-      - OTEL_PROPAGATORS=tracecontext,baggage,
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 500M
-          cpus: 2.0
-    logging: *default-logging
+  # webflux-app:
+  #   build:
+  #     context: ../demo
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - grafana
+  #     - prometheus
+  #     - tempo
+  #   environment:
+  #     - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
+  #     - SPRING_DATA_REDIS_HOST=redis
+  #     - SPRING_DATA_REDIS_PORT=6379
+  #     - SPRING_DATA_REDIS_PASSWORD=redis1234
+  #     - OTEL_PROPAGATORS=tracecontext,baggage,
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 500M
+  #         cpus: 2.0
+  #   logging: *default-logging
 
   grafana:
     image: grafana/grafana:latest

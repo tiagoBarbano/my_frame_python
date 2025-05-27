@@ -13,10 +13,10 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 const log = pino({ level: 'info' });
 
 const fastify = Fastify({ logger: false });
-// await fastify.register(fastifyOtelInstrumentation.plugin());
-await fastify.register(import('fastify-healthcheck'))
-await fastify.register(fastifySwagger);
-await fastify.register(fastifySwaggerUi, {
+
+fastify.register(import('fastify-healthcheck'))
+fastify.register(fastifySwagger);
+fastify.register(fastifySwaggerUi, {
   routePrefix: '/docs',
   uiConfig: {
     docExpansion: 'full',
@@ -31,19 +31,25 @@ await fastify.register(fastifySwaggerUi, {
   transformSpecification: (swaggerObject, request, reply) => { return swaggerObject },
   transformSpecificationClone: true
 })
-await fastify.register(fastifyRedis, {
+
+fastify.register(fastifyRedis, {
   host: 'redis',
   // host: 'localhost',
   port: 6379,
   password: 'redis1234',
   db: 0,
+  maxRetriesPerRequest: null, // Evita atraso em caso de erro
+  enableOfflineQueue: false,  // Evita uso de memória caso Redis caia
+  lazyConnect: false,         // Garante conexão pronta no boot
+  retryStrategy: (times) => Math.min(times * 50, 2000),  
 });
-await fastify.register(fastifyMongo, {
+
+fastify.register(fastifyMongo, {
   forceClose: true,
   url: 'mongodb://mongodb:27017/cotador',
   // url: 'mongodb://localhost:27017/cotador',
 });
-await fastify.register(fastifyMetrics, {
+fastify.register(fastifyMetrics, {
   endpoint: '/metrics',
   routeMetrics: {
     enabled: {

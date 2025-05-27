@@ -29,7 +29,7 @@ class RedisClient:
         """Inicializa o client dentro do loop correto."""
         cls._pool = redis.ConnectionPool.from_url(
             settings.redis_url,
-            max_connections=500,
+            max_connections=250,
             socket_timeout=2,  # tempo para operações
             socket_connect_timeout=2,  # tempo para conectar
             retry_on_timeout=True,
