@@ -14,6 +14,7 @@ from app.core.utils import (
     validate_schema_object,
 )
 from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
+from app.infra.proxy_handler import SessionManager
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
@@ -136,3 +137,35 @@ async def exception(scope, receive, send):
         },
         status_code=500,
     )
+
+
+@get("/actiontype", summary="actiontype", tags=["actiontype"])
+async def get_cep(scope, receive, send):
+    try:
+        start_process = time.perf_counter()
+
+        async with SessionManager.connection() as session:
+            async with session.get(
+                "https://apps.jornada-precos.dev.awsporto/python-corp-snps-brms-core/action_type",
+                verify_ssl=False,
+            ) as response:
+                user_result = await response.json()
+
+        time_process = time.perf_counter() - start_process
+        return await send_response(
+            send,
+            json_response(
+                user_result, headers={"time_process": f"{time_process:.7f} segs"}
+            ),
+        )
+    except Exception as ex:
+        log.error(ex)
+        time_process = time.perf_counter() - start_process
+        return await send_response(
+            send,
+            json_response(
+                str(ex),
+                headers={"time_process": f"{time_process:.7f} segs"},
+                status=500,
+            ),
+        )
