@@ -171,3 +171,49 @@ Basta rodar `python main.py` para iniciar a aplicação com todos os recursos co
 
 **Resumo:**  
 Monte sua aplicação criando modelos, DTOs, repositórios, serviços e rotas conforme a estrutura sugerida. O framework já provê logging, métricas, tracing, cache, documentação automática e integrações externas prontos para uso.
+
+
+## 🛠️ Tecnologias Utilizadas
+
+O projeto utiliza um conjunto de tecnologias modernas para garantir alta performance, observabilidade e facilidade de integração:
+
+- **Python 3.10+**  
+  Linguagem principal da aplicação.
+
+- **Granian**  
+  Servidor ASGI de alta performance para aplicações Python assíncronas.
+
+- **msgspec**  
+  Serialização/deserialização e validação de dados eficiente, utilizada nos DTOs e modelos.
+
+- **Pydantic Settings**  
+  Gerenciamento de configurações e variáveis de ambiente de forma tipada.
+
+- **orjson**  
+  Serializador JSON ultrarrápido para Python.
+
+- **MongoDB**  
+  Banco de dados NoSQL, integrado via drivers assíncronos.
+
+- **Redis**  
+  Armazenamento em memória para cache e operações rápidas.
+
+- **aiohttp**  
+  Cliente HTTP assíncrono para integrações externas.
+
+- **Prometheus Client**  
+  Coleta e exposição de métricas para monitoramento.
+
+- **OpenTelemetry**  
+  Observabilidade e tracing distribuído, com instrumentação para ASGI, MongoDB, Redis, logging e aiohttp.
+
+- **uvloop**  
+  Loop de eventos alternativo para maior desempenho em aplicações assíncronas.
+
+- **pytest & pytest-asyncio**  
+  Frameworks para testes automatizados síncronos e assíncronos.
+
+- **jsonschema**  
+  Validação de dados baseada em JSON Schema.
+
+Essas tecnologias proporcionam uma base robusta, performática e observável para o desenvolvimento de APIs modernas.
