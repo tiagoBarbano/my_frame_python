@@ -281,3 +281,21 @@ post = (  # noqa: E731
         cookie_params,
     )
 )
+
+def get_route_details(scope):
+    method = scope["method"]
+    path = scope["path"]
+
+    if routes.get((path, method)):
+        return (path, method.upper())
+
+    return next(
+        (
+            (path_template, method.upper())
+            for regex, path_template, _ in routes_by_method[
+                method.upper()
+            ]
+            if regex.match(path)
+        ),
+        (path, method.upper()),
+    )

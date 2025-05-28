@@ -1,6 +1,8 @@
 import time
 
 from prometheus_client import (
+    Counter,
+    Gauge,
     Histogram,
     CollectorRegistry,
     generate_latest,
@@ -8,41 +10,83 @@ from prometheus_client import (
 )
 
 from app.config import get_settings
+from app.core.exception import AppException
 from app.core.utils import send_response, text_plain_response
-from app.core.routing import get
+from app.core.routing import get, get_route_details
 
 settings = get_settings()
 
 
-def prometheus_metrics():
+def _prometheus_metrics():
     """Generate Prometheus metrics for the application."""
     if not settings.prometheus_multiproc_dir:
         return generate_latest()
+    
     registry = CollectorRegistry()
-    multiprocess.MultiProcessCollector(registry, "metrics")
+    multiprocess.MultiProcessCollector(registry=registry)
     return generate_latest(registry)
 
 
-REQUEST_LATENCY = Histogram(
-    "http_request_duration_seconds", "Request latency", ["method", "path", "status"]
+HTTP_REQUESTS_TOTAL = Counter(
+    "http_requests_total",
+    "Total number of HTTP requests",
+    ["method", "path", "status_code"],
+)
+
+HTTP_REQUEST_DURATION_SECONDS = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "path", "status_code"],
+    buckets=(
+        0.005,
+        0.01,
+        0.025,
+        0.05,
+        0.075,
+        0.1,
+        0.25,
+        0.5,
+        0.75,
+        1.0,
+        2.5,
+        5.0,
+        7.5,
+        10.0,
+    ),
+)
+
+HTTP_REQUESTS_IN_PROGRESS = Gauge(
+    "http_requests_in_progress",
+    "Number of HTTP requests in progress",
+    ["method", "path"],
+)
+
+HTTP_RESPONSES_TOTAL = Counter(
+    "http_responses_total",
+    "Total number of HTTP responses",
+    ["method", "path", "status_code"],
+)
+
+MAX_HTTP_REQUEST_DURATION_SECONDS = Gauge(
+    "max_http_request_duration_seconds",
+    "Maximum observed HTTP request duration in seconds",
+    ["method", "path"]
 )
 
 if settings.enable_metrics:
-
     @get("/metrics", summary="METRICS", tags=["METRICS"], response_model=None)
-    async def hello_world(scope, receive, send):
-        body = prometheus_metrics()
+    async def metrics(scope, receive, send):
+        body = _prometheus_metrics()
         return await send_response(send, text_plain_response(body))
 
 
 class PrometheusMiddleware:
     """Middleware to measure request latency and expose metrics."""
+
     def __init__(self, app):
         self.app = app
 
     async def __call__(self, scope, receive, send):
-        start_time = time.perf_counter_ns()
-
         if (
             scope["type"] != "http"
             or scope["path"] == "/metrics"
@@ -52,17 +96,51 @@ class PrometheusMiddleware:
         ):
             return await self.app(scope, receive, send)
 
-        method = scope["method"]
-        path = scope["path"]
-        status_code = 500
+        start_time = time.perf_counter_ns()
+        path, method = get_route_details(scope)
+        
+        HTTP_REQUESTS_IN_PROGRESS.labels(method=method, path=path).inc()
 
         async def send_wrapper(message):
-            nonlocal status_code
             if message["type"] == "http.response.start":
                 status_code = message["status"]
+
+                HTTP_REQUESTS_TOTAL.labels(
+                    method=method, path=path, status_code=status_code
+                ).inc()
+
+                HTTP_RESPONSES_TOTAL.labels(
+                    method=method, path=path, status_code=status_code
+                ).inc()
+
+                duration = (time.perf_counter_ns() - start_time) / 1_000_000_000
+                HTTP_REQUEST_DURATION_SECONDS.labels(method, path, str(status_code)).observe(duration)
+
+                previous_max = MAX_HTTP_REQUEST_DURATION_SECONDS.labels(method=method, path=path)._value.get()
+
+                if duration > previous_max:
+                    MAX_HTTP_REQUEST_DURATION_SECONDS.labels(method=method, path=path).set(duration)                
+                    
             await send(message)
 
-        await self.app(scope, receive, send_wrapper)
+        try:
+            await self.app(scope, receive, send_wrapper)
+        except Exception as e:
+            status_code = "500"
+            if isinstance(e, AppException):
+                status_code = str(e.status_code)
 
-        duration = (time.perf_counter_ns() - start_time) / 1_000_000_000
-        REQUEST_LATENCY.labels(method, path, str(status_code)).observe(duration)
+            HTTP_REQUESTS_TOTAL.labels(
+                method=method, path=path, status_code=status_code
+            ).inc()
+
+            HTTP_RESPONSES_TOTAL.labels(
+                method=method, path=path, status_code=status_code
+            ).inc()
+
+            duration = (time.perf_counter_ns() - start_time) / 1_000_000_000
+            HTTP_REQUEST_DURATION_SECONDS.labels(
+                method=method, path=path, status_code=status_code
+            ).observe(duration)
+        finally:
+            HTTP_REQUESTS_IN_PROGRESS.labels(method=method, path=path).dec()

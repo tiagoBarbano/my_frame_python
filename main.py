@@ -6,6 +6,7 @@ from app.routers.router import *  # noqa: F403
 from granian import Granian
 from app.config import Settings
 from app.core.application import app
+from app.core.routing import get_route_details
 
 settings = Settings()
 
@@ -38,11 +39,12 @@ if __name__ == "__main__":
 
 
 # Habilita as Metricas do Prometheus
-if settings.enable_metrics:
-    from app.core.metrics import PrometheusMiddleware
-
+if settings.enable_metrics:  
     if settings.prometheus_multiproc_dir:
-        os.makedirs(settings.prometheus_multiproc_dir, exist_ok=True)
+        os.environ["PROMETHEUS_MULTIPROC_DIR"] = os.path.abspath("./metrics")
+        os.makedirs(os.environ["PROMETHEUS_MULTIPROC_DIR"], exist_ok=True)
+
+    from app.core.metrics import PrometheusMiddleware        
 
     app = PrometheusMiddleware(app)
 
@@ -50,31 +52,11 @@ if settings.enable_metrics:
 if settings.enable_tracing:
     import app.core.tracing as otel  # noqa: F401
     from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
-    from opentelemetry.util.http import parse_excluded_urls, sanitize_method
+    from opentelemetry.util.http import parse_excluded_urls
     from opentelemetry.semconv.attributes.http_attributes import HTTP_ROUTE
-    from app.core.routing import routes_by_method, routes
-
-    
-    def _get_route_details(scope):
-        method = scope["method"]
-        path = scope["path"]
-
-        if routes.get((path, method)):
-            return (path, method.upper())
-
-        return next(
-            (
-                (path_template, method.upper())
-                for regex, path_template, _ in routes_by_method[
-                    method.upper()
-                ]
-                if regex.match(path)
-            ),
-            (path, method.upper()),
-        )
 
     def _get_default_span_details(scope):
-        route, method = _get_route_details(scope)
+        route, method = get_route_details(scope)
         attributes = {HTTP_ROUTE: route}
         span_name = f"{method} {route}"
 
