@@ -1,9 +1,11 @@
 import dataclasses
 
+import msgspec
+
 from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
 from app.models.user_model import UserModel
 from app.repository.mongo_repository import MongoRepository
-from app.infra.redis import redis_cache
+from app.infra.redis import RedisClient, redis_cache
 
 
 @dataclasses.dataclass(slots=True)
@@ -40,16 +42,25 @@ class UserService:
         await self.repository.save(model=user)
         return user.to_dict()
 
-    @redis_cache(
-        ttl=60,
-        key_prefix="user",
-        key_fn=lambda user_id, **_: f"id:{user_id}",
-        use_cache=True,
-    )
+    # @redis_cache(
+    #     ttl=60,
+    #     key_prefix="user",
+    #     key_fn=lambda user_id, **_: f"id:{user_id}", #"id:{user_id}",
+    #     use_cache=True,
+    # )
     async def get_user_by_id(self, user_id: str) -> dict:
-        result = await self.repository.find_by_id(id=user_id)
+        redis_key = f"user:id:{user_id}"
+        async with RedisClient.connection() as redis:        
+            cached = await redis.get(redis_key)
+            if cached:
+                return msgspec.json.decode(cached)
+            
+            result = await self.repository.find_by_id(id=user_id)
+            
+            if result is not None:
+                await redis.set(redis_key, msgspec.json.encode(result), ex=60)
 
-        return result
+            return result
 
     async def soft_delete_user(self, user_id: str):
         await self.repository.soft_delete(id=user_id)

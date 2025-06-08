@@ -21,7 +21,8 @@ volumes:
   redis-insight:
   mongo-data:
   tempo-data:
-  pm2-data:
+  grafana-data:
+  redis-data: 
 
 
 services:
@@ -46,17 +47,27 @@ services:
     logging: *default-logging
 
   redis:
-    image: redis:alpine
+    image: redis:7
     command: [ "redis-server", "/etc/redis/redis.conf", --requirepass redis1234 ]
     ports:
       - "6379:6379"
     volumes:
       - ./redis.conf:/etc/redis/redis.conf
+      - redis-data:/data
     deploy:
       resources:
         limits:
-          memory: 3000M
-          cpus: 1.0
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    sysctls:
+      - net.core.somaxconn=1024
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
     logging: *default-logging
 
   redis-insight:
@@ -89,9 +100,10 @@ services:
   #     - ENABLE_LOGGER=false
   #     - ENABLE_SWAGGER=true
   #     - WORKER=2
-  #     - redis_url=redis://:redis1234@redis:6379
+  #     - redis_url=redis://:redis1234@redis:6379/1
   #     - mongo_url=mongodb://mongodb:27017
   #     - granian_runtime_mode=mt
+  #     - enable_trace_ratio_based=false
   #   deploy:
   #     resources:
   #       limits:
@@ -101,7 +113,7 @@ services:
 
   # app-fastify:
   #   build:
-  #     context: ../fastify
+  #     context: ../benchmark/fastify
   #   ports:
   #     - "3000:3000"
   #   environment:
@@ -126,7 +138,7 @@ services:
 
   # webflux-app:
   #   build:
-  #     context: ../demo
+  #     context: ../benchmark/demo
   #   ports:
   #     - "8080:8080"
   #   depends_on:
@@ -153,6 +165,7 @@ services:
       - 3001:3000
     volumes:
       - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - grafana-data:/var/lib/grafana
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -197,22 +210,41 @@ services:
     extra_hosts: [ "host.docker.internal:host-gateway" ]
     logging: *default-logging
 
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.54.0
+    ports:
+      - "9121:9121"
+    environment:
+      REDIS_ADDR: redis://:redis1234@redis:6379
+    depends_on:
+      - redis
+
+  mongodb_exporter:
+    image: percona/mongodb_exporter:0.40
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+    ports:
+      - "9216:9216"
+    depends_on:
+      - mongodb
+    restart: always
+
   tempo:
     image: grafana/tempo:2.3.1
-    command: ["--target=all", "--storage.trace.backend=local", "--storage.trace.local.path=/var/tempo", "--auth.enabled=false",  "--ingester.max-traces-per-user=50000", "--ingester.max-block-duration=30s", "service_graphs.enabled=true"]
+    command: ["--config.file=/etc/tempo/tempo.yaml"]
+    volumes:
+      - tempo-data:/var/tempo
+      - ./tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - ./overrides.yaml:/etc/tempo/overrides.yaml:ro
     ports:
-      - "3200:3200"
       - "4317:4317"
       - "4318:4318"
-    depends_on:
-      - loki
-    volumes:
-      - tempo-data:/var/tempo      
-    logging: &default-logging
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+      - "3200:3200"   # Tempo metrics / Tempo search
+    tmpfs:
+      - /var/tempo:exec,nosuid,size=500m
+    logging: *default-logging
+
+    
   # jaeger-all-in-one:
   #   image: jaegertracing/all-in-one
   #   volumes:

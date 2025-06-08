@@ -1,43 +1,37 @@
-compactor: null
-distributor:
-    receivers:
-        zipkin:
-        jaeger:
-            protocols:
-                thrift_http: null
-        opencensus: null
-ingester:
-    trace_idle_period: 1s
-    lifecycler:
-        ring:
-            replication_factor: 3
-
-memberlist:
-  abort_if_cluster_join_fails: false
-  bind_port: 7946
-  join_members:
-  - ingester-0:7946
-  - ingester-1:7946
-  - ingester-2:7946
-
-overrides:
-  ingestion_burst_size_bytes: 10_000_000
-  max_traces_per_user: 1000000
-
 server:
-    http_listen_port: 3200
+  http_listen_port: 3200
+  log_level: info
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+
+compactor:
+  compaction:
+    block_retention: 1h
+
+ingester:
+  trace_idle_period: 10s
+  max_block_bytes: 1_000_000
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo
 
 storage:
   trace:
-    backend: s3
-    s3:
-      bucket: tempo
-      endpoint: minio:9000
-      access_key: tempo
-      secret_key: supersecret
-      insecure: true
+    backend: local
+    local:
+      path: /var/tempo
 
-    pool:
-        queue_depth: 2000
-    wal:
-        path: /var/tempo/wal
+overrides:
+  per_tenant_override_config: /etc/tempo/overrides.yaml
+
+monitoring:
+  metrics:
+    prometheus:
+      endpoint: 0.0.0.0:3200

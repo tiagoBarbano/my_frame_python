@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     ratio_value: str = Field(
         default=0.1,
         validate_default=False,
-        description="Ratio value for ratio-based tracing - percentage of requests to trace",
+        description="Ratio value for ratio-based tracing - percentage of requests to trace - if enable_trace_ratio_based is True",
     )
     redis_url: str = Field(
         default="redis://:redis1234@localhost:6379",
@@ -78,13 +78,13 @@ class Settings(BaseSettings):
         example=1,
     )
     worker: int = Field(
-        default=None,
-        validate_default=False,
+        default=2,
+        validate1default=False,
         description="Number of worker processes",
         example=1,
     )
     granian_runtime_mode: str = Field(
-        default="mt",
+        default="st",
         validate_default=False,
         description="Granian runtime mode (st for single-threaded, mt for multi-threaded)",
         example="st",

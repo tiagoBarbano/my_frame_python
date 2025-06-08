@@ -1,3 +1,6 @@
+global:
+  scrape_interval: 30s  
+  
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
@@ -14,8 +17,12 @@ scrape_configs:
     metrics_path: '/metrics'
     static_configs:
       - targets: ['app-fastify:3000']
-  - job_name: 'pm2'
-    metrics_path: '/metrics'
+  - job_name: 'redis'
     static_configs:
-      - targets: ['app-fastify:9209']
-      
+      - targets: ['redis_exporter:9121']
+  - job_name: "mongodb"
+    static_configs:
+      - targets: ["mongodb_exporter:9216"]
+  - job_name: 'tempo'
+    static_configs:
+      - targets: ['tempo:3200']      

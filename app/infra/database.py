@@ -8,7 +8,7 @@ from app.config import get_settings
 
 settings = get_settings()
 
-PymongoInstrumentor().instrument()
+PymongoInstrumentor().instrument(capture_statement=True)
 
 
 class MongoManager:
@@ -24,7 +24,7 @@ class MongoManager:
         """Inicializa o client dentro do loop correto."""
         cls._client = AsyncMongoClient(
             settings.mongo_url,
-            maxPoolSize=1500,  # aumenta a concorrência com o Mongo
+            maxPoolSize=500,  # aumenta a concorrência com o Mongo
             minPoolSize=100,
             serverSelectionTimeoutMS=3000,
             socketTimeoutMS=5000,

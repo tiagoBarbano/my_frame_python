@@ -46,10 +46,10 @@ class AppException(Exception):
         self.headers = headers
 
         if settings.enable_tracing:
-            with tracer.start_span(
-                f"error.{status_code}", attributes={"force_sample": True}
-            ) as span:
-                span.set_status(Status(StatusCode.ERROR, detail))
+            span = trace.get_current_span()
+            if span and span.is_recording():
+                span.set_attribute("force_sample", True)
+                span.set_status(Status(StatusCode.ERROR, str(detail)))
                 span.record_exception(self)
 
         log.error(self.detail, extra={"status_code": status_code})

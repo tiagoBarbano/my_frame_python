@@ -28,7 +28,7 @@ async def validate_schema_dict(body, ModelDto):
     If the validation succeeds, it returns the validated data
     as a dictionary.
     """
-    data = orjson.loads(body) if isinstance(body, bytes) else body
+    data = msgspec.json.decode(body) if isinstance(body, bytes) else body
     validator = get_validator(ModelDto)
 
     if erros := sorted(validator.iter_errors(data), key=lambda e: e.path):
@@ -104,7 +104,7 @@ def json_response(data, status=200, headers: dict[str, str] = None):
     )
     headers_response.extend(CONTENT_TYPE_APPLICATION_JSON_HEADER)
 
-    return status, headers_response, [orjson.dumps(data)]
+    return status, headers_response, [msgspec.json.encode(data)]
 
 
 def text_plain_response(data, status=200, headers=None):
@@ -157,7 +157,7 @@ async def read_body(receive) -> dict:
             body += message.get("body", b"")
             if not message.get("more_body", False):
                 break
-    return orjson.loads(body)
+    return msgspec.json.decode(body)
 
 
 async def send_response(send, response):

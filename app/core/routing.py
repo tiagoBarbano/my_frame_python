@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import lru_cache
 from typing import Tuple, Type
 import msgspec
 from app.config import Settings
@@ -282,10 +283,8 @@ post = (  # noqa: E731
     )
 )
 
-def get_route_details(scope):
-    method = scope["method"]
-    path = scope["path"]
 
+def get_route_details(method, path):
     if routes.get((path, method)):
         return (path, method.upper())
 

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 public class DemoApplication {
 
 	public static void main(String[] args) {
-		// System.setProperty("reactor.netty.ioWorkerCount", "1");
+		System.setProperty("reactor.netty.ioWorkerCount", "2");
 
 		SpringApplication.run(DemoApplication.class, args);
 	}

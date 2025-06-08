@@ -5,12 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "DemoApplication",
+            "request": "launch",
+            "mainClass": "com.example.demo.DemoApplication"
+        },
+        {
+            "type": "java",
+            "name": "DemoApplication",
+            "request": "launch",
+            "mainClass": "com.example.demo.DemoApplication",
+            "projectName": "demo"
+        },
+        {
             "name": "Python Debugger: FastAPI",
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
             "args": [
-                "main_fastapi:app",
+                "main:app",
                 "--reload"
             ],
             "jinja": true
@@ -32,14 +45,6 @@
             "mode": "auto",
             "args": [],
             "program": "/home/f0113800/dev/my_frame_granian/golang/main.go"
-        },
-        {
-            "type": "python",
-            "name": "main",
-            "request": "launch",
-            "justMyCode": false,
-            "args": [],
-            "program": "/home/ventura/dev/my_frame_granian/main.py"
         }
     ]
 

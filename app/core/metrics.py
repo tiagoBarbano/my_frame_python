@@ -27,11 +27,11 @@ def _prometheus_metrics():
     return generate_latest(registry)
 
 
-HTTP_REQUESTS_TOTAL = Counter(
-    "http_requests_total",
-    "Total number of HTTP requests",
-    ["method", "path", "status_code"],
-)
+# HTTP_REQUESTS_TOTAL = Counter(
+#     "http_requests_total",
+#     "Total number of HTTP requests",
+#     ["method", "path", "status_code"],
+# )
 
 HTTP_REQUEST_DURATION_SECONDS = Histogram(
     "http_request_duration_seconds",
@@ -61,11 +61,11 @@ HTTP_REQUESTS_IN_PROGRESS = Gauge(
     ["method", "path"],
 )
 
-HTTP_RESPONSES_TOTAL = Counter(
-    "http_responses_total",
-    "Total number of HTTP responses",
-    ["method", "path", "status_code"],
-)
+# HTTP_RESPONSES_TOTAL = Counter(
+#     "http_responses_total",
+#     "Total number of HTTP responses",
+#     ["method", "path", "status_code"],
+# )
 
 MAX_HTTP_REQUEST_DURATION_SECONDS = Gauge(
     "max_http_request_duration_seconds",
@@ -97,30 +97,32 @@ class PrometheusMiddleware:
             return await self.app(scope, receive, send)
 
         start_time = time.perf_counter_ns()
-        path, method = get_route_details(scope)
+        path, method = get_route_details(method=scope["method"], path=scope["path"])
         
-        HTTP_REQUESTS_IN_PROGRESS.labels(method=method, path=path).inc()
-
+        labels = dict(
+            method=method,
+            path=path,
+        )
+        
+        in_progress = HTTP_REQUESTS_IN_PROGRESS.labels(**labels)
+        in_progress.inc()
+        
         async def send_wrapper(message):
             if message["type"] == "http.response.start":
-                status_code = message["status"]
+                status_code = str(message["status"])
+                labels_status = {**labels, "status_code": status_code}
+                # req_total = HTTP_REQUESTS_TOTAL.labels(**labels_status)
+                # resp_total = HTTP_RESPONSES_TOTAL.labels(**labels_status)
+                duration_hist = HTTP_REQUEST_DURATION_SECONDS.labels(**labels_status)
+                max_gauge = MAX_HTTP_REQUEST_DURATION_SECONDS.labels(**labels)
 
-                HTTP_REQUESTS_TOTAL.labels(
-                    method=method, path=path, status_code=status_code
-                ).inc()
-
-                HTTP_RESPONSES_TOTAL.labels(
-                    method=method, path=path, status_code=status_code
-                ).inc()
-
+                # req_total.inc()
+                # resp_total.inc()
                 duration = (time.perf_counter_ns() - start_time) / 1_000_000_000
-                HTTP_REQUEST_DURATION_SECONDS.labels(method, path, str(status_code)).observe(duration)
-
-                previous_max = MAX_HTTP_REQUEST_DURATION_SECONDS.labels(method=method, path=path)._value.get()
-
-                if duration > previous_max:
-                    MAX_HTTP_REQUEST_DURATION_SECONDS.labels(method=method, path=path).set(duration)                
-                    
+                duration_hist.observe(duration)
+                prev_max = max_gauge._value.get()
+                if duration > prev_max:
+                    max_gauge.set(duration)
             await send(message)
 
         try:
@@ -129,18 +131,11 @@ class PrometheusMiddleware:
             status_code = "500"
             if isinstance(e, AppException):
                 status_code = str(e.status_code)
-
-            HTTP_REQUESTS_TOTAL.labels(
-                method=method, path=path, status_code=status_code
-            ).inc()
-
-            HTTP_RESPONSES_TOTAL.labels(
-                method=method, path=path, status_code=status_code
-            ).inc()
-
+            labels_status = {**labels, "status_code": status_code}
+            # HTTP_REQUESTS_TOTAL.labels(**labels_status).inc()
+            # HTTP_RESPONSES_TOTAL.labels(**labels_status).inc()
             duration = (time.perf_counter_ns() - start_time) / 1_000_000_000
-            HTTP_REQUEST_DURATION_SECONDS.labels(
-                method=method, path=path, status_code=status_code
-            ).observe(duration)
+            HTTP_REQUEST_DURATION_SECONDS.labels(**labels_status).observe(duration)
+            raise
         finally:
-            HTTP_REQUESTS_IN_PROGRESS.labels(method=method, path=path).dec()
+            in_progress.dec()

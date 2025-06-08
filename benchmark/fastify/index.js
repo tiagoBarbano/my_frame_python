@@ -54,7 +54,7 @@ fastify.register(fastifyMetrics, {
   routeMetrics: {
     enabled: {
       histogram: true,
-      summary: false
+      summary: true
     },
   }
 });

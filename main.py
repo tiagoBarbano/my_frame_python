@@ -30,10 +30,7 @@ if __name__ == "__main__":
         runtime_threads=1,
         loop="uvloop",
         task_impl="asyncio",
-        http="1",
         websockets=False,
-        backlog=500000,
-        backpressure=50000,
         log_enabled=True,
     ).serve()
 
@@ -56,7 +53,7 @@ if settings.enable_tracing:
     from opentelemetry.semconv.attributes.http_attributes import HTTP_ROUTE
 
     def _get_default_span_details(scope):
-        route, method = get_route_details(scope)
+        route, method = get_route_details(method=scope["method"], path=scope["path"])
         attributes = {HTTP_ROUTE: route}
         span_name = f"{method} {route}"
 
