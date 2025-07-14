@@ -1,18 +1,18 @@
 # instalar plugin do loki
 # docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions --enable
 
-x-logging: &default-logging
-  driver: loki
-  options:
-    loki-url: "http://localhost:3100/api/prom/push"
-    no-file: "false"
-    keep-file: "true"
-    loki-pipeline-stages: |
-      - multiline:
-          firstline: '^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}'
-          max_wait_time: 3s
-      - regex:
-          expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2},d{3}) (?P<message>(?s:.*))$$'
+# x-logging: &default-logging
+#   driver: loki
+#   options:
+#     loki-url: "http://localhost:3100/api/prom/push"
+#     no-file: "false"
+#     keep-file: "true"
+#     loki-pipeline-stages: |
+#       - multiline:
+#         firstline: '^\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2}'
+#         max_wait_time: 3s
+#       - regex:
+#         expression: '^(?P<time>\d{4}-\d{2}-\d{2} \d{1,2}:\d{2}:\d{2},d{3}) (?P<message>(?s:.*))$$'
 
 # version: "3"
 
@@ -44,7 +44,7 @@ services:
         limits:
           memory: 3000M
           cpus: 1.0
-    logging: *default-logging
+#    logging: *default-logging
 
   redis:
     image: redis:7
@@ -68,7 +68,7 @@ services:
       nofile:
         soft: 100000
         hard: 100000
-    logging: *default-logging
+#    logging: *default-logging
 
   redis-insight:
     image: redis/redisinsight:latest
@@ -80,84 +80,84 @@ services:
     depends_on:
       - redis
 
-  # app-granian:
-  #   build:
-  #     context: ../
-  #   ports:
-  #     - '8000:8000'
-  #   depends_on:
-  #     - grafana
-  #     - prometheus
-  #     - tempo
-  #   environment:
-  #     - PROMETHEUS_MULTIPROC_DIR=metrics
-  #     - APP_NAME=MY_FRAME_GRANIAN
-  #     - LOGGER_LEVEL=info
-  #     - ENDPOINT_OTEL=http://tempo:4317
-  #     - FLAG_LOCAL=false
-  #     - ENABLE_TRACING=true
-  #     - ENABLE_METRICS=true
-  #     - ENABLE_LOGGER=false
-  #     - ENABLE_SWAGGER=true
-  #     - WORKER=2
-  #     - redis_url=redis://:redis1234@redis:6379/1
-  #     - mongo_url=mongodb://mongodb:27017
-  #     - granian_runtime_mode=mt
-  #     - enable_trace_ratio_based=false
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 500M
-  #         cpus: 2.0
-  #   logging: *default-logging
+  app-granian:
+    build:
+      context: ../
+    ports:
+      - '8000:8000'
+    depends_on:
+      - grafana
+      - prometheus
+      - tempo
+    environment:
+      - PROMETHEUS_MULTIPROC_DIR=metrics
+      - APP_NAME=MY_FRAME_GRANIAN
+      - LOGGER_LEVEL=info
+      - ENDPOINT_OTEL=http://tempo:4317
+      - FLAG_LOCAL=false
+      - ENABLE_TRACING=true
+      - ENABLE_METRICS=true
+      - ENABLE_LOGGER=false
+      - ENABLE_SWAGGER=true
+      - WORKER=2
+      - redis_url=redis://:redis1234@redis:6379/1
+      - mongo_url=mongodb://mongodb:27017
+      - granian_runtime_mode=st
+      - enable_trace_ratio_based=true
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+          cpus: 2.0
+#    logging: *default-logging
 
-  # app-fastify:
-  #   build:
-  #     context: ../benchmark/fastify
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - PORT=3000
-  #     - TEMPO_URL=http://tempo:4317
-  #     - SERVICE_NAME=api-fastify
-  #     - HOST_REDIS=redis
-  #     - PORT_REDIS=6379
-  #     - PS_REDIS=redis1234
-  #     - MONGODB_URL=mongodb://mongodb:27017
-  #   depends_on:
-  #     - grafana
-  #     - prometheus
-  #     - tempo
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 500M
-  #         cpus: 2.0
-  #   logging: *default-logging
+  app-fastify:
+    build:
+      context: ../benchmark/fastify
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - TEMPO_URL=http://tempo:4317
+      - SERVICE_NAME=api-fastify
+      - HOST_REDIS=redis
+      - PORT_REDIS=6379
+      - PS_REDIS=redis1234
+      - MONGODB_URL=mongodb://mongodb:27017
+    depends_on:
+      - grafana
+      - prometheus
+      - tempo
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+          cpus: 2.0
+#    logging: *default-logging
 
 
-  # webflux-app:
-  #   build:
-  #     context: ../benchmark/demo
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - grafana
-  #     - prometheus
-  #     - tempo
-  #   environment:
-  #     - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
-  #     - SPRING_DATA_REDIS_HOST=redis
-  #     - SPRING_DATA_REDIS_PORT=6379
-  #     - SPRING_DATA_REDIS_PASSWORD=redis1234
-  #     - OTEL_PROPAGATORS=tracecontext,baggage,
-  #   restart: unless-stopped
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 500M
-  #         cpus: 2.0
-  #   logging: *default-logging
+  webflux-app:
+    build:
+      context: ../benchmark/demo
+    ports:
+      - "8080:8080"
+    depends_on:
+      - grafana
+      - prometheus
+      - tempo
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=redis1234
+      - OTEL_PROPAGATORS=tracecontext,baggage,
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+          cpus: 2.0
+    # logging: *default-logging
 
   grafana:
     image: grafana/grafana:latest
@@ -170,7 +170,7 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
-    logging: *default-logging
+#    logging: *default-logging
 
   loki:
     image: grafana/loki:latest
@@ -188,7 +188,7 @@ services:
     command: -config.file=/etc/promtail/docker-config.yaml
     depends_on:
       - loki
-    logging: *default-logging
+#    logging: *default-logging
 
   prometheus:
     container_name: prometheus
@@ -208,7 +208,7 @@ services:
     ports:
       - "9090:9090"
     extra_hosts: [ "host.docker.internal:host-gateway" ]
-    logging: *default-logging
+#    logging: *default-logging
 
   redis_exporter:
     image: oliver006/redis_exporter:v1.54.0
@@ -242,7 +242,7 @@ services:
       - "3200:3200"   # Tempo metrics / Tempo search
     tmpfs:
       - /var/tempo:exec,nosuid,size=500m
-    logging: *default-logging
+#    logging: *default-logging
 
     
   # jaeger-all-in-one:

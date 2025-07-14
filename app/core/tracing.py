@@ -36,9 +36,6 @@ exporter = (
     if settings.flag_local
     else OTLPSpanExporter(endpoint=settings.endpoint_otel, insecure=True)
 )
-    
-# exporter = OTLPSpanExporterHTTP(endpoint=settings.endpoint_otel)
-
 
 resource = Resource.create(attributes={"service.name": settings.app_name})
 tracer = TracerProvider(
@@ -51,9 +48,9 @@ tracer = TracerProvider(
 tracer.add_span_processor(
     BatchSpanProcessor(
         exporter,
-        # max_export_batch_size=512,
-        # schedule_delay_millis=1000,
-        # max_queue_size=2048,
+        max_export_batch_size=512,
+        schedule_delay_millis=1000,
+        max_queue_size=2048,
     )
 )
 trace.set_tracer_provider(tracer)

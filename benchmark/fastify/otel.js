@@ -7,6 +7,7 @@ import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis';
 import { NodeTracerProvider, BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { FastifyOtelInstrumentation } from '@fastify/otel';
+import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base';
 
 const traceExporter = new OTLPTraceExporter({
    url: 'http://tempo:4317', // Replace with your OTLP endpoint
@@ -14,6 +15,7 @@ const traceExporter = new OTLPTraceExporter({
 })
 
 const provider = new NodeTracerProvider({
+   sampler: new TraceIdRatioBasedSampler(0.1),
    resource: resourceFromAttributes({
       [SemanticResourceAttributes.SERVICE_NAME]: 'fastify-service',
       [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',

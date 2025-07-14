@@ -2,8 +2,9 @@ from dataclasses import dataclass
 import functools
 import hashlib
 import inspect
-import zlib
+# import zlib
 import orjson
+
 from typing import Callable, Any, Optional
 from redis.exceptions import RedisError
 from contextlib import asynccontextmanager
@@ -29,7 +30,8 @@ class RedisClient:
         """Inicializa o client dentro do loop correto."""
         cls._pool = redis.ConnectionPool.from_url(
             settings.redis_url,
-            # max_connections=100,
+            decode_responses=False,
+            max_connections=500,
         )
         cls._client = redis.Redis(connection_pool=cls._pool)
 
@@ -58,12 +60,12 @@ class RedisClient:
             log.info("Redis connection closed.")
 
 
-def compress(data: bytes) -> bytes:
-    return zlib.compress(data, level=3)
+# def compress(data: bytes) -> bytes:
+#     return zlib.compress(data, level=3)
 
 
-def decompress(data: bytes) -> bytes:
-    return zlib.decompress(data)
+# def decompress(data: bytes) -> bytes:
+#     return zlib.decompress(data)
 
 def redis_cache(
     ttl: int = 60,
@@ -113,6 +115,7 @@ def redis_cache(
                     return result
 
             except RedisError as e:
+                log.error(f"Redis error: {e}")
                 return await func(*args, **kwargs)
 
         return wrapper

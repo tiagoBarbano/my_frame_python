@@ -1,5 +1,4 @@
 import './otel.js';
-// import { fastifyOtelInstrumentation } from './otel.js';
 import 'dotenv/config';
 import pino from 'pino';
 import Fastify from 'fastify';

@@ -1,5 +1,5 @@
 # Etapa base
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
 # Diretório de trabalho
 WORKDIR /app

@@ -78,8 +78,7 @@ class SessionManager:
             inject(HEADERS)
             verbo_http: str = etapa_modulo.get("method").lower()
             auth_config: str = etapa_modulo.get("auth_config", None)
-            headers_fields = etapa_modulo.get("header_fields", None)
-            if headers_fields:
+            if headers_fields := etapa_modulo.get("header_fields", None):
                 HEADERS.update(headers_fields)
 
             if auth_config:
@@ -87,30 +86,24 @@ class SessionManager:
                 HEADERS.setdefault("Authorization", token)
 
             async with self.connection.request(
-                method=verbo_http.upper(),
-                url=url_api,
-                json=request if verbo_http == "post" else None,
-                params=params,
-                headers=HEADERS,
-                verify_ssl=False,
-                timeout=TIMEOUT,
-            ) as response:
-                if response.status == 200:
+                        method=verbo_http.upper(),
+                        url=url_api,
+                        json=request if verbo_http == "post" else None,
+                        params=params,
+                        headers=HEADERS,
+                        verify_ssl=False,
+                        timeout=TIMEOUT,
+                    ) as response:
+                if response.status == 200 or response.status != 204:
                     resposta = {
                         "status": response.status,
                         "result": await response.json(),
-                    }
-                elif response.status == 204:
-                    resposta = {
-                        "status": response.status,
-                        "result": "registro nao encontrado",
                     }
                 else:
                     resposta = {
                         "status": response.status,
-                        "result": await response.json(),
+                        "result": "registro nao encontrado",
                     }
-
             return resposta
 
         except asyncio.TimeoutError as ex:
@@ -121,7 +114,7 @@ class SessionManager:
             logger.error("Erro inesperado: %s", str(ex))
             return {"status": 500, "result": f"{str(ex)} - URL: {url_api}"}
 
-    async def get_auth_token(auth_config: dict):
+    async def get_auth_token(self, auth_config: dict):
         """
         Obtém um token de autenticação baseado no método configurado.
         Pode ser Bearer Token (OAuth), API Key ou Basic Auth.
@@ -129,11 +122,6 @@ class SessionManager:
 
         auth_type = auth_config.get("auth_type", "bearer")
         auth_url = auth_config.get("auth_url", "")
-        headers = {
-            "Accept": "*/*",
-            "Content-Type": "application/x-www-form-urlencoded",
-        }  # Garante que usamos os headers corretos
-
         if auth_type == "bearer":
             payload = auth_config.get("body", {})
 
@@ -142,16 +130,20 @@ class SessionManager:
             for key, value in payload.items():
                 form_data.add_field(key, str(value))
 
+            headers = {
+                "Accept": "*/*",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }  # Garante que usamos os headers corretos
+
             async with aiohttp.ClientSession() as session:
                 async with session.post(
-                    auth_url, data=form_data, headers=headers, verify_ssl=False
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return f"{data.get('token_type')} {data.get('access_token')}"
-                    else:
+                                auth_url, data=form_data, headers=headers, verify_ssl=False
+                            ) as response:
+                    if response.status != 200:
                         raise Exception(f"Erro ao obter token: {response.status}")
 
+                    data = await response.json()
+                    return f"{data.get('token_type')} {data.get('access_token')}"
         elif auth_type == "api_key":
             return auth_config.get("api_key")  # Apenas retorna a chave já cadastrada
 

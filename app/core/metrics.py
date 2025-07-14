@@ -1,7 +1,7 @@
 import time
 
 from prometheus_client import (
-    Counter,
+    # Counter,
     Gauge,
     Histogram,
     CollectorRegistry,

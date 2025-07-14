@@ -1,8 +1,6 @@
 from typing import Any
 import msgspec
 
-from enum import Enum
-
 
 class BaseParams(msgspec.Struct, kw_only=True):
     """Base Params"""

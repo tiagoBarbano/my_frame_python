@@ -1,7 +1,7 @@
-from collections import defaultdict
-from functools import lru_cache
-from typing import Tuple, Type
 import msgspec
+
+from collections import defaultdict
+from typing import Tuple, Type
 from app.config import Settings
 from app.core.exception import ErrorResponse, ErrorResponseGeneric
 from app.core.utils import compile_path_to_regex

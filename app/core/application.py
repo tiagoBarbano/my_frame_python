@@ -42,7 +42,7 @@ async def app(scope, receive, send):
             return await send_response(send, json_response(openapi_spec))
 
         # 4. Swagger UI
-        if path == "/docs":
+        if path == "/docs" and settings.enable_swagger:
             return await send_response(
                 send, text_html_response(await serve_swagger_ui(), status=200)
             )

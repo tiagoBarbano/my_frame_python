@@ -1,4 +1,4 @@
-FROM python:3.13.3-alpine
+FROM python:3.13.5-slim
 RUN mkdir src
 
 ENV LC_ALL=C.UTF-8

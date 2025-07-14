@@ -5,7 +5,7 @@ import msgspec
 from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
 from app.models.user_model import UserModel
 from app.repository.mongo_repository import MongoRepository
-from app.infra.redis import RedisClient, redis_cache
+from app.infra.redis import RedisClient
 
 
 @dataclasses.dataclass(slots=True)

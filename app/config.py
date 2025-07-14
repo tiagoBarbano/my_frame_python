@@ -34,7 +34,7 @@ class Settings(BaseSettings):
         default=True, validate_default=False, description="Enable or disable tracing"
     )
     enable_metrics: bool = Field(
-        default=True,
+        default=False,
         validate_default=False,
         description="Enable or disable metrics collection",
     )
@@ -44,10 +44,10 @@ class Settings(BaseSettings):
         description="Enable or disable logging middleware",
     )
     enable_swagger: bool = Field(
-        default=True, validate_default=False, description="Enable or disable Swagger UI"
+        default=False, validate_default=False, description="Enable or disable Swagger UI"
     )
     enable_trace_ratio_based: bool = Field(
-        default=False,
+        default=True,
         validate_default=False,
         description="Enable or disable ratio-based tracing - limits the number of traces sent to the tracing system",
     )
@@ -78,7 +78,7 @@ class Settings(BaseSettings):
         example=1,
     )
     worker: int = Field(
-        default=2,
+        default=1,
         validate1default=False,
         description="Number of worker processes",
         example=1,

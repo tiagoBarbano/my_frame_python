@@ -27,11 +27,10 @@ if __name__ == "__main__":
         interface="asgi",
         workers=settings.worker or workers,
         runtime_mode=settings.granian_runtime_mode,
-        runtime_threads=1,
         loop="uvloop",
         task_impl="asyncio",
         websockets=False,
-        log_enabled=True,
+        log_enabled=False,
     ).serve()
 
 
