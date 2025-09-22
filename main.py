@@ -23,10 +23,12 @@ if __name__ == "__main__":
     Granian(
         "main:app",
         address="0.0.0.0",
-        port=8000,
+        port=settings.port_app,
         interface="asgi",
         workers=settings.worker or workers,
         runtime_mode=settings.granian_runtime_mode,
+        backlog=16384,
+        backpressure=4096,
         loop="uvloop",
         task_impl="asyncio",
         websockets=False,

@@ -1,4 +1,4 @@
-POST http://localhost:8000/cotador
+POST http://localhost:8000/users
 
 {
     "valor": 10,
@@ -9,7 +9,7 @@ POST http://localhost:8000/cotador
 ###
 
 
-GET http://localhost:8000/user?id=6818c5858bafb63c530c3816
+GET http://localhost:8000/users?id=6818c5858bafb63c530c3816
 
 
 ###

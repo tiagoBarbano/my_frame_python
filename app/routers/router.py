@@ -11,10 +11,9 @@ from app.core.utils import (
     json_response,
     read_body,
     send_response,
-    validate_schema_object,
+    validate_schema,
 )
 from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
-from app.infra.proxy_handler import SessionManager
 from app.services.user_service import UserService
 from app.core.logger import log  # noqa: F401
 
@@ -22,21 +21,20 @@ user_service = UserService()
 
 
 @post(
-    "/cotador",
-    summary="Cotador",
-    description="EndPoint responsável por cadastrar cotacoes",
+    "/users",
+    summary="Users",
+    description="EndPoint responsável por cadastrar usuarios",
     request_model=UserRequestDto,
     response_model=UserResponseDto,
     headers=[
         HeaderParams(name="X-Token", type_field="string", description="Token de acesso")
     ],
-    tags=["cotador"],
+    tags=["USERS"],
 )
-async def cotador(scope, receive, send):
+async def users(scope, receive, send):
     try:
         body = await read_body(receive)
-
-        data = await validate_schema_object(body, UserRequestDto)
+        data = await validate_schema(body, UserRequestDto, return_dict=False)
 
         new_user = await user_service.create_user(data)
 
@@ -52,9 +50,9 @@ async def cotador(scope, receive, send):
 
 
 @get(
-    "/user",
-    summary="Cotador Get",
-    tags=["cotador"],
+    "/users",
+    summary="Users Get",
+    tags=["USERS"],
     response_model=UserResponseDto,
     query_params=[
         QueryParams(
@@ -62,7 +60,7 @@ async def cotador(scope, receive, send):
         )
     ],
 )
-async def cotador_get(scope, receive, send):
+async def users_get(scope, receive, send):
     start_process = time.perf_counter()
 
     query = parse_qs(scope.get("query_string", b"").decode())
@@ -83,9 +81,9 @@ async def cotador_get(scope, receive, send):
 
 
 @get(
-    "/user/{id}",
-    summary="Cotador Get",
-    tags=["cotador"],
+    "/users/{id}",
+    summary="Users Get",
+    tags=["USERS"],
     response_model=UserResponseDto,
     path_params=[
         PathParams(
@@ -93,28 +91,23 @@ async def cotador_get(scope, receive, send):
         ),
     ],
 )
-async def cotador_gest(scope, receive, send):
-    item_id = scope["path_params"]["id"]
-
-    user_result = await user_service.get_user_by_id(user_id=item_id)
-
-    if not user_result:
-        return await send_response(send, json_response("Recurso não encontrado", 404))
+async def user_ges_path(scope, receive, send):
+    user_result = await user_service.get_user_by_id(user_id=scope["path_params"]["id"])
 
     return await send_response(send, json_response(user_result))
 
 
 @get(
-    "/cotadores",
-    summary="Cotador Get ALL",
-    tags=["cotador"],
+    "/users_all",
+    summary="Users Get ALL",
+    tags=["USERS"],
     response_model=UserListResponse,
     query_params=[
         QueryParams(name="page", required=True, type_field="integer", default=1),
         QueryParams(name="limite", required=True, type_field="integer", default=10),
     ],
 )
-async def cotador_get_all(scope, receive, send) -> list[dict]:
+async def users_get_all(scope, receive, send) -> list[dict]:
     query = parse_qs(scope.get("query_string", b"").decode())
     page = int(query.get("page", ["1"])[0])
     limit = int(query.get("limite", ["10"])[0])
@@ -137,35 +130,3 @@ async def exception(scope, receive, send):
         },
         status_code=500,
     )
-
-
-@get("/actiontype", summary="actiontype", tags=["actiontype"])
-async def get_cep(scope, receive, send):
-    try:
-        start_process = time.perf_counter()
-
-        async with SessionManager.connection() as session:
-            async with session.get(
-                "https://apps.jornada-precos.dev.awsporto/python-corp-snps-brms-core/action_type",
-                verify_ssl=False,
-            ) as response:
-                user_result = await response.json()
-
-        time_process = time.perf_counter() - start_process
-        return await send_response(
-            send,
-            json_response(
-                user_result, headers={"time_process": f"{time_process:.7f} segs"}
-            ),
-        )
-    except Exception as ex:
-        log.error(ex)
-        time_process = time.perf_counter() - start_process
-        return await send_response(
-            send,
-            json_response(
-                str(ex),
-                headers={"time_process": f"{time_process:.7f} segs"},
-                status=500,
-            ),
-        )

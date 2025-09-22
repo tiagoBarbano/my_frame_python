@@ -1,5 +1,5 @@
 # Etapa base
-FROM node:20-slim AS base
+FROM node:24.6.0-slim AS base
 
 # Diretório de trabalho
 WORKDIR /app
@@ -8,7 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala dependências de produção e o PM2 globalmente
-RUN npm ci --omit=dev && npm install -g pm2
+RUN npm ci --omit=dev && npm install -g pm2 \
+	&& apt-get update && apt-get upgrade -y --no-install-recommends \
+	&& apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copia o restante da aplicação
 COPY . .
@@ -17,5 +19,5 @@ COPY . .
 EXPOSE 3000
 
 # Inicia com PM2 (modo fork)
-CMD ["pm2-runtime", "--no-daemon", "--instances", "2", "index.js"]
+CMD ["pm2-runtime", "--no-daemon", "--instances", "1", "index.js"]
 

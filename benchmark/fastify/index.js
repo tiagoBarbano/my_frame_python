@@ -1,4 +1,4 @@
-import './otel.js';
+// import './otel.js';
 import 'dotenv/config';
 import pino from 'pino';
 import Fastify from 'fastify';
@@ -32,8 +32,8 @@ fastify.register(fastifySwaggerUi, {
 })
 
 fastify.register(fastifyRedis, {
-  host: 'redis',
-  // host: 'localhost',
+  // host: 'redis',
+  host: 'localhost',
   port: 6379,
   password: 'redis1234',
   db: 0,
@@ -45,8 +45,8 @@ fastify.register(fastifyRedis, {
 
 fastify.register(fastifyMongo, {
   forceClose: true,
-  url: 'mongodb://mongodb:27017/cotador',
-  // url: 'mongodb://localhost:27017/cotador',
+  // url: 'mongodb://mongodb:27017/cotador',
+  url: 'mongodb://localhost:27017/cotador',
 });
 fastify.register(fastifyMetrics, {
   endpoint: '/metrics',

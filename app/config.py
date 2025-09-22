@@ -34,7 +34,7 @@ class Settings(BaseSettings):
         default=True, validate_default=False, description="Enable or disable tracing"
     )
     enable_metrics: bool = Field(
-        default=False,
+        default=True,
         validate_default=False,
         description="Enable or disable metrics collection",
     )
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
         description="Enable or disable logging middleware",
     )
     enable_swagger: bool = Field(
-        default=False, validate_default=False, description="Enable or disable Swagger UI"
+        default=True, validate_default=False, description="Enable or disable Swagger UI"
     )
     enable_trace_ratio_based: bool = Field(
         default=True,
@@ -89,7 +89,13 @@ class Settings(BaseSettings):
         description="Granian runtime mode (st for single-threaded, mt for multi-threaded)",
         example="st",
     )
-
+    port_app: int = Field(
+        default=8001,
+        validate_default=False,
+        description="Port for the application to listen on",
+        example=8001,
+    )
+    
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 

@@ -15,7 +15,7 @@ class BaseParams(msgspec.Struct, kw_only=True):
     minLength: int | None = None
     enum: list[Any] | None = None
     pattern: str | None = None
-    default: Any = None  # ← valor padrão adicional
+    default: Any = None
 
     def encode_dict(self) -> dict:
         return msgspec.to_builtins(self)

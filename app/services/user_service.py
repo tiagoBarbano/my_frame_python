@@ -2,6 +2,7 @@ import dataclasses
 
 import msgspec
 
+from app.core.logger import log
 from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
 from app.models.user_model import UserModel
 from app.repository.mongo_repository import MongoRepository

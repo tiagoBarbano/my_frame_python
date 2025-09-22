@@ -8,31 +8,57 @@ from app.core.utils import send_response, json_response, text_html_response
 
 settings = get_settings()
 
+# --- Pré-processamento para performance ---
+# 1. Pré-compilar rotas por método em uppercase
+ROUTES_BY_METHOD = {method.upper(): lst for method, lst in routes_by_method.items()}
+
+# 2. Pré-gerar HTML do Swagger
+SWAGGER_UI_HTML = None
+if settings.enable_swagger:
+    import asyncio
+
+    SWAGGER_UI_HTML = asyncio.run(serve_swagger_ui())  # roda uma vez na inicialização
+
+
+# --- Middleware para tratamento de exceções ---
+async def handle_app_exceptions(scope, receive, send, handler):
+    try:
+        await handler(scope, receive, send)
+    except AppException as ex:
+        await send_response(
+            send,
+            json_response(data=ex.detail, status=ex.status_code, headers=ex.headers),
+        )
+
+
+# --- Função principal ASGI ---
 async def app(scope, receive, send):
     """
-        ASGI application callable.
-        This function handles incoming requests and routes them to the appropriate handler.
-        It also manages the lifespan of the application and handles exceptions.
-        The function takes the ASGI scope, receive channel, and send channel as input.
-        It first checks if the scope type is "lifespan" and calls the lifespan function.
-        Then, it retrieves the HTTP method and path from the scope.
-        It checks for an exact route match, a regex route match, and handles OpenAPI JSON and Swagger UI requests.
-        If no match is found, it returns a 404 Not Found response.
-        If an AppException is raised, it returns the error message and status code.
+    ASGI application callable.
+    This function handles incoming requests and routes them to the appropriate handler.
+    It also manages the lifespan of the application and handles exceptions.
+    The function takes the ASGI scope, receive channel, and send channel as input.
+    It first checks if the scope type is "lifespan" and calls the lifespan function.
+    Then, it retrieves the HTTP method and path from the scope.
+    It checks for an exact route match, a regex route match, and handles OpenAPI JSON and Swagger UI requests.
+    If no match is found, it returns a 404 Not Found response.
+    If an AppException is raised, it returns the error message and status code.
     """
-    
-    try:
-        if scope["type"] == "lifespan":
-            await lifespan(scope, receive, send)
 
-        method = scope["method"]
-        path = scope["path"]
+    # Lifespan
+    if scope["type"] == "lifespan":
+        return await lifespan(scope, receive, send)
 
+    method = scope["method"].upper()
+    path = scope["path"]
+
+    async def route_handler(scope, receive, send):
+        # 1. Rotas estáticas
         if handler := routes.get((path, method)):
             return await handler(scope, receive, send)
 
-        # 2. Rota com regex
-        for regex, path_template, handler in routes_by_method[method.upper()]:
+        # 2. Rotas dinâmicas com regex
+        for regex, path_template, handler in ROUTES_BY_METHOD.get(method, []):
             if match := regex.match(path):
                 scope["path_params"] = match.groupdict()
                 return await handler(scope, receive, send)
@@ -42,15 +68,13 @@ async def app(scope, receive, send):
             return await send_response(send, json_response(openapi_spec))
 
         # 4. Swagger UI
-        if path == "/docs" and settings.enable_swagger:
+        if path == "/docs" and SWAGGER_UI_HTML:
             return await send_response(
-                send, text_html_response(await serve_swagger_ui(), status=200)
+                send, text_html_response(SWAGGER_UI_HTML, status=200)
             )
 
         # 5. 404 Not Found
         return await send_response(send, json_response({"error": "Not found"}, 404))
-    except AppException as ex:
-        body = ex.detail
-        status_code = ex.status_code
-        headers = ex.headers
-        return await send_response(send, json_response(data=body, status=status_code, headers=headers))
+
+    # Executa handler com middleware de exceções
+    await handle_app_exceptions(scope, receive, send, route_handler)

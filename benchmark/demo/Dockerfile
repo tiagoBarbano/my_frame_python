@@ -1,5 +1,5 @@
 # Etapa 1: Build da aplicação usando Maven e JDK 17
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Etapa 2: Runtime enxuto com JRE 17 + OpenTelemetry Agent
-FROM eclipse-temurin:17-jre-alpine AS runtime
+FROM eclipse-temurin:21-jre-alpine AS runtime
 
 WORKDIR /app
 
@@ -33,5 +33,7 @@ ENTRYPOINT [ \
 "-Dotel.exporter.otlp.protocol=grpc", \
 "-Dotel.metrics.exporter=none", \
 "-Dotel.logs.exporter=none", \
+"-Dotel.traces.sampler=traceidratio", \
+"-Dotel.traces.sampler.arg=0.1", \
 "-jar", "/app/app.jar" \
 ]

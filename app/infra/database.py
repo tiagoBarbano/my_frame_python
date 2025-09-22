@@ -24,11 +24,8 @@ class MongoManager:
         """Inicializa o client dentro do loop correto."""
         cls._client = AsyncMongoClient(
             settings.mongo_url,
-            maxPoolSize=500,  # aumenta a concorrência com o Mongo
-            minPoolSize=100,
-            serverSelectionTimeoutMS=3000,
-            socketTimeoutMS=5000,
         )
+        log.info("MongoDB connection started")
 
     @classmethod
     def get_client(cls):

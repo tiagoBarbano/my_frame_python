@@ -10,8 +10,8 @@ import { FastifyOtelInstrumentation } from '@fastify/otel';
 import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base';
 
 const traceExporter = new OTLPTraceExporter({
-   url: 'http://tempo:4317', // Replace with your OTLP endpoint
-   // url: 'http://localhost:4317', // Replace with your OTLP endpoint
+   // url: 'http://tempo:4317', // Replace with your OTLP endpoint
+   url: 'http://localhost:4317', // Replace with your OTLP endpoint
 })
 
 const provider = new NodeTracerProvider({

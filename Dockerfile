@@ -1,19 +1,32 @@
-FROM python:3.13.5-slim
-RUN mkdir src
+FROM python:3.13.7-slim AS base
 
-ENV LC_ALL=C.UTF-8
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
-ENV TERM=screen
+# Evita criar .pyc e melhora logs em containers
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    LC_ALL=C.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    TERM=screen
 
-COPY requirements.txt src
-COPY main.py src
-COPY app src/app
+# Diretório da aplicação
+WORKDIR /app
 
-WORKDIR /src
-RUN mkdir metrics
-RUN pip install --no-cache-dir --upgrade certifi
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+# Copia apenas o requirements primeiro para aproveitar cache de build
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --upgrade pip certifi \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Copia o restante do código
+COPY main.py .
+COPY app ./app
+
+# Diretório para métricas (com permissões corretas)
+RUN mkdir -p /app/metrics \
+    && chown -R nobody:nogroup /app
+USER nobody
 
 EXPOSE 8000
+
 CMD ["python", "main.py"]

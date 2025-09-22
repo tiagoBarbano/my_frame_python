@@ -1,0 +1,30 @@
+groups:
+  - name: autoscaling
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[30s])) * 100) > 80
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alto uso de CPU"
+          description: "CPU > 80% no nó {{ $labels.instance }}"
+      - alert: AppHighCPU
+        # expr: container_cpu_usage_seconds_total{container_label_com_docker_swarm_service_name="minha-stack_app-granian"} > 0.8
+        expr: sum by(container_label_com_docker_swarm_service_name) (rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_service_name="minha-stack_app-granian"}[$__rate_interval])) > 0.8
+        for: 1m
+        labels:
+          service: app-granian
+          severity: warning
+        annotations:
+          summary: "Alto uso de CPU na app-granian"
+          description: "O serviço {{ $labels.container_label_com_docker_swarm_service_name }} está acima de 80% de CPU."
+      - alert: HighRequestLatency
+        expr: http_request_duration_seconds_sum / http_request_duration_seconds_count > 0.5
+        for: 5m
+        labels:
+          severity: page
+          service: app-granian
+        annotations:
+          summary: "High request latency"
+          description: "Request latency is above 0.5s for more than 5 minutes."

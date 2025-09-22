@@ -14,7 +14,7 @@ compactor:
     block_retention: 1h
 
 ingester:
-  trace_idle_period: 10s
+  trace_idle_period: 2s
   max_block_bytes: 1_000_000
 
 metrics_generator:
@@ -30,8 +30,3 @@ storage:
 
 overrides:
   per_tenant_override_config: /etc/tempo/overrides.yaml
-
-# monitoring:
-#   metrics:
-#     prometheus:
-#       endpoint: 0.0.0.0:3200

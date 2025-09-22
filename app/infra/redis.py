@@ -31,9 +31,10 @@ class RedisClient:
         cls._pool = redis.ConnectionPool.from_url(
             settings.redis_url,
             decode_responses=False,
-            max_connections=500,
+            # max_connections=500,
         )
         cls._client = redis.Redis(connection_pool=cls._pool)
+        log.info("Redis connection started.")
 
     @classmethod
     def get(cls) -> redis.Redis:

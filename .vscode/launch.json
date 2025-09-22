@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
             "type": "java",
             "name": "DemoApplication",
             "request": "launch",
@@ -47,5 +54,4 @@
             "program": "/home/f0113800/dev/my_frame_granian/golang/main.go"
         }
     ]
-
 }
