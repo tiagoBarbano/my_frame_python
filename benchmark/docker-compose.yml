@@ -1,0 +1,47 @@
+services:
+  my-app-undertow:
+    build: demovt/.
+    container_name: spring-undertow
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"      # máximo 1.0 CPUs
+          memory: 1g       # máximo 1GB RAM
+  my-app-webflux:
+    build: demo/.
+    container_name: spring-webflux
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"      # máximo 1.0 CPUs
+          memory: 1g       # máximo 1GB RAM
+  my-app-fastapi:
+    build: fastapi_benck/.
+    container_name: fastapi
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"      # máximo 1.0 CPUs
+          memory: 1g       # máximo 1GB RAM
+  my-app-python-puro:
+    build:
+      context: fastapi_benck
+      dockerfile: Dockerfile_puro
+    container_name: python-puro
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"      # máximo 1.0 CPUs
+          memory: 1g       # máximo 1GB RAM

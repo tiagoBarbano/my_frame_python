@@ -2,15 +2,14 @@ import msgspec
 import time
 
 from jsonschema import ValidationError
-from urllib.parse import parse_qs
 
 from app.core.exception import AppException
 from app.core.params import HeaderParams, QueryParams, PathParams
 from app.core.routing import post, get
 from app.core.utils import (
-    json_response,
+    response,
+    get_query_param,
     read_body,
-    send_response,
     validate_schema,
 )
 from app.dto.user_dto import UserListResponse, UserRequestDto, UserResponseDto
@@ -38,15 +37,13 @@ async def users(scope, receive, send):
 
         new_user = await user_service.create_user(data)
 
-        return await send_response(send, json_response(new_user))
+        return await response(send, new_user)
     except (msgspec.ValidationError, ValueError, TypeError, ValidationError) as e:
         log.error(f"Validation error: {e.args[0]}")
-        return await send_response(
-            send, json_response({"error": e.args[0]}, status=422)
-        )
+        return await response(send, {"error": e.args[0]}, status=422)
     except Exception as e:  # noqa: B902
         log.error(f"Unexpected error: {e}")
-        return await send_response(send, json_response({"error": str(e)}, status=500))
+        return await response(send, {"error": str(e)}, status=500)
 
 
 @get(
@@ -63,21 +60,15 @@ async def users(scope, receive, send):
 async def users_get(scope, receive, send):
     start_process = time.perf_counter()
 
-    query = parse_qs(scope.get("query_string", b"").decode())
-    _id = query.get("id", [None])[0]
+    _id = get_query_param(scope=scope, name="id", default=None, cast=str)
 
     user_result = await user_service.get_user_by_id(user_id=_id)
 
     if not user_result:
-        return await send_response(send, json_response("Recurso não encontrado", 404))
+        return await response(send, "recurso nao encontrado", status=404)
 
     time_process = time.perf_counter() - start_process
-    return await send_response(
-        send,
-        json_response(
-            user_result, headers={"time_process": f"{time_process:.7f} segs"}
-        ),
-    )
+    return await response(send, user_result, headers={"time_process": f"{time_process:.7f} segs"})
 
 
 @get(
@@ -94,7 +85,7 @@ async def users_get(scope, receive, send):
 async def user_ges_path(scope, receive, send):
     user_result = await user_service.get_user_by_id(user_id=scope["path_params"]["id"])
 
-    return await send_response(send, json_response(user_result))
+    return await response(send, user_result)
 
 
 @get(
@@ -108,17 +99,15 @@ async def user_ges_path(scope, receive, send):
     ],
 )
 async def users_get_all(scope, receive, send) -> list[dict]:
-    query = parse_qs(scope.get("query_string", b"").decode())
-    page = int(query.get("page", ["1"])[0])
-    limit = int(query.get("limite", ["10"])[0])
-
+    page = get_query_param(scope, "page", 1, int)
+    limit = get_query_param(scope, "limite", 10, int)
     result = await user_service.list_users(page=page, limit=limit)
-    return await send_response(send, json_response(result))
+    return await response(send, result)
 
 
 @get("/", summary="HelloWorld", tags=["helloWorld"])
 async def hello_world(scope, receive, send):
-    return await send_response(send, json_response({"message": "HelloWorld"}))
+    return await response(send, {"message": "HelloWorld"})
 
 
 @get("/exception", summary="Exception", tags=["helloWorld"])

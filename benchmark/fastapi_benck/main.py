@@ -1,15 +1,17 @@
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-import anyio
-from contextlib import asynccontextmanager
+from prometheus_fastapi_instrumentator import Instrumentator
 
-@asynccontextmanager
-async def lifespan(app):
-    limiter = anyio.to_thread.current_default_thread_limiter()
-    limiter.total_tokens = 1000
-    yield
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="FastAPI Benchmark",
+    version="1.0.0",
+    default_response_class=ORJSONResponse,
+    lifespan=None,
+    docs_url=None,
+    redoc_url=None,
+    
+)
+Instrumentator().instrument(app).expose(app, should_gzip=True, include_in_schema=False)
 
 
 @app.get("/")

@@ -1,5 +1,5 @@
 import re
-from typing import get_type_hints
+from urllib.parse import parse_qs
 import msgspec
 
 from jsonschema import Draft7Validator, ValidationError
@@ -143,3 +143,11 @@ async def send_response(send, response):
     await send({"type": "http.response.start", "status": status, "headers": headers})
     for chunk in body_chunks:
         await send({"type": "http.response.body", "body": chunk})
+
+def get_query_param(scope, name: str, default=None, cast=str):
+    query = parse_qs(scope.get("query_string", b"").decode())
+    value = query.get(name, [default])[0]
+    return cast(value) if value is not None else default
+
+async def response(send, data, status=200, headers=None):
+    return await send_response(send, json_response(data, status=status, headers=headers))

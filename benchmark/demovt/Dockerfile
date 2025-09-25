@@ -28,7 +28,7 @@ EXPOSE 8080
 ENTRYPOINT [ \
 "java", \
 # "-javaagent:/app/opentelemetry-javaagent.jar", \
-# "-Dotel.service.name=demo-app", \
+# "-Dotel.service.name=demo-vt-app", \
 # "-Dotel.exporter.otlp.endpoint=http://tempo:4317", \
 # "-Dotel.exporter.otlp.protocol=grpc", \
 # "-Dotel.metrics.exporter=none", \
