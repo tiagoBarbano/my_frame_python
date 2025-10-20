@@ -25,8 +25,7 @@ public class CacheConfig {
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new GenericJackson2JsonRedisSerializer()
                         )
-                )
-                .disableCachingNullValues(); // <--- impede salvar null;
+                );
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(config)

@@ -46,7 +46,10 @@ tracer = TracerProvider(
     else None,
 )
 
-tracer.add_span_processor(BatchSpanProcessor(exporter))
+tracer.add_span_processor(BatchSpanProcessor(exporter,
+                        max_export_batch_size=512,
+                        schedule_delay_millis=1000,
+                        max_queue_size=2048,))
 trace.set_tracer_provider(tracer)
 
 LoggingInstrumentor().instrument(tracer_provider=tracer)

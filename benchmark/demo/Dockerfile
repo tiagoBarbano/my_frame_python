@@ -19,7 +19,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # Copia o agente do OpenTelemetry (você pode baixar antes ou durante o build)
-ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar .
+# ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar .
 
 # Expõe a porta padrão do WebFlux
 EXPOSE 8080

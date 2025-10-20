@@ -3,7 +3,7 @@ services:
     build: demovt/.
     container_name: spring-undertow
     ports:
-      - "8080:8080"
+      - "8090:8080"
     restart: unless-stopped
     deploy:
       resources:
@@ -14,7 +14,7 @@ services:
     build: demo/.
     container_name: spring-webflux
     ports:
-      - "8081:8080"
+      - "8091:8080"
     restart: unless-stopped
     deploy:
       resources:
@@ -25,7 +25,7 @@ services:
     build: fastapi_benck/.
     container_name: fastapi
     ports:
-      - "8000:8000"
+      - "8002:8000"
     restart: unless-stopped
     deploy:
       resources:
@@ -45,3 +45,20 @@ services:
         limits:
           cpus: "1"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
+  node-fastify:
+    build: fastify/.
+    container_name: node-fastify
+    environment:
+      PORT: 3000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis1234
+      MONGO_URL: mongodb://mongodb:27017/cotador
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"      # máximo 1.0 CPUs
+          memory: 1g       # máximo 1GB RAM          

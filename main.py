@@ -6,7 +6,6 @@ from app.routers.router import *  # noqa: F403
 from granian import Granian
 from app.config import Settings
 from app.core.application import app
-from app.core.routing import get_route_details
 
 settings = Settings()
 
@@ -52,6 +51,7 @@ if settings.enable_tracing:
     from opentelemetry.instrumentation.asgi import OpenTelemetryMiddleware
     from opentelemetry.util.http import parse_excluded_urls
     from opentelemetry.semconv.attributes.http_attributes import HTTP_ROUTE
+    from app.core.routing import get_route_details
 
     def _get_default_span_details(scope):
         route, method = get_route_details(method=scope["method"], path=scope["path"])

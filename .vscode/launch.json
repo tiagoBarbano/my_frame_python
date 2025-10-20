@@ -6,6 +6,12 @@
     "configurations": [
         {
             "type": "java",
+            "name": "PrimeTest",
+            "request": "launch",
+            "mainClass": "PrimeTest"
+        },
+        {
+            "type": "java",
             "name": "Main",
             "request": "launch",
             "mainClass": "com.example.Main",

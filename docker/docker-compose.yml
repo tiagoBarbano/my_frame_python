@@ -80,7 +80,7 @@ services:
     logging: *default-logging      
 
   app-granian:
-    image: tiagobarbano/myframegranian:0.1.1
+    image: tiagobarbano/myframegranian:0.1.3
     ports:
       - target: 8000
         published: 8000
@@ -96,11 +96,11 @@ services:
       - LOGGER_LEVEL=info
       - ENDPOINT_OTEL=http://tempo:4317
       - FLAG_LOCAL=false
-      - ENABLE_TRACING=true
-      - ENABLE_METRICS=true
+      - ENABLE_TRACING=false
+      - ENABLE_METRICS=false
       - ENABLE_LOGGER=false
-      - ENABLE_SWAGGER=true
-      - WORKER=1
+      - ENABLE_SWAGGER=false
+      - WORKER=4
       - redis_url=redis://:redis1234@redis:6379/1
       - mongo_url=mongodb://mongodb:27017
       - granian_runtime_mode=st
@@ -110,37 +110,44 @@ services:
       replicas: 1
       resources:
         limits:
-          memory: 500M
+          memory: "1g"
           cpus: "1"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     logging: *default-logging
 
-  webflux-app:
-    image: tiagobarbano/demo_java:latest
-    ports:
-      - target: 8080
-        published: 8080
-        protocol: tcp
-        mode: ingress
-    depends_on:
-      - grafana
-      - prometheus
-      - tempo
-    environment:
-      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
-      - SPRING_DATA_REDIS_HOST=redis
-      - SPRING_DATA_REDIS_PORT=6379
-      - SPRING_DATA_REDIS_PASSWORD=redis1234
-      - OTEL_PROPAGATORS=tracecontext,baggage
-      - OTEL_TRACES_SAMPLER=traceidratio
-      - OTEL_TRACES_SAMPLER_ARG=0.1      
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          memory: 500M
-          cpus: "1"
-
-    logging: *default-logging          
+  # webflux-app:
+  #   image: tiagobarbano/demo_java:latest
+  #   ports:
+  #     - target: 8080
+  #       published: 8080
+  #       protocol: tcp
+  #       mode: ingress
+  #   depends_on:
+  #     - grafana
+  #     - prometheus
+  #     - tempo
+  #   environment:
+  #     - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/cotador
+  #     - SPRING_DATA_REDIS_HOST=redis
+  #     - SPRING_DATA_REDIS_PORT=6379
+  #     - SPRING_DATA_REDIS_PASSWORD=redis1234
+  #     - OTEL_PROPAGATORS=tracecontext,baggage
+  #     - OTEL_TRACES_SAMPLER=traceidratio
+  #     - OTEL_TRACES_SAMPLER_ARG=0.1      
+  #   deploy:
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         memory: 500M
+  #         cpus: "1"
+  #   # ulimits:
+  #   #   nofile:
+  #   #     soft: 65535
+  #   #     hard: 65535
+  #   logging: *default-logging          
 
   grafana:
     image: grafana/grafana:latest

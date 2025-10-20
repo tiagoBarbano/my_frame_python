@@ -24,7 +24,7 @@ public class UsuarioService {
         this.repository = repository;
     }
 
-    // @Cacheable(value = "usuarios", key = "#id", unless = "#result == null")
+    @Cacheable(value = "usuarios", key = "#id", unless = "#result == null")
     public Optional<User> buscarPorId(String id) {
         // System.out.println("Buscando no MongoDB...");
         return repository.findById(id);
