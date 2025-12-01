@@ -9,18 +9,12 @@ POST http://localhost:8000/users
 ###
 
 
-GET http://localhost:8000/users?id=6818c5858bafb63c530c3816
+GET http://localhost:8000/users?id=692251538acbe725826f7b43
 
 
 ###
 
-
-GET http://localhost:8000/user/6818c5858bafb63c530c3816
-
-
-###
-
-GET http://localhost:8000/cotadores
+GET http://localhost:8001/users_all
 
 ###
 

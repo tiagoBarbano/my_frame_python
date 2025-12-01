@@ -21,4 +21,4 @@ EXPOSE 8000
 
 # Usa auto-instrumentação do OpenTelemetry com Uvicorn
 #ENTRYPOINT ["uvicorn", "main_puro:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "warning", "--workers", "1", "--loop", "uvloop"]
-ENTRYPOINT ["granian",  "--interface",  "asginl",  "main_puro:app", "--host", "0.0.0.0", "--port", "8000", "--loop", "uvloop", "--workers", "1"]
+ENTRYPOINT ["granian",  "--interface",  "asginl",  "main_puro:app", "--host", "0.0.0.0", "--port", "8000", "--loop", "uvloop", "--workers", "2"]

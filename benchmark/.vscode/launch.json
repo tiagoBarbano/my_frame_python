@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "DemovtApplication",
+            "request": "launch",
+            "mainClass": "com.example.demovt.DemovtApplication",
+            "projectName": "demovt"
+        },
+        {
+            "name": "Python Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "fastapi_benck.main:app",
+                "--reload"
+            ],
+            "jinja": true
+        }
+    ]
+}

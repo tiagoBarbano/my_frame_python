@@ -89,6 +89,22 @@ async def user_ges_path(scope, receive, send):
 
 
 @get(
+    "/users-mongo/{id}",
+    summary="Users Get",
+    tags=["USERS"],
+    response_model=UserResponseDto,
+    path_params=[
+        PathParams(
+            name="id", type_field="string", required=True, description="id do cliente"
+        ),
+    ],
+)
+async def user_get_path(scope, receive, send):
+    user_result = await user_service.get_user_by_id_mongo(user_id=scope["path_params"]["id"])
+
+    return await response(send, user_result)
+
+@get(
     "/users_all",
     summary="Users Get ALL",
     tags=["USERS"],

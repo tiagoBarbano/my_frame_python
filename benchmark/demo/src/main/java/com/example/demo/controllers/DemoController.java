@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.Duration;
 import java.util.Map;
 
 import org.springframework.http.MediaType;
@@ -45,6 +46,7 @@ public class DemoController {
     }
 
     private Mono<Map<String, Object>> processBody(Map<String, Object> body) {
-        return Mono.just(body);
+        return Mono.just(body)
+                .delayElement(Duration.ofMillis(100));
     }    
 }

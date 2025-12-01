@@ -31,10 +31,10 @@ class Settings(BaseSettings):
         description="Flag to indicate if the application is running in local mode",
     )
     enable_tracing: bool = Field(
-        default=True, validate_default=False, description="Enable or disable tracing"
+        default=False, validate_default=False, description="Enable or disable tracing"
     )
     enable_metrics: bool = Field(
-        default=True,
+        default=False,
         validate_default=False,
         description="Enable or disable metrics collection",
     )
@@ -44,10 +44,10 @@ class Settings(BaseSettings):
         description="Enable or disable logging middleware",
     )
     enable_swagger: bool = Field(
-        default=True, validate_default=False, description="Enable or disable Swagger UI"
+        default=False, validate_default=False, description="Enable or disable Swagger UI"
     )
     enable_trace_ratio_based: bool = Field(
-        default=True,
+        default=False,
         validate_default=False,
         description="Enable or disable ratio-based tracing - limits the number of traces sent to the tracing system",
     )

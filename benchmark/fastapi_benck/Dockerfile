@@ -17,13 +17,6 @@ RUN pip install --upgrade pip && pip install \
     gunicorn==23.0.0 \
     pymongo==4.14.1 \
     redis==6.4.0 \ 
-    opentelemetry-distro==0.57b0 \
-    opentelemetry-instrumentation==0.57b0 \
-    opentelemetry-exporter-otlp==1.36.0 \
-    opentelemetry-instrumentation-fastapi==0.57b0 \
-    opentelemetry-instrumentation-pymongo==0.57b0 \
-    opentelemetry-instrumentation-redis==0.57b0 \
-    prometheus-fastapi-instrumentator==7.1.0     \
     msgspec==0.19.0   
 
 # Copia o app
@@ -31,23 +24,23 @@ COPY main.py .
 
 EXPOSE 8000
 
-# ENTRYPOINT [ "sh", "-c", "\
-#     exec gunicorn main:app \
-#         -k uvicorn.workers.UvicornWorker \
-#         --bind 0.0.0.0:8000 \
-#         --workers 1 \
-#         --worker-connections 75000 \
-#         --keep-alive 2 \
-#         --timeout 30 \
-#         # --graceful-timeout 5 \
-#         --log-level warning \
-#         --preload \
-#         --reuse-port" ]
-
 ENTRYPOINT [ "sh", "-c", "\
-    exec granian \
-        --interface asgi \
-        --host 0.0.0.0 \
-        --port 8000 \
+    exec gunicorn main:app \
+        -k uvicorn.workers.UvicornWorker \
+        --bind 0.0.0.0:8000 \
         --workers 1 \
-        main:app" ]
+        --worker-connections 75000 \
+        --keep-alive 2 \
+        --timeout 30 \
+        --graceful-timeout 5 \
+        --log-level warning \
+        --preload \
+        --reuse-port" ]
+
+# ENTRYPOINT [ "sh", "-c", "\
+#     exec granian \
+#         --interface asgi \
+#         --host 0.0.0.0 \
+#         --port 8000 \
+#         --workers 1 \
+#         main:app" ]

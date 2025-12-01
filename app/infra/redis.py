@@ -9,7 +9,7 @@ from typing import Callable, Any, Optional
 from redis.exceptions import RedisError
 from contextlib import asynccontextmanager
 import redis.asyncio as redis
-from opentelemetry.instrumentation.redis import RedisInstrumentor
+# from opentelemetry.instrumentation.redis import RedisInstrumentor
 
 from app.config import get_settings
 from app.core.logger import log
@@ -17,7 +17,7 @@ from app.core.logger import log
 
 settings = get_settings()
 
-RedisInstrumentor().instrument()
+# RedisInstrumentor().instrument()
 
 
 @dataclass(slots=True)
@@ -45,13 +45,9 @@ class RedisClient:
         return cls._client
 
     @classmethod
-    @asynccontextmanager
     async def connection(cls):
-        client = cls.get()
-        try:
-            yield client
-        finally:
-            pass  # não fecha aqui, pois o client é singleton
+        return cls.get()
+
 
     @classmethod
     async def close(cls):

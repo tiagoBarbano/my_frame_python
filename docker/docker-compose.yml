@@ -80,16 +80,16 @@ services:
     logging: *default-logging      
 
   app-granian:
-    image: tiagobarbano/myframegranian:0.1.3
+    image: tiagobarbano/myframegranian:0.1.4
     ports:
       - target: 8000
         published: 8000
         protocol: tcp
         mode: ingress
-    depends_on:
-      - grafana
-      - prometheus
-      - tempo
+    # depends_on:
+      # - grafana
+      # - prometheus
+      # - tempo
     environment:
       - PROMETHEUS_MULTIPROC_DIR=metrics
       - APP_NAME=MY_FRAME_GRANIAN
@@ -100,11 +100,11 @@ services:
       - ENABLE_METRICS=false
       - ENABLE_LOGGER=false
       - ENABLE_SWAGGER=false
-      - WORKER=4
+      - WORKER=2
       - redis_url=redis://:redis1234@redis:6379/1
       - mongo_url=mongodb://mongodb:27017
       - granian_runtime_mode=st
-      - enable_trace_ratio_based=true
+      - enable_trace_ratio_based=false
       - port_app=8000
     deploy:
       replicas: 1
@@ -303,12 +303,12 @@ services:
       - "9100:9100"
     logging: *default-logging
 
-  alertmanager:
-    image: prom/alertmanager:latest
-    volumes:
-      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
-    command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-    ports:
-      - "9093:9093"
-    logging: *default-logging
+  # alertmanager:
+  #   image: prom/alertmanager:latest
+  #   volumes:
+  #     - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+  #   command:
+  #     - '--config.file=/etc/alertmanager/alertmanager.yml'
+  #   ports:
+  #     - "9093:9093"
+  #   logging: *default-logging

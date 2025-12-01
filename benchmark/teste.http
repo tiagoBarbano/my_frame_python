@@ -1,0 +1,33 @@
+POST http://localhost:8080/actuator/loggers/ROOT
+Content-Type: application/json
+
+{
+  "configuredLevel": "WARN"
+}
+
+### 
+
+
+curl -X POST http://localhost:8000/loggers/update \
+    -H "Content-Type: application/json" \
+    -d '{"logger_name":"root","level":"DEBUG"}'
+
+###
+
+POST http://localhost:8000/regras
+Content-Type: application/json
+
+{ 
+  "cliente": {
+  "nome": "Carla",
+  "score": 750,
+  "vip": false
+  },
+  "valorTotal": 1250.50,
+  "descontoAplicado": 0.10,
+  "produtosComprados": ["ELETRONICO", "VESTUARIO"]
+}
+
+###
+
+GET http://localhost:8080/check

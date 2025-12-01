@@ -1,56 +1,40 @@
-from opentelemetry.instrumentation.pymongo import PymongoInstrumentor
 from pymongo import AsyncMongoClient
-from pymongo.errors import ConfigurationError, ConnectionFailure, OperationFailure
-from contextlib import asynccontextmanager
-
-from app.core.logger import log
 from app.config import get_settings
+from app.core.logger import log
 
 settings = get_settings()
 
-PymongoInstrumentor().instrument(capture_statement=True)
-
 
 class MongoManager:
-    """Manages the MongoDB client connection for the application.
-
-    Provides methods to obtain and close the MongoDB client and database connections.
-    """
-
     _client: AsyncMongoClient | None = None
 
     @classmethod
     def init(cls):
-        """Inicializa o client dentro do loop correto."""
-        cls._client = AsyncMongoClient(
-            settings.mongo_url,
-        )
-        log.info("MongoDB connection started")
+        if cls._client is None:
+            cls._client = AsyncMongoClient(
+                settings.mongo_url,
+                maxPoolSize=150,      # ajuste recomendável
+                minPoolSize=5,       # mantém conexões prontas
+                connectTimeoutMS=500,
+                serverSelectionTimeoutMS=500,
+                maxConnecting=50,
+            )
+            log.info("MongoDB client initialized")
 
     @classmethod
     def get_client(cls):
         if cls._client is None:
-            raise RuntimeError(
-                "Mongo client not initialized. Call MongoManager.init() first."
-            )
+            raise RuntimeError("Mongo client not initialized.")
         return cls._client
 
     @classmethod
-    @asynccontextmanager
-    async def get_database(cls):
-        client = cls.get_client()
-        try:
-            yield client[settings.mongo_db]
-        except (ConnectionFailure, ConfigurationError, OperationFailure) as ex:
-            client.close()
-            log.error(f"MongoDB connection error: {ex}")
-            raise
+    def get_database(cls):
+        """Fast access without context manager."""
+        return cls.get_client()[settings.mongo_db]
 
     @classmethod
     async def close(cls):
         if cls._client:
-            await cls._client.close()
+            cls._client.close()
             cls._client = None
-            log.info("MongoDB connection closed.")
-        else:
-            log.warning("MongoDB client is already closed.")
+            log.info("MongoDB client closed")

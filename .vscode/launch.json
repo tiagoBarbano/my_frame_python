@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "DemovtApplication",
+            "request": "launch",
+            "mainClass": "com.example.demovt.DemovtApplication",
+            "projectName": "demovt"
+        },
+        {
+            "type": "java",
             "name": "PrimeTest",
             "request": "launch",
             "mainClass": "PrimeTest"

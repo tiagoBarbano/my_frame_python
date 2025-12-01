@@ -24,7 +24,7 @@ public class UsuarioService {
         this.repository = repository;
     }
 
-    @Cacheable(value = "usuarios", key = "#id", unless = "#result == null")
+    // @Cacheable(value = "usuarios", key = "#id", unless = "#result == null")
     public Optional<User> buscarPorId(String id) {
         // System.out.println("Buscando no MongoDB...");
         return repository.findById(id);
@@ -32,8 +32,7 @@ public class UsuarioService {
 
     public CompletableFuture<User> buscarUsuario(String id) {
         return CompletableFuture.supplyAsync(() -> {
-            Optional<User> usuario = repository.findById(id); // MongoDB bloqueante
-            return usuario.orElse(null);
+            return repository.findById(id).orElse(null); // MongoDB bloqueante
         }, executor);
     }
 

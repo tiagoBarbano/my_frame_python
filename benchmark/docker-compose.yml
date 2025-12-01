@@ -1,3 +1,11 @@
+volumes:
+  dbdata6:
+  redis-insight:
+  mongo-data:
+  tempo-data:
+  grafana-data:
+  redis-data: 
+
 services:
   my-app-undertow:
     build: demovt/.
@@ -8,7 +16,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1"      # máximo 1.0 CPUs
+          cpus: "1.15"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
   my-app-webflux:
     build: demo/.
@@ -19,7 +27,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1"      # máximo 1.0 CPUs
+          cpus: "1.15"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
   my-app-fastapi:
     build: fastapi_benck/.
@@ -30,7 +38,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1"      # máximo 1.0 CPUs
+          cpus: "1.15"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
   my-app-python-puro:
     build:
@@ -43,7 +51,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1"      # máximo 1.0 CPUs
+          cpus: "2"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
   node-fastify:
     build: fastify/.
@@ -60,5 +68,85 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1"      # máximo 1.0 CPUs
+          cpus: "2"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM          
+
+  mongo:
+    image: mongo:latest
+    environment:
+      - MONGO_OPTIONS=--wiredTigerCacheSizeGB 2
+      - MONGO_OPTIONS=--enableCompression
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - dbdata6:/data/db
+    ports:
+      - "27017:27017"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 3g
+          cpus: "2.0"
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "/etc/redis/redis.conf", "--requirepass", "redis1234"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf
+      - redis-data:/data
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1024M
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    sysctls:
+      net.core.somaxconn: 1024
+    ulimits:
+      nofile:
+        soft: 100000
+        hard: 100000
+
+  app-granian:
+    image: tiagobarbano/myframegranian:0.2.1
+    ports:
+      - target: 8000
+        published: 8000
+        protocol: tcp
+        mode: ingress
+    # depends_on:
+      # - grafana
+      # - prometheus
+      # - tempo
+    environment:
+      - PROMETHEUS_MULTIPROC_DIR=metrics
+      - APP_NAME=MY_FRAME_GRANIAN
+      - LOGGER_LEVEL=info
+      - ENDPOINT_OTEL=http://tempo:4317
+      - FLAG_LOCAL=false
+      - ENABLE_TRACING=false
+      - ENABLE_METRICS=false
+      - ENABLE_LOGGER=false
+      - ENABLE_SWAGGER=false
+      - WORKER=1
+      - redis_url=redis://:redis1234@redis:6379/1
+      - mongo_url=mongodb://mongo:27017
+      - granian_runtime_mode=st
+      - enable_trace_ratio_based=false
+      - port_app=8000
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: "1g"
+          cpus: "1.15"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535

@@ -50,17 +50,21 @@ class UserService:
     # )
     async def get_user_by_id(self, user_id: str) -> dict:
         redis_key = f"user:id:{user_id}"
-        async with RedisClient.connection() as redis:        
-            cached = await redis.get(redis_key)
-            if cached:
-                return msgspec.json.decode(cached)
-            
-            result = await self.repository.find_by_id(id=user_id)
-            
-            if result is not None:
-                await redis.set(redis_key, msgspec.json.encode(result), ex=60)
+        redis = await RedisClient.connection()
+        cached = await redis.get(redis_key)
+        if cached:
+            return msgspec.json.decode(cached)
+        
+        result = await self.repository.find_by_id(id=user_id)
+        
+        if result is not None:
+            await redis.set(redis_key, msgspec.json.encode(result), ex=60)
 
-            return result
+        return result
+        
+    async def get_user_by_id_mongo(self, user_id: str) -> dict:        
+        result = await self.repository.find_by_id(id=user_id)
+        return result        
 
     async def soft_delete_user(self, user_id: str):
         await self.repository.soft_delete(id=user_id)

@@ -24,4 +24,4 @@ ENTRYPOINT ["dumb-init", "--"]
 # Substitua o CMD por:
 # CMD ["node", "index.js"]
 # CMD ["pm2-runtime", "index.js"]
-CMD ["pm2-runtime", "--no-daemon", "--instances", "1", "index.js"]
+CMD ["pm2-runtime", "--no-daemon", "--instances", "2", "index.js"]
