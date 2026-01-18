@@ -10,65 +10,60 @@ services:
   my-app-undertow:
     build: demovt/.
     container_name: spring-undertow
-    ports:
-      - "8090:8080"
+    network_mode: host
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          cpus: "1.15"      # máximo 1.0 CPUs
+          cpus: "0.750"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
   my-app-webflux:
     build: demo/.
     container_name: spring-webflux
-    ports:
-      - "8091:8080"
+    network_mode: host
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          cpus: "1.15"      # máximo 1.0 CPUs
+          cpus: "0.750"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
   my-app-fastapi:
     build: fastapi_benck/.
     container_name: fastapi
-    ports:
-      - "8002:8000"
+    network_mode: host
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          cpus: "1.15"      # máximo 1.0 CPUs
+          cpus: "0.750"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM
-  my-app-python-puro:
-    build:
-      context: fastapi_benck
-      dockerfile: Dockerfile_puro
-    container_name: python-puro
-    ports:
-      - "8001:8000"
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "2"      # máximo 1.0 CPUs
-          memory: 1g       # máximo 1GB RAM
+  # my-app-python-puro:
+  #   build:
+  #     context: fastapi_benck
+  #     dockerfile: Dockerfile_puro
+  #   container_name: python-puro
+  #   network_mode: host
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "2"      # máximo 1.0 CPUs
+  #         memory: 1g       # máximo 1GB RAM
   node-fastify:
     build: fastify/.
     container_name: node-fastify
     environment:
       PORT: 3000
-      REDIS_HOST: redis
+      REDIS_HOST: localhost
       REDIS_PORT: 6379
       REDIS_PASSWORD: redis1234
-      MONGO_URL: mongodb://mongodb:27017/cotador
-    ports:
-      - "3000:3000"
+      MONGO_URL: mongodb://localhost:27017/cotador
+    network_mode: host
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          cpus: "2"      # máximo 1.0 CPUs
+          cpus: "0.750"      # máximo 1.0 CPUs
           memory: 1g       # máximo 1GB RAM          
 
   mongo:
@@ -80,20 +75,18 @@ services:
       - PGID=1000
     volumes:
       - dbdata6:/data/db
-    ports:
-      - "27017:27017"
+    network_mode: host
     deploy:
       replicas: 1
       resources:
         limits:
           memory: 3g
-          cpus: "2.0"
+          cpus: "4.0"
 
   redis:
     image: redis:7
     command: ["redis-server", "/etc/redis/redis.conf", "--requirepass", "redis1234"]
-    ports:
-      - "6379:6379"
+    network_mode: host
     volumes:
       - ./redis.conf:/etc/redis/redis.conf
       - redis-data:/data
@@ -106,47 +99,3 @@ services:
         reservations:
           cpus: "0.5"
           memory: 512M
-    sysctls:
-      net.core.somaxconn: 1024
-    ulimits:
-      nofile:
-        soft: 100000
-        hard: 100000
-
-  app-granian:
-    image: tiagobarbano/myframegranian:0.2.1
-    ports:
-      - target: 8000
-        published: 8000
-        protocol: tcp
-        mode: ingress
-    # depends_on:
-      # - grafana
-      # - prometheus
-      # - tempo
-    environment:
-      - PROMETHEUS_MULTIPROC_DIR=metrics
-      - APP_NAME=MY_FRAME_GRANIAN
-      - LOGGER_LEVEL=info
-      - ENDPOINT_OTEL=http://tempo:4317
-      - FLAG_LOCAL=false
-      - ENABLE_TRACING=false
-      - ENABLE_METRICS=false
-      - ENABLE_LOGGER=false
-      - ENABLE_SWAGGER=false
-      - WORKER=1
-      - redis_url=redis://:redis1234@redis:6379/1
-      - mongo_url=mongodb://mongo:27017
-      - granian_runtime_mode=st
-      - enable_trace_ratio_based=false
-      - port_app=8000
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          memory: "1g"
-          cpus: "1.15"
-    ulimits:
-      nofile:
-        soft: 65535
-        hard: 65535

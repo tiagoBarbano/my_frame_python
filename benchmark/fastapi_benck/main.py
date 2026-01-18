@@ -1,11 +1,17 @@
 import os
-from pydantic import BaseModel
 import logging
-from fastapi import Body, FastAPI, Request, HTTPException
+import re
+from fastapi import Body, FastAPI, Request
 from fastapi.responses import JSONResponse, ORJSONResponse, Response
 import msgspec
 import orjson
-from fastapi.middleware.gzip import GZipMiddleware
+from light_health.asgi.management import ManagementASGIApp
+from light_health.asgi.health import HealthASGIApp
+
+from light_health.registry import AsyncHealthRegistry, HealthCheckResult, HealthState
+
+from light_health.checks.mongo import mongo_health_check
+from light_health.checks.redis import redis_health_check
 
 from redis.asyncio import Redis
 from pymongo import AsyncMongoClient
@@ -22,13 +28,8 @@ app = FastAPI(
     openapi_url=None,  # desativa geração automática de OpenAPI
 )
 
-app.add_middleware(GZipMiddleware, minimum_size=1000)
-
 # --- Redis (async) ---
-redis = Redis(
-    host="localhost", port=6379, password="redis1234", db=0, decode_responses=True
-)
-# redis = Redis(host="localhost", port=6379, password="redis1234", db=0, decode_responses=True)
+redis = Redis(host="localhost", port=6379, password="redis1234", db=0, decode_responses=True)
 
 # --- MongoDB (async) ---
 mongo_client = AsyncMongoClient(
@@ -37,13 +38,23 @@ mongo_client = AsyncMongoClient(
     minPoolSize=5,       # mantém conexões prontas
     connectTimeoutMS=500,
     serverSelectionTimeoutMS=500,
-    maxConnecting=50,
+    maxConnecting=75,
 )
-# mongo_client = AsyncMongoClient("mongodb://localhost:27017")
 
 db = mongo_client["cotador"]
 collection = db["users"]
 
+mongo_check = mongo_health_check(mongo_client)
+redis_check = redis_health_check(redis)
+
+async def process_alive():
+    return HealthCheckResult(status=HealthState.UP)
+
+registry = AsyncHealthRegistry()
+
+registry.register_liveness("process", process_alive)
+registry.register_readiness("mongo", mongo_health_check(mongo_client))
+registry.register_readiness("redis", redis_health_check(redis))
 
 @app.on_event("startup")
 async def startup_event():
@@ -65,6 +76,9 @@ async def shutdown_event():
     await mongo_client.close()
 
 
+app.mount("/actuator", HealthASGIApp(registry)) 
+app.mount("/management", ManagementASGIApp())
+
 @app.get("/users/{user_id}")
 async def mongo_get_id(user_id: str):
     # redis_key = f"user:id:{user_id}"
@@ -72,12 +86,12 @@ async def mongo_get_id(user_id: str):
     # if cached:
     #     return msgspec.json.decode(cached)
 
-    logging.info(f"User fetched from MongoDB: {user_id}")
+    # logging.info(f"User fetched from MongoDB: {user_id}")
     
     result = await collection.find_one({"_id": user_id})
 
-    if os.environ["flag_pass"] == "sim":
-        logging.info(result)
+    # if os.environ["flag_pass"] == "sim":
+    #     logging.info(result)
         
     # if not result:
     #     return ORJSONResponse(status_code=404, content={"error": "User not found"})
@@ -136,53 +150,103 @@ async def root_msgspec():
     )
 
 
-# Modelo para request
-class LogConfig(BaseModel):
-    logger_name: str = "root"
-    level: str
+class ASGIApp:
+    def __init__(self):
+        self.route_root = re.compile(r"^/users-asgi$")
+        self.route_with_id = re.compile(r"^/users-asgi/(?P<id>[^/]+)$")
+        self.json_encoder = msgspec.json.Encoder()
+        self.json_decoder = msgspec.json.Decoder()
 
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return
 
-@app.get("/loggers")
-def list_loggers():
-    """Retorna todos os loggers e seus níveis atuais."""
-    loggers = {}
-    for name, logger in logging.Logger.manager.loggerDict.items():
-        if isinstance(logger, logging.Logger):
-            loggers[name] = logging.getLevelName(logger.level)
-    root_level = logging.getLevelName(logging.getLogger().level)
-    return {"root": root_level, **loggers}
+        method = scope["method"]
+        path = self._internal_path(scope)
 
+        if method == "GET" and self.route_root.match(path):
+            await self.transformar_asgi(scope, receive, send)
+            return
 
-@app.post("/loggers/update")
-def update_logger(config: LogConfig):
-    logger_name = config.logger_name
+        if method == "GET":
+            if match := self.route_with_id.match(path):
+                # path params
+                scope["path_params"] = match.groupdict()
+                await self.transformar_asgi_path(scope, receive, send)
+                return
 
-    if logger_name == "root":
-        logger = logging.getLogger()
-    else:
-        logger = logging.getLogger(logger_name)
+        await self._send(send, 404, {"error": "Not Found"})
 
-    level = config.level.upper()
+    # ---------- handlers ----------
 
-    if level not in logging._nameToLevel:
-        raise HTTPException(400, f"Invalid level: {level}")
+    async def transformar_asgi(self, scope, receive, send):
+        value = self.get_query_param(scope, b"id")  
 
-    # Define o nível do logger
-    logger.setLevel(level)
+        result = await collection.find_one({"_id": value})
 
-    # MUITO IMPORTANTE: ajusta os handlers também
-    for handler in logger.handlers:
-        handler.setLevel(level)
+        await self._send(send, 200, result) 
         
-@app.get("/env")
-def list_env():
-    return dict(os.environ)
+    async def transformar_asgi_path(self, scope, receive, send):
+        value = self.get_path_param(scope, 3)  
 
-class EnvUpdate(BaseModel):
-    key: str
-    value: str
+        result = await collection.find_one({"_id": value})
+
+        await self._send(send, 200, result) 
+    # ---------- infra ----------
+
+    def get_path_param(self, scope, index: int):
+        # scope["path"] é string pronta
+        parts = scope["path"].split("/")
+        try:
+            return parts[index]
+        except IndexError:
+            return None
+
+    def get_query_param(self, scope, key: bytes):
+        qs = scope.get("query_string", b"")
+        return next(
+            (
+                part[len(key) + 1 :].decode()
+                for part in qs.split(b"&")
+                if part.startswith(key + b"=")
+            ),
+            None,
+        )
     
-@app.post("/env/update")
-def update_env(data: EnvUpdate):
-    os.environ[data.key] = data.value
-    return {"message": f"Environment variable '{data.key}' updated", "value": data.value}
+    async def _read_body(self, receive) -> bytes:
+        chunks = []
+        while True:
+            msg = await receive()
+            chunks.append(msg["body"])
+            if not msg["more_body"]:
+                break
+
+        return msgspec.json.decode(b"".join(chunks))
+
+    def _internal_path(self, scope) -> str:
+        path = scope["path"]
+        root = scope.get("root_path", "")
+        return path[len(root) :] if path.startswith(root) else path
+
+    async def _send(self, send, status: int, body):
+        raw = msgspec.json.encode(body)
+
+        await send(
+            {
+                "type": "http.response.start",
+                "status": status,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"cache-control", b"no-store"),
+                ],
+            }
+        )
+        await send(
+            {
+                "type": "http.response.body",
+                "body": raw,
+            }
+        )
+
+
+app.mount("/users-asgi", ASGIApp())

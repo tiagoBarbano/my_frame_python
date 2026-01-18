@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demovt.controllers.Controller.ResponseRules;
 import com.example.demovt.helpers.AdvancedRuleEvaluator;
 import com.example.demovt.helpers.RegraConfig;
 import com.example.demovt.helpers.RegraConfig.PayloadRetorno;
@@ -34,8 +30,6 @@ public class Controller {
     private final UsuarioService service;
     private final AdvancedRuleEvaluator advanceRuleEvaluator;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private Executor cpuExecutor;
-    private Executor vtExecutor;
 
     private final RegraConfig REGRA_FIDELIDADE = new RegraConfig(
             "json",
@@ -53,13 +47,9 @@ public class Controller {
                     "Cliente VIP comprou ALIMENTO. Requer aprovação manual.",
                     "MANUAL_REVIEW"));
 
-    public Controller(UsuarioService service, AdvancedRuleEvaluator advanceRuleEvaluator,
-            @Qualifier("cpuBoundExecutor") Executor cpuExecutor,
-            @Qualifier("vtExecutor") Executor vtExecutor) {
+    public Controller(UsuarioService service, AdvancedRuleEvaluator advanceRuleEvaluator){
         this.service = service;
         this.advanceRuleEvaluator = advanceRuleEvaluator;
-        this.cpuExecutor = cpuExecutor;
-        this.vtExecutor = vtExecutor;
     }
 
     @GetMapping

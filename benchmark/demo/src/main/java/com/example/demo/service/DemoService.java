@@ -33,7 +33,7 @@ public class DemoService {
         return ServerResponse.ok().bodyValue("Hello, WebFlux!");
     }
 
-    @Cacheavel(chave = "user:id:{id}", ttl = 300, type = User.class)
+    // @Cacheavel(chave = "user:id:{id}", ttl = 300, type = User.class)
     public Mono<User> findUserByIdTest(String id) {
         return userRepository.findById(id);
     }

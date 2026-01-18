@@ -1,16 +1,16 @@
-POST http://localhost:8080/actuator/loggers/ROOT
+POST http://localhost:8000/management/loggers/update
 Content-Type: application/json
 
 {
-  "configuredLevel": "WARN"
+  "level": "INFO",
+  "logger_name": "root"
 }
 
 ### 
 
 
-curl -X POST http://localhost:8000/loggers/update \
-    -H "Content-Type: application/json" \
-    -d '{"logger_name":"root","level":"DEBUG"}'
+curl -X GET http://localhost:8000/users-asgi/users-asgi/692268efdda24659adc0b8b6 \
+    -H "Content-Type: application/json" 
 
 ###
 

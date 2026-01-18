@@ -22,6 +22,6 @@ EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
 # Substitua o CMD por:
-# CMD ["node", "index.js"]
+# CMD ["npm", "run", "start"]
 # CMD ["pm2-runtime", "index.js"]
-CMD ["pm2-runtime", "--no-daemon", "--instances", "2", "index.js"]
+CMD ["pm2-runtime", "--no-daemon", "--instances", "1", "index.js"]

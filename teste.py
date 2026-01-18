@@ -1,13 +1,10 @@
+import inspect
 import time
 import asyncio
-import anyio
 import sys
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
-try:
-    import uvloop
-except ImportError:
-    uvloop = None
+import anyio
 
 
 # 🔹 Exemplo de regra já compilada
@@ -41,29 +38,41 @@ context = {
 # 🔹 Estratégias de avaliação
 # ============================================================
 
+
 def eval_direct():
     return eval(compiled_rule, {}, context)
+
 
 async def eval_direct_async():
     return eval(compiled_rule, {}, context)
 
+limiter = anyio.CapacityLimiter(8) 
+
 async def eval_threadpool():
-    return await anyio.to_thread.run_sync(eval, compiled_rule, {}, context)
+    return await anyio.to_thread.run_sync(eval, compiled_rule, {}, context, limiter=limiter)
+
 
 # precisa mandar string, não code object
 def eval_in_process(rule_str, context):
     code = compile(rule_str, "<string>", "eval")
     return eval(code, {}, context)
 
-process_executor = ProcessPoolExecutor()
+
+thread_executor = ThreadPoolExecutor(max_workers=22)
+process_executor = ProcessPoolExecutor(max_workers=4)
+
 
 async def eval_processpool():
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(process_executor, eval_in_process, rule_str, context)
+    return await loop.run_in_executor(
+        thread_executor, eval, rule_str, context
+    )
+
 
 # ============================================================
 # 🔹 Benchmarks
 # ============================================================
+
 
 async def benchmark(func, n=10_000, is_async=False):
     start = time.perf_counter()
@@ -74,56 +83,44 @@ async def benchmark(func, n=10_000, is_async=False):
         for _ in range(n):
             func()
     elapsed = time.perf_counter() - start
-    print(f"{func.__name__:<20} -> {n} exec em {elapsed:.4f}s "
-          f"({(n/elapsed):,.0f} ops/s)")
-
-
-async def bench_event_loop(name, n=100_000):
-    async def dummy_io():
-        await asyncio.sleep(0)
-
+    print(
+        f"{func.__name__:<20} -> {n} exec em {elapsed:.4f}s "
+        f"({(n / elapsed):,.0f} ops/s)"
+    )
+    
+async def benchmark_parallel(func, n=50_000):
     start = time.perf_counter()
-    for _ in range(n):
-        await dummy_io()
+
+    async def runner():
+        result = func()
+        if inspect.isawaitable(result):
+            await result
+
+    async with anyio.create_task_group() as tg:
+        for _ in range(n):
+            tg.start_soon(runner)
+
     elapsed = time.perf_counter() - start
-    print(f"{name:<20} -> {n} ops em {elapsed:.4f}s "
-          f"({(n/elapsed):,.0f} ops/s)")
-
-
+    print(
+        f"{func.__name__:<25} -> {n} exec em {elapsed:.4f}s "
+        f"({(n / elapsed):,.0f} ops/s)"
+    )
+    
 # ============================================================
 # 🔹 Execução
 # ============================================================
 
+
 async def main_eval():
     print(f"Python: {sys.version}")
     print("\n--- Bench Eval ---")
-    await benchmark(eval_direct, n=100_000, is_async=False)
-    await benchmark(eval_direct_async, n=100_000, is_async=True)    
-    await benchmark(eval_threadpool, n=10_000, is_async=True)
-    # await benchmark(eval_processpool, n=1_000, is_async=True)
+    await benchmark(eval_direct, n=10_000_000)
+    await benchmark(eval_direct_async, n=10_000_000, is_async=True)
+    await benchmark_parallel(eval_threadpool, n=10_000)
+    await benchmark_parallel(eval_processpool, n=10_000)
 
     process_executor.shutdown()
 
 
-def main_event_loops():
-    print("\n--- Bench Event Loops ---")
-
-    # asyncio padrão
-    asyncio.run(bench_event_loop("asyncio stdlib"))
-
-    # anyio rodando sobre asyncio
-    async def anyio_runner():
-        await bench_event_loop("anyio+asyncio")
-    anyio.run(anyio_runner, backend="asyncio")
-
-    # uvloop
-    if uvloop:
-        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-        asyncio.run(bench_event_loop("uvloop"))
-    else:
-        print("uvloop não instalado")
-
-
 if __name__ == "__main__":
     asyncio.run(main_eval())
-    main_event_loops()

@@ -19,7 +19,7 @@ public class AdvancedRuleEvaluator {
 
     private final JexlEngine jexl = new JexlBuilder()
         .silent(false)
-        .cache(256)                 // CACHE INTERNO DO JEXL!
+        .cache(0)
         .strict(true)
         .create();
     private final Map<String, BiFunction<Map<String, Object>, Object, Object>> evaluators = new HashMap<>();
